@@ -1,0 +1,24 @@
+Package: rage
+Type: Package
+Title: Age Calculation and Grouping 
+Version: 0.1.0.9007
+Authors@R: person(
+    "Russ", "Jones",
+    role = c("aut", "cre"),
+    email = "RussJones007@gmail.com",
+    comment = NULL
+  )
+Description: R age manipulation. Provides functions to calculate ages in different  time units 
+   hours, days, years, etc. Also provides a function to to group ages using an age_group class and a list of commonly 
+   used age groups for public health.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Language: en
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 3.5)
+Roxygen: list(markdown = TRUE)
