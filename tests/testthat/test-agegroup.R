@@ -56,7 +56,7 @@ test_that(
     ageGrp <-as.age_group(base_grp)
     expect_s3_class(ageGrp, "age_group")
     expect_length(ageGrp, 11)
-    expect_identical(attr(ageGrp, which = "symbols")$separator, "-")
+    expect_identical(attr(ageGrp, which = "symbols")$sep, "-")
     expect_identical(attr(ageGrp, which = "symbols")$below, "0-")
 
   }
@@ -162,5 +162,4 @@ test_that(
 
   }
 )
-
 
