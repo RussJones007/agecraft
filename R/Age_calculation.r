@@ -91,11 +91,12 @@ calculate_age <- function(start,
 calc_age <- function(start,
                      end = lubridate::now(),
                      unit = c("year", "day", "hour", "minute", "month", "second", "week")){
-  calculate_age(start = start, end = end,unit = unit)
+  ret <- calculate_age(start = start, end = end,unit = unit)
   show_message_once("calc_age_deprecated",
                     paste("The calc_age() function is deprecated and will eventually be removed. \n",
                           "Use the updated function calculate_age().  This message is shown once during the session.")
   )
+  ret
 }
 
 
@@ -136,10 +137,20 @@ calc_year <- function(start, end){
 #' @export
 age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
                     .sep = "-", .above.char = " +") {
+  show_message_once("age_dot_cat_deprecated",
+                    paste("The age.cat() function is deprecated and will eventually be removed. \n",
+                          "Use categorize_age() or age_cat() instead. This message is shown once during the session.")
+  )
+  categorize_age(ages = .ages, lower = .lower, upper = .upper, by = .by,
+                 sep = .sep, above.char = .above.char)
+}
+
+categorize_age_impl <- function(ages, lower = 0, upper=70, by = 10,
+                                sep = "-", above.char = " +") {
 
   # check argument types
-  num_args_err <- list(.ages, .lower, .upper, .by) %>%
-    rlang::set_names(names(as.list(args(age.cat))[1:4])) %>%
+  num_args_err <- list(ages, lower, upper, by) |>
+    rlang::set_names(names(as.list(args(categorize_age_impl))[1:4])) |>
     purrr::map_lgl(is.numeric)
 
   if(!all(num_args_err)){
@@ -148,23 +159,16 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
   }
   rm(num_args_err)
 
-  if(length(.by) ==1){  # uniform span in age groups
-    labs <- c(paste(seq(.lower, .upper - .by, by = .by),
-                    seq(.lower + .by - 1, .upper - 1, by = .by),
-                    sep = .sep),
-              paste0(.upper, .above.char))
-    brks <- c(seq(.lower, .upper, by = .by), Inf)
-    labs <- brks |> as.age_group(sep = .sep, below = .lower, above = .above.char) |> as.character()
-    ret  <-  cut(.ages, breaks = brks,
+  if(length(by) ==1){  # uniform span in age groups
+    brks <- c(seq(lower, upper, by = by), Inf)
+    labs <- brks |> as.age_group(sep = sep, below = lower, above = above.char) |> as.character()
+    ret  <-  cut(ages, breaks = brks,
               right = FALSE, labels = labs, ordered_result = T)
       } else {  # custom age cuts being used
-    # consruct label limits
-    lowers <- .by[1:(length(.by) - 1)]
-    uppers <- .by[2:length(.by)] - 1
-    labs   <- .by |>  as.age_group(sep = .sep, below = .lower, above = .above.char) |> as.character()
-    ret    <- cut(.ages, breaks = .by, right = FALSE,labels = labs, ordered_result = T)
+    labs   <- by |>  as.age_group(sep = sep, below = lower, above = above.char) |> as.character()
+    ret    <- cut(ages, breaks = by, right = FALSE,labels = labs, ordered_result = T)
       }
-  if(has_attr(.ages, "units")) attr(ret, "units") <- units(.ages)[["numerator"]]
+  if(!is.null(attr(ages, "units"))) attr(ret, "units") <- attr(ages, "units")[["numerator"]]
   return(ret)
 }
 
@@ -197,8 +201,8 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' @export
 categorize_age <- function(ages, lower = 0, upper=70, by = 10,
                     sep = "-", above.char = " +") {
- age.cat(.ages = ages, .lower = lower, .upper = upper, .by = by,
-          .sep = sep, .above.char = above.char)
+  categorize_age_impl(ages = ages, lower = lower, upper = upper, by = by,
+                      sep = sep, above.char = above.char)
   }
 
 
@@ -243,8 +247,9 @@ age_auto_unit <- function(birth, event){
 
   ages <- numeric(length(birth))   # the vector to return, set to 0
   nms  <- character(length(birth)) # character vector to use for naming ages
-  ages[is.na(spans$y)] <- NA_real_
-  nms[is.na(spans$y)]  <- ""       # set the name to blank for those entries that are NA
+  na_lgl <- is.na(days)
+  ages[na_lgl] <- NA_real_
+  nms[na_lgl]  <- ""       # set the name to blank for those entries that are NA
 
   # now change all NAs in the logical span vectors to FALSE
   spans <- purrr::map(spans, function(x) replace(x, is.na(x), FALSE))
@@ -263,4 +268,12 @@ age_auto_unit <- function(birth, event){
 
 #' @inherit categorize_age
 #' @export
-age_cat <- categorize_age
+age_cat <- function(ages, lower = 0, upper=70, by = 10,
+                    sep = "-", above.char = " +") {
+  show_message_once("age_cat_deprecated",
+                    paste("The age_cat() function is deprecated and will eventually be removed. \n",
+                          "Use categorize_age() instead. This message is shown once during the session.")
+  )
+  categorize_age(ages = ages, lower = lower, upper = upper, by = by,
+                 sep = sep, above.char = above.char)
+}

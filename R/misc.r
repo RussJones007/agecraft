@@ -43,7 +43,9 @@
 # Add to .msg_once_list a flag for each message that could be used using an empty NULL environment
 # Then call show_message_once with the list item name and msg inside the function that needs the message
 .msg_once_list <- list(
-  calc_age_deprecated = new.env(parent = emptyenv())
+  calc_age_deprecated = new.env(parent = emptyenv()),
+  age_dot_cat_deprecated = new.env(parent = emptyenv()),
+  age_cat_deprecated = new.env(parent = emptyenv())
 )
 
 

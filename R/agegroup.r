@@ -17,7 +17,7 @@ get_below <- compose(
 )
 
 get_separator <- compose(
-  ~pluck(., "separator"),
+  ~pluck(., "sep"),
   get_symbols_attr
 )
 
@@ -137,15 +137,14 @@ vec_cast.age_group.ivs_iv <- function(x, to, ...){
 #' @param all_ages defaults to "all", but may be set to "total"
 #' @keywords internal
 #' @export
-age_group_to_char <- function(groups, sep = get_symbols(groups)[["separator"]] %||% "-",
+age_group_to_char <- function(groups, sep = get_symbols(groups)[["sep"]] %||% "-",
                             above = get_symbols(groups)[["above"]] %||% " +",
                             below  = get_symbols(groups)[["below"]] %||% "0",
                             all_ages = "All") {
-
-  sep = get_symbols(groups)[["separator"]] %||% "-"
-  above = get_symbols(groups)[["above"]] %||% " +"
-  below  = get_symbols(groups)[["below"]] %||% "0"
-  all_ages = "All"
+  sep = sep %||% get_symbols(groups)[["sep"]] %||% "-"
+  above = above %||% get_symbols(groups)[["above"]] %||% " +"
+  below  = below %||% get_symbols(groups)[["below"]] %||% "0"
+  all_ages = all_ages %||% "All"
 
   starts <- ivs::iv_start(groups)
   ends <- ivs::iv_end(groups)
@@ -171,8 +170,9 @@ age_group_to_char <- function(groups, sep = get_symbols(groups)[["separator"]] %
   inf_present <- (iv_end(groups) == Inf)
   if(any(inf_present)) ret[inf_present] <- paste0(iv_start(groups[inf_present]), above)
 
-  # finally, change any '0 +' to 'All'
-  ret <- str_replace(ret, "^0 ?\\+", "All")
+  # represent all ages as a single label
+  all_present <- iv_start(groups) <= 0 & iv_end(groups) == Inf
+  if(any(all_present)) ret[all_present] <- all_ages
   ret
 }
 
@@ -342,7 +342,7 @@ as.age_group <- function(x, below = "0-", sep = "-", above = "+") {
 #' @exportS3Method as.age_group factor
 as.age_group.factor <- function(x, below = "0-", sep = "-", above = "+") {
   as.character(x) |>
-    as.age_group.character()
+    as.age_group.character(below = below, sep = sep, above = above)
 }
 
 #' @rdname as.age_group
@@ -353,7 +353,7 @@ as.age_group.character <- function(x, below = "0-", sep = "-", above = "+") {
   #   stop("groups is not a factor or character vector")
   # }
 
-  x <- str_trim(x, side = "both") %>% str_to_lower()
+  x <- str_trim(x, side = "both") |> str_to_lower()
 
   # check that the correct symbols are present
   valid_syms <- valid_age_group_symbol(x)
@@ -364,7 +364,7 @@ as.age_group.character <- function(x, below = "0-", sep = "-", above = "+") {
   rm(valid_syms)
 
   symbols <- list(below     = character(),
-                  separator = character(),
+                  sep = character(),
                   above     = character())
 
   # get the symbols or character strings used in formatting the age group, always chooe the first symbol encountered
@@ -378,7 +378,7 @@ as.age_group.character <- function(x, below = "0-", sep = "-", above = "+") {
   symbols$below     <- get_symbol(pattern = below_str) %||% below
 
   separator_str <- " ?(-|to|thru|through) ?"
-  symbols$separator     <- get_symbol(separator_str) %||% sep
+  symbols$sep     <- get_symbol(separator_str) %||% sep
 
   above_str      <-  " ?(plus|\\+|>|above)"
   symbols$above     <- get_symbol(above_str) %||% above
@@ -487,11 +487,11 @@ as.age_group.ivs_iv <- function(x, below = "0-", sep = "-", above = "+") {#, inc
 #'
 age_cat_iv <- function(age, age_group){
   if(is.numeric(age_group)) age_group <- as.age_group(age_group) |> sort()
-  if(is.numeric(age)) age <- as.age_goup(age)
+  if(is.numeric(age)) age <- as.age_group(age)
 
   # using interval logic find the location for each age in the age group.  The "haystack" vector is the integer of the
   # factor, then assigning the lables from the age group as a factor.
-  locations <- iv_locate_overlaps(needles = age, haystack = age_group, type = "within") |>
+  locations <- ivs::iv_locate_overlaps(needles = age, haystack = age_group, type = "within") |>
     na.omit()
   res <- factor(x = locations$haystack,
                 levels = unique(locations$haystack),
@@ -513,5 +513,3 @@ age_cat_iv <- function(age, age_group){
 #'
 #' @export
 is.age_group <- function(x){ inherits(x, "age_group")}
-
-

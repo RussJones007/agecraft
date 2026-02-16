@@ -37,5 +37,5 @@ summary.ivs_iv <- function(object, ...) {
 #' @noRd
 #' @export
 as.character.ivs_iv <- function(x, ...){
-  str_glue('[{iv_start(x)}, {iv_end(x)})')
+  paste0("[", iv_start(x), ", ", iv_end(x), ")")
 }
