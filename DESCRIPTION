@@ -31,3 +31,5 @@ Imports:
     units,
     vctrs
 Roxygen: list(markdown = TRUE)
+URL: https://github.com/RussJones007/rage
+BugReports: https://github.com/RussJones007/rage/issues
