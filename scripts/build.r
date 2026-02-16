@@ -11,8 +11,7 @@
 
 # increment the development version
 usethis::use_version("dev")
-roxygen2::roxygenise()
-#document()
+
 pkg <- devtools::build(binary = TRUE)
 
 bspm::disable()

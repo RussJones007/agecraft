@@ -21,4 +21,13 @@ Config/testthat/edition: 3
 RoxygenNote: 7.3.3
 Depends: 
     R (>= 3.5)
+Imports:
+    assertthat,
+    ivs,
+    lubridate,
+    purrr,
+    rlang,
+    stringr,
+    units,
+    vctrs
 Roxygen: list(markdown = TRUE)
