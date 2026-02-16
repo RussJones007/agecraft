@@ -148,16 +148,29 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 categorize_age_impl <- function(ages, lower = 0, upper=70, by = 10,
                                 sep = "-", above.char = " +") {
 
-  # check argument types
-  num_args_err <- list(ages, lower, upper, by) |>
-    rlang::set_names(names(as.list(args(categorize_age_impl))[1:4])) |>
-    purrr::map_lgl(is.numeric)
+  if(!is.numeric(ages)) stop('Argument: "ages" must be numeric')
+  if(!is.numeric(lower)) stop('Argument: "lower" must be numeric')
+  if(!is.numeric(upper)) stop('Argument: "upper" must be numeric')
 
-  if(!all(num_args_err)){
-    arg_err <- names(num_args_err)[!num_args_err]
-    stop('Argument: "', arg_err, '" must be numeric')
+  by_is_numeric <- is.numeric(by)
+  by_is_age_group <- is.age_group(by)
+  if(!(by_is_numeric || by_is_age_group)) {
+    stop('Argument: "by" must be numeric cut points or an age_group vector')
   }
-  rm(num_args_err)
+
+  if(by_is_age_group) {
+    by <- sort(by)
+    starts <- ivs::iv_start(by)
+    ends <- ivs::iv_end(by)
+
+    # cut() requires adjacent breakpoints when labels are supplied.
+    if(length(by) > 1 && any(ends[-length(ends)] != starts[-1])) {
+      stop('Argument: "by" age_group must be contiguous with no gaps/overlaps')
+    }
+    brks <- c(starts, ends[length(ends)])
+    labs <- as.character(by)
+    ret <- cut(ages, breaks = brks, right = FALSE, labels = labs, ordered_result = T)
+  } else
 
   if(length(by) ==1){  # uniform span in age groups
     brks <- c(seq(lower, upper, by = by), Inf)
