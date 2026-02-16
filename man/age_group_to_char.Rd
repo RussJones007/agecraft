@@ -6,7 +6,7 @@
 \usage{
 age_group_to_char(
   groups,
-  sep = get_symbols(groups)[["separator"]] \%||\% "-",
+  sep = get_symbols(groups)[["sep"]] \%||\% "-",
   above = get_symbols(groups)[["above"]] \%||\% " +",
   below = get_symbols(groups)[["below"]] \%||\% "0",
   all_ages = "All"
