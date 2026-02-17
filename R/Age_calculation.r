@@ -163,13 +163,21 @@ categorize_age_impl <- function(ages, lower = 0, upper=70, by = 10,
     starts <- ivs::iv_start(by)
     ends <- ivs::iv_end(by)
 
-    # cut() requires adjacent breakpoints when labels are supplied.
-    if(length(by) > 1 && any(ends[-length(ends)] != starts[-1])) {
-      stop('Argument: "by" age_group must be contiguous with no gaps/overlaps')
+    # Allow gaps, but disallow overlap to avoid ambiguous category assignment.
+    if(length(by) > 1 && any(ends[-length(ends)] > starts[-1])) {
+      stop('Argument: "by" age_group must not contain overlapping intervals')
     }
-    brks <- c(starts, ends[length(ends)])
+
+    age_vals <- as.numeric(ages)
+    idx <- rep.int(NA_integer_, length(age_vals))
+
+    for(i in seq_along(starts)) {
+      in_grp <- age_vals >= starts[i] & age_vals < ends[i]
+      idx[is.na(idx) & in_grp] <- i
+    }
+
     labs <- as.character(by)
-    ret <- cut(ages, breaks = brks, right = FALSE, labels = labs, ordered_result = T)
+    ret <- factor(idx, levels = seq_along(labs), labels = labs, ordered = TRUE)
   } else
 
   if(length(by) ==1){  # uniform span in age groups
