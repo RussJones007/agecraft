@@ -8,6 +8,14 @@
 \description{
 R age manipulation. Provides functions to calculate ages in different time units hours, days, years, etc. Also provides a function to to group ages using an age_group class and a list of commonly used age groups for public health.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/RussJones007/rage}
+  \item Report bugs at \url{https://github.com/RussJones007/rage/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Russ Jones \email{RussJones007@gmail.com}
 
