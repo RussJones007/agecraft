@@ -1,0 +1,209 @@
+# agegroup-coerce.r
+#
+# Coercion infrastructure for age_group objects.
+# This file contains vctrs coercion methods plus as.age_group() constructors and related coercion helpers.
+
+# coercion methods --------------------------------------------------------------------------------------------
+#' @keywords internal
+#' @export
+vec_ptype2.age_group.age_group <- function(x, y, ...) new_age_group()
+
+#' @keywords internal
+#' @export
+vec_ptype2.age_group.double <- function(x, y, ...) iv(double(), double())
+
+#' @keywords internal
+#' @export
+vec_ptype2.double.age_group <- function(x, y, ...) iv(double(), double())
+
+#' @keywords internal
+#' @export
+vec_cast.ivs_iv.age_group <- function(x, to, ...){
+  iv(as.double(iv_start(x)), as.double(iv_end(x)))
+}
+
+#' @keywords internal
+#' @export
+vec_cast.age_group.ivs_iv <- function(x, to, ...){
+  new_age_group(iv_start(x), iv_end(x), symbols = list(below = "0-", sep = "-", above = "+"))
+}
+
+#' @exportS3Method base::as.integer age_group
+as.integer.age_group <- function(x, ...){
+  ret <- iv_start(x) |> trunc()
+  if(is.double(ret)) ret <- as.integer(ret)
+  ret
+}
+
+#' Age groups class
+#'
+#' Convert integer, double,  character or factor vectors to a "age_group" vector. The "age_group" class represents
+#' age ranges as an numeric interval. The is.age_group() function tests whether a variable is an "age_group" vector.
+#'
+#' @param x for as.age_group() a character, factor, numeric vector or interval vector [ivs::iv()]. Character based age
+#'   groups,  like " <5, 5-10, 11-15", must have two two numbers separated by: "-", "to", "thru", or, "through". If x is
+#'   numeric vector, each entry is treated as a cut point with each group abutting the previous group. See details
+#'   below. For the is.age_group() function, x is an object to test.
+#'
+#' @param below,sep,above  are scalar strings of valid symbols for age groups. Valid symbols are:
+#'  * below: '<'
+#'  * sep:   'through , 'thru', 'to', '-'
+#'  * above: '>', '+', 'plus'
+#'
+#' @details
+#' The age_group class is based on numeric intervals, specifically the ivs class. An [introduction to
+#' ivs](https://davisvaughan.github.io/ivs/articles/ivs.html) intervals explains what they are, notation, and the math
+#' that can be done with them. Regarding notation,age groups are presented as "5-10"  to represent all ages beginning
+#' with 5 and ending with 10. However, the underneath encoding is a right open interval in this case
+#' `[5, 11)` which means including five and all numbers through 10 but not including 11 which is the typical way ages are
+#' interpreted.
+#'
+#' To convert from a character or factor vector to age_group, the strings must be formatted using specific symbols to
+#' show the age ranges. Those symbols are '-', ':', to',  'through', or 'thru'. The exception are single ages that are
+#' made into an age group of one year.  The as.age_group() function also recognizes the prefix '<' to create a range of
+#' ages from 0 up to but not including the given age. For example '< 5' would be all numbers below 5 but not including
+#' 5. The Ages grouped above an age are recognized by the use of suffixes; '+', 'plus', 'above', and '>'.  These mean
+#' the age stated plus all ages greater are included in the group. So, '80+' would be 80 and all greater ages. Two
+#' special key words in the character vector can be used: 'all' and 'total', which are encoded as `[0, Inf)` and means all
+#' ages.
+#'
+#' A numeric vector will be converted to age groups by using each value as a cut point resulting in age groups with no
+#' gaps. For example, a c(0,10,20,60,Inf) vector results in age groups: "0-9" "10-19", "20-59" and "60+".
+#'
+#' All age groups are encoded as right-open intervals. Examples `"< 5"`, `"0-4"`, `"85+"`, and `"14"` are encoded as
+#' `[0, 5)`, `[0, 5)`, `[85, Inf)`, and `[14, 15)` respectively. Note that a single year of `"14"` is an age
+#' group of one year encoded as an interval `[14, 15)` and is interpreted as all values beginning with 14 and
+#' up to but not including 15.
+#'
+#' @return as.age_group() returns an "age_group" vector with attributes of symbols used for the below, sep, and above
+#'   characters.
+#'
+#' @examples
+#'
+#' # character vector of age groups
+#' char_age_groups <- c("0-5", "6-10", "11-20", "20+")
+#'
+#' ag <- as.age_group(char_age_groups)
+#' ag
+#' attributes(ag)
+#'
+#' # numeric vector of age cut points with 80 plus grouped together
+#' num_cuts <- c(0,10,20,40,50,60,70,80,Inf)
+#' ag_num <- as.age_group(num_cuts, sep = " to ", above = " plus")
+#' ag_num
+#'
+#' @export
+as.age_group <- function(x, below = "0-", sep = "-", above = "+") {
+  UseMethod("as.age_group")
+}
+
+#' @rdname as.age_group
+#' @exportS3Method as.age_group factor
+as.age_group.factor <- function(x, below = "0-", sep = "-", above = "+") {
+  as.character(x) |>
+    as.age_group.character(below = below, sep = sep, above = above)
+}
+
+#' @rdname as.age_group
+#' @exportS3Method as.age_group character
+as.age_group.character <- function(x, below = "0-", sep = "-", above = "+") {
+  x <- str_trim(x, side = "both") |> str_to_lower()
+
+  # check that the correct symbols are present
+  valid_syms <- valid_age_group_symbol(x)
+  if(isFALSE(valid_syms)){
+    msg <- paste0('These age groups in x are malformed: "', get_problems(valid_syms), '"')
+    stop(msg)
+  }
+  rm(valid_syms)
+
+  symbols <- list(below = character(),
+                  sep = character(),
+                  above = character())
+
+  # get the symbols or character strings used in formatting the age group, always choose the first symbol encountered
+  get_symbol <- compose(
+    ~ if(length(.)) .[1] else NULL,
+    na.omit,
+    ~ stringr::str_extract(string = x, pattern = .x)
+  )
+
+  below_str <- "^(< ?|0 ?-?)"
+  symbols$below <- get_symbol(pattern = below_str) %||% below
+
+  separator_str <- " ?(-|to|thru|through) ?"
+  symbols$sep <- get_symbol(separator_str) %||% sep
+
+  above_str <- " ?(plus|\\+|>|above)"
+  symbols$above <- get_symbol(above_str) %||% above
+
+  # get starts and ends. If special symbols/strings are present then replace them
+  starts <- str_extract(x, regex("^(<|\\d{1,7}|all|total)", ignore_case = TRUE)) |>
+    str_replace(pattern = regex("(all|total|<|-)", ignore_case = TRUE), replacement = "0") |>
+    as.double()
+  ends <- str_extract(x, regex("(>|\\d{1,7}|all( ages)?|total|\\+|above)$", ignore_case = TRUE)) |>
+    str_replace(pattern = regex("(all( ages)?|total|>|\\+|above)", ignore_case = TRUE), replacement = "Inf") |>
+    as.double()
+
+  # check if any NAs exists and throw error with message
+  st_ndx <- is.na(starts)
+  en_ndx <- is.na(ends)
+  if(any(st_ndx | en_ndx)) {
+    ndx <- c(which(st_ndx), which(en_ndx)) |> unique() |> sort()
+    err_age_groups <- x[ndx] |> paste(collapse = ", ") |> unique()
+    msg <- paste0("Unrecognized groups in x: ", err_age_groups)
+    stop(msg)
+  }
+
+  ends[!str_detect(x, "^<")] <- ends[!str_detect(x, "^<")] + 1
+  ret <- new_age_group(starts, ends, symbols)
+
+  return(ret)
+}
+
+# integer vectors cannot include the grouped upper age range as integer cannot include 'Inf'
+# this function passes the vector to the as.age_group.double() function.
+#' @rdname as.age_group
+#' @exportS3Method as.age_group integer
+as.age_group.integer <- function(x, below = "0-", sep = "-", above = "+") {
+  x <- as.double(x)
+  as.age_group.double(x, below, sep, above)
+}
+
+#' @rdname as.age_group
+#' @exportS3Method as.age_group double
+as.age_group.double <- function(x, below = "0-", sep = "-", above = "+") {
+  assert_that(is.double(x))
+  assert_that(min(x, na.rm = TRUE) >= 0)
+
+  start <- x[1:length(x)]
+  end <- c(x[2:length(x)], x[length(x)] + 1)
+
+  if(start[1] != 0) below = paste0(start[1], "-")   # age groups does not include 0
+
+  # if Inf is present at the end, then trim both start and end
+  if(end[length(end)] == Inf){
+    start <- start[seq_len(length(x)-1)]
+    end <- end[seq_len(length(x)-1)]
+  }
+
+  syms <- list("below" = below, "sep" = sep, "above" = above)
+
+  #check the symbols are valid
+  valid_syms <- valid_age_group_symbol(unlist(syms))
+  if(isFALSE(valid_syms)){
+    msg <- paste0('These age groups in x are malformed: "', get_problems(valid_syms), '"')
+    stop(msg)
+  }
+  rm(valid_syms)
+
+  new_age_group(start = start, end = end, symbols = syms)
+}
+
+#' @rdname as.age_group
+#' @exportS3Method as.age_group ivs_iv
+as.age_group.ivs_iv <- function(x, below = "0-", sep = "-", above = "+") {
+  syms <- list("below" = below, "sep" = sep, "above" = above)
+  x <- na.omit(x)
+  new_age_group(ivs::iv_start(x), ivs::iv_end(x), syms)
+}
