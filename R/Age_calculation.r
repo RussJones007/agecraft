@@ -159,25 +159,7 @@ categorize_age_impl <- function(ages, lower = 0, upper=70, by = 10,
   }
 
   if(by_is_age_group) {
-    by <- sort(by)
-    starts <- ivs::iv_start(by)
-    ends <- ivs::iv_end(by)
-
-    # Allow gaps, but disallow overlap to avoid ambiguous category assignment.
-    if(length(by) > 1 && any(ends[-length(ends)] > starts[-1])) {
-      stop('Argument: "by" age_group must not contain overlapping intervals')
-    }
-
-    age_vals <- as.numeric(ages)
-    idx <- rep.int(NA_integer_, length(age_vals))
-
-    for(i in seq_along(starts)) {
-      in_grp <- age_vals >= starts[i] & age_vals < ends[i]
-      idx[is.na(idx) & in_grp] <- i
-    }
-
-    labs <- as.character(by)
-    ret <- factor(idx, levels = seq_along(labs), labels = labs, ordered = TRUE)
+    ret <- age_cat_iv(age = ages, age_group = by)
   } else
 
   if(length(by) ==1){  # uniform span in age groups
@@ -227,13 +209,12 @@ categorize_age <- function(ages, lower = 0, upper=70, by = 10,
   }
 
 
-#' Calculate the Age Auto Determine Unit
+#' Calculate the Age automatically determining minimum unit
 #'
 #' Using a start time, like a birth date and an event date the function calculates the age based on the minimal unit;
 #' days, months, or years.  For example if the number of days is 31 or more but fewer than 365, the number of months are
 #' calculated. Likewise if the number days is less than 31, the number of days are returned.
 #'
-#' Future implemenation will in
 #'
 #' @param birth,event dates for the birth and event
 #' @return for age_auto_unit(), a named vector with ages.  The names denote the unit; y - years, m - months,

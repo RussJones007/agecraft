@@ -374,7 +374,7 @@ as.age_group.character <- function(x, below = "0-", sep = "-", above = "+") {
                   sep = character(),
                   above     = character())
 
-  # get the symbols or character strings used in formatting the age group, always chooe the first symbol encountered
+  # get the symbols or character strings used in formatting the age group, always choose the first symbol encountered
   get_symbol <- compose(
     ~ if(length(.)) .[1] else NULL,
     na.omit,
@@ -469,8 +469,10 @@ as.age_group.ivs_iv <- function(x, below = "0-", sep = "-", above = "+") {#, inc
 #' @param age_group a integer, or numeric vector that can be represented as age groups.  Integer and numeric
 #' vectors are internally converted to intervals as an age_group vector.
 #' @param age a integer or numeric
+#' @param multiple how to handle a single age matching multiple age groups.
+#'   One of "error" (default), "first", or "last".
 #'
-#' @return  an ordered factor with where each ach is in age_group.
+#' @return  an ordered factor with where each age is in an age_group.
 #' @keywords internal
 #' @export
 #'
@@ -492,29 +494,99 @@ as.age_group.ivs_iv <- function(x, below = "0-", sep = "-", above = "+") {#, inc
 #'  groups <-   tarr::age_cat_iv(age = ages, age_group = tarr::age.groups$Yr.10)
 #'  head(groups, 12)
 #'
-age_cat_iv <- function(age, age_group){
-  if(is.numeric(age_group)) age_group <- as.age_group(age_group) |> sort()
-  if(is.numeric(age)) age <- as.age_group(age)
-
-  # using interval logic find the location for each age in the age group.  The "haystack" vector is the integer of the
-  # factor, then assigning the lables from the age group as a factor.
-  locations <- ivs::iv_locate_overlaps(needles = age, haystack = age_group, type = "within") |>
-    na.omit()
-  res <- factor(x = locations$haystack,
-                levels = unique(locations$haystack),
-                labels = age_group,
-                ordered = TRUE)
-  return(res)
-
-  # ret <- iv_align(needles = age, haystack = age_group, locations = locations)
-  # if(nrow(locations) != length(age)) {
-  #   warning('The following ages did not fit into an age group: "',
-  #           paste(age[attr(locations, "na.action")], collapse = ", "),
-  #           '"')
-  # }
-  # ret[["haystack"]]
+age_cat_iv <- function(age, age_group, multiple = c("error", "first", "last")){
+  UseMethod("age_cat_iv")
 }
 
+# normalize and validate age_group input. Numeric vectors are treated as cut points.
+age_cat_iv_haystack <- function(age_group) {
+  if(is.numeric(age_group)) age_group <- as.age_group(age_group)
+  if(!is.age_group(age_group)) {
+    stop('Argument: "age_group" must be numeric cut points or an age_group vector')
+  }
+  sort(age_group)
+}
+
+# convert iv locate output to an ordered factor aligned to input needle order.
+age_cat_iv_to_factor <- function(locations, age_group, n_needles, multiple = c("error", "first", "last")) {
+  multiple <- match.arg(multiple)
+
+  if(anyDuplicated(locations$needles)) {
+    if(multiple == "error") {
+      stop('Age groups passed in the age argument match more than one group in the age_group argument')
+    }
+
+    locations <- locations[order(locations$needles, locations$haystack), , drop = FALSE]
+    if(multiple == "first") {
+      locations <- locations[!duplicated(locations$needles), , drop = FALSE]
+    } else {
+      locations <- locations[!duplicated(locations$needles, fromLast = TRUE), , drop = FALSE]
+    }
+  }
+
+  idx <- rep.int(NA_integer_, n_needles)
+  idx[locations$needles] <- locations$haystack
+  factor(x = idx,
+         levels = seq_along(age_group),
+         labels = as.character(age_group),
+         ordered = TRUE)
+}
+
+#' @exportS3Method
+age_cat_iv.default <- function(age, age_group, multiple = c("error", "first", "last")){
+  stop('Argument: "age" must be numeric or an interval/age_group vector')
+}
+
+#' @exportS3Method
+age_cat_iv.numeric <- function(age, age_group, multiple = c("error", "first", "last")){
+  age_group <- age_cat_iv_haystack(age_group)
+  locations <- ivs::iv_locate_between(
+    needles = as.numeric(age),
+    haystack = age_group
+  )
+  age_cat_iv_to_factor(locations = locations, age_group = age_group, n_needles = length(age), multiple = multiple)
+}
+
+#' @exportS3Method
+age_cat_iv.integer <- function(age, age_group, multiple = c("error", "first", "last")){
+  age_cat_iv.numeric(age = as.numeric(age), age_group = age_group, multiple = multiple)
+}
+
+#' @exportS3Method
+age_cat_iv.units <- function(age, age_group, multiple = c("error", "first", "last")){
+  age_cat_iv.numeric(age = as.numeric(age), age_group = age_group, multiple = multiple)
+}
+
+#' @exportS3Method
+age_cat_iv.age_group <- function(age, age_group, multiple = c("error", "first", "last")){
+  age_group <- age_cat_iv_haystack(age_group)
+  locations <- ivs::iv_locate_overlaps(
+    needles = age,
+    haystack = age_group,
+    type = "within"
+  )
+  age_cat_iv_to_factor(locations = locations, age_group = age_group, n_needles = length(age), multiple = multiple)
+}
+
+#' @exportS3Method
+age_cat_iv.ivs_iv <- function(age, age_group, multiple = c("error", "first", "last")){
+  age_cat_iv.age_group(age = age, age_group = age_group, multiple = multiple)
+}
+
+#' @exportS3Method
+age_cat_iv.double <- function(age, age_group, multiple = c("error", "first", "last")){
+  age_cat_iv.numeric(age = age, age_group = age_group, multiple = multiple)
+}
+
+#' @exportS3Method
+age_cat_iv.POSIXct <- function(age, age_group, multiple = c("error", "first", "last")){
+  stop('Argument: "age" as POSIXct is not supported for age_cat_iv()')
+}
+
+#' @exportS3Method
+age_cat_iv.Date <- function(age, age_group, multiple = c("error", "first", "last")){
+  stop('Argument: "age" as Date is not supported for age_cat_iv()')
+}
 #' @returns is.age_group returns either TRUE or FALSE
 #' @rdname as.age_group
 #'
