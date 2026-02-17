@@ -12,6 +12,10 @@
 #' @param age a integer or numeric
 #' @param multiple how to handle a single age matching multiple age groups.
 #'   One of "error" (default), "first", or "last".
+#' @param convert_units which side to convert when `age` and `age_group` units differ.
+#'   One of "age_to_group" (default), "group_to_age", or "none".
+#' @param allow_approx logical; if FALSE (default), block conversions between fine units
+#'   (second/minute/hour/day/week) and coarse units (month/year) because they are approximate.
 #'
 #' @return an ordered factor with where each age is in an age_group.
 #' @keywords internal
@@ -22,7 +26,10 @@
 #' ages <- c(0L, 82L, 1L, 1L, 93L, 83L, 76L, 57L, 59L, 67L, 0L, 64L, 60L, 0L)
 #' groups <- age_cat_iv(age = ages, age_group = age.groups$Yr.10)
 #' head(groups, 12)
-age_cat_iv <- function(age, age_group, multiple = c("error", "first", "last")){
+age_cat_iv <- function(age, age_group,
+                       multiple = c("error", "first", "last"),
+                       convert_units = c("age_to_group", "group_to_age", "none"),
+                       allow_approx = FALSE){
   UseMethod("age_cat_iv")
 }
 
@@ -35,25 +42,88 @@ age_cat_iv_haystack <- function(age_group) {
   sort(age_group)
 }
 
+normalize_age_unit <- function(x) {
+  if(is.null(x) || !length(x)) return(NULL)
+  x <- tolower(trimws(as.character(x)[1]))
+  if(x %in% c("s", "sec", "secs", "second", "seconds")) return("second")
+  if(x %in% c("min", "mins", "minute", "minutes")) return("minute")
+  if(x %in% c("h", "hr", "hrs", "hour", "hours")) return("hour")
+  if(x %in% c("d", "day", "days")) return("day")
+  if(x %in% c("wk", "wks", "week", "weeks")) return("week")
+  if(x %in% c("mo", "mos", "month", "months")) return("month")
+  if(x %in% c("yr", "yrs", "year", "years")) return("year")
+  x
+}
+
 age_cat_iv_age_unit <- function(age) {
   if(is.age_group(age)) return(get_unit(age))
   units_attr <- attr(age, "units")
   if(is.null(units_attr)) return(NULL)
-  as.character(units_attr[["numerator"]] %||% units_attr)
+  normalize_age_unit(units_attr[["numerator"]] %||% units_attr)
 }
 
-age_cat_iv_validate_units <- function(age, age_group) {
-  age_unit <- age_cat_iv_age_unit(age)
-  group_unit <- get_unit(age_group)
+age_cat_iv_convert_values <- function(values, from_unit, to_unit) {
+  from_unit <- normalize_age_unit(from_unit)
+  to_unit <- normalize_age_unit(to_unit)
+  if(identical(from_unit, to_unit)) return(as.numeric(values))
+  x <- units::set_units(as.numeric(values), from_unit, mode = "standard")
+  x <- units::set_units(x, to_unit, mode = "standard")
+  as.numeric(x)
+}
 
-  if(is.null(age_unit) && is.null(group_unit)) return(invisible(NULL))
+age_cat_iv_is_approx_conversion <- function(from_unit, to_unit) {
+  fine <- c("second", "minute", "hour", "day", "week")
+  coarse <- c("month", "year")
+  (from_unit %in% fine && to_unit %in% coarse) ||
+    (from_unit %in% coarse && to_unit %in% fine)
+}
+
+age_cat_iv_align_units <- function(age, age_group,
+                                   convert_units = c("age_to_group", "group_to_age", "none"),
+                                   allow_approx = FALSE) {
+  convert_units <- match.arg(convert_units)
+  age_unit <- age_cat_iv_age_unit(age)
+  group_unit <- normalize_age_unit(get_unit(age_group))
+
+  if(is.null(age_unit) && is.null(group_unit)) return(list(age = age, age_group = age_group))
   if(is.null(age_unit) || is.null(group_unit)) {
     stop('Age and age_group units are not compatible: one has units and the other does not')
   }
-  if(!identical(age_unit, group_unit)) {
+  if(identical(age_unit, group_unit)) return(list(age = age, age_group = age_group))
+
+  if(convert_units == "none") {
     stop('Age and age_group units are not compatible')
   }
-  invisible(NULL)
+
+  from_unit <- if(convert_units == "age_to_group") age_unit else group_unit
+  to_unit <- if(convert_units == "age_to_group") group_unit else age_unit
+  if(age_cat_iv_is_approx_conversion(from_unit, to_unit) && !isTRUE(allow_approx)) {
+    stop('Age and age_group unit conversion is approximate (month/year involved). Set allow_approx = TRUE to proceed')
+  }
+
+  if(convert_units == "age_to_group") {
+    if(is.age_group(age) || inherits(age, "ivs_iv")) {
+      age <- new_age_group(
+        start = age_cat_iv_convert_values(ivs::iv_start(age), age_unit, group_unit),
+        end = age_cat_iv_convert_values(ivs::iv_end(age), age_unit, group_unit),
+        symbols = get_symbols(age),
+        unit = group_unit
+      )
+    } else {
+      if(!is.null(attr(age, "units"))) {
+        age <- units::set_units(age, group_unit, mode = "standard")
+      }
+    }
+  } else {
+    age_group <- new_age_group(
+      start = age_cat_iv_convert_values(ivs::iv_start(age_group), group_unit, age_unit),
+      end = age_cat_iv_convert_values(ivs::iv_end(age_group), group_unit, age_unit),
+      symbols = get_symbols(age_group),
+      unit = age_unit
+    )
+  }
+
+  list(age = age, age_group = age_group)
 }
 
 # convert iv locate output to an ordered factor aligned to input needle order.
@@ -82,14 +152,23 @@ age_cat_iv_to_factor <- function(locations, age_group, n_needles, multiple = c("
 }
 
 #' @exportS3Method
-age_cat_iv.default <- function(age, age_group, multiple = c("error", "first", "last")){
+age_cat_iv.default <- function(age, age_group,
+                               multiple = c("error", "first", "last"),
+                               convert_units = c("age_to_group", "group_to_age", "none"),
+                               allow_approx = FALSE){
   stop('Argument: "age" must be numeric or an interval/age_group vector')
 }
 
 #' @exportS3Method
-age_cat_iv.numeric <- function(age, age_group, multiple = c("error", "first", "last")){
+age_cat_iv.numeric <- function(age, age_group,
+                               multiple = c("error", "first", "last"),
+                               convert_units = c("age_to_group", "group_to_age", "none"),
+                               allow_approx = FALSE){
   age_group <- age_cat_iv_haystack(age_group)
-  age_cat_iv_validate_units(age = age, age_group = age_group)
+  aligned <- age_cat_iv_align_units(age = age, age_group = age_group,
+                                    convert_units = convert_units, allow_approx = allow_approx)
+  age <- aligned$age
+  age_group <- aligned$age_group
   locations <- ivs::iv_locate_between(
     needles = as.numeric(age),
     haystack = age_group
@@ -98,14 +177,24 @@ age_cat_iv.numeric <- function(age, age_group, multiple = c("error", "first", "l
 }
 
 #' @exportS3Method
-age_cat_iv.integer <- function(age, age_group, multiple = c("error", "first", "last")){
-  age_cat_iv.numeric(age = as.numeric(age), age_group = age_group, multiple = multiple)
+age_cat_iv.integer <- function(age, age_group,
+                               multiple = c("error", "first", "last"),
+                               convert_units = c("age_to_group", "group_to_age", "none"),
+                               allow_approx = FALSE){
+  age_cat_iv.numeric(age = as.numeric(age), age_group = age_group, multiple = multiple,
+                     convert_units = convert_units, allow_approx = allow_approx)
 }
 
 #' @exportS3Method
-age_cat_iv.units <- function(age, age_group, multiple = c("error", "first", "last")){
+age_cat_iv.units <- function(age, age_group,
+                             multiple = c("error", "first", "last"),
+                             convert_units = c("age_to_group", "group_to_age", "none"),
+                             allow_approx = FALSE){
   age_group <- age_cat_iv_haystack(age_group)
-  age_cat_iv_validate_units(age = age, age_group = age_group)
+  aligned <- age_cat_iv_align_units(age = age, age_group = age_group,
+                                    convert_units = convert_units, allow_approx = allow_approx)
+  age <- aligned$age
+  age_group <- aligned$age_group
   locations <- ivs::iv_locate_between(
     needles = as.numeric(age),
     haystack = age_group
@@ -114,9 +203,15 @@ age_cat_iv.units <- function(age, age_group, multiple = c("error", "first", "las
 }
 
 #' @exportS3Method
-age_cat_iv.age_group <- function(age, age_group, multiple = c("error", "first", "last")){
+age_cat_iv.age_group <- function(age, age_group,
+                                 multiple = c("error", "first", "last"),
+                                 convert_units = c("age_to_group", "group_to_age", "none"),
+                                 allow_approx = FALSE){
   age_group <- age_cat_iv_haystack(age_group)
-  age_cat_iv_validate_units(age = age, age_group = age_group)
+  aligned <- age_cat_iv_align_units(age = age, age_group = age_group,
+                                    convert_units = convert_units, allow_approx = allow_approx)
+  age <- aligned$age
+  age_group <- aligned$age_group
   locations <- ivs::iv_locate_overlaps(
     needles = age,
     haystack = age_group,
@@ -126,21 +221,35 @@ age_cat_iv.age_group <- function(age, age_group, multiple = c("error", "first", 
 }
 
 #' @exportS3Method
-age_cat_iv.ivs_iv <- function(age, age_group, multiple = c("error", "first", "last")){
-  age_cat_iv.age_group(age = age, age_group = age_group, multiple = multiple)
+age_cat_iv.ivs_iv <- function(age, age_group,
+                              multiple = c("error", "first", "last"),
+                              convert_units = c("age_to_group", "group_to_age", "none"),
+                              allow_approx = FALSE){
+  age_cat_iv.age_group(age = age, age_group = age_group, multiple = multiple,
+                       convert_units = convert_units, allow_approx = allow_approx)
 }
 
 #' @exportS3Method
-age_cat_iv.double <- function(age, age_group, multiple = c("error", "first", "last")){
-  age_cat_iv.numeric(age = age, age_group = age_group, multiple = multiple)
+age_cat_iv.double <- function(age, age_group,
+                              multiple = c("error", "first", "last"),
+                              convert_units = c("age_to_group", "group_to_age", "none"),
+                              allow_approx = FALSE){
+  age_cat_iv.numeric(age = age, age_group = age_group, multiple = multiple,
+                     convert_units = convert_units, allow_approx = allow_approx)
 }
 
 #' @exportS3Method
-age_cat_iv.POSIXct <- function(age, age_group, multiple = c("error", "first", "last")){
+age_cat_iv.POSIXct <- function(age, age_group,
+                               multiple = c("error", "first", "last"),
+                               convert_units = c("age_to_group", "group_to_age", "none"),
+                               allow_approx = FALSE){
   stop('Argument: "age" as POSIXct is not supported for age_cat_iv()')
 }
 
 #' @exportS3Method
-age_cat_iv.Date <- function(age, age_group, multiple = c("error", "first", "last")){
+age_cat_iv.Date <- function(age, age_group,
+                            multiple = c("error", "first", "last"),
+                            convert_units = c("age_to_group", "group_to_age", "none"),
+                            allow_approx = FALSE){
   stop('Argument: "age" as Date is not supported for age_cat_iv()')
 }

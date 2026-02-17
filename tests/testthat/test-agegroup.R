@@ -163,13 +163,24 @@ test_that(
 
     expect_error(age_cat_iv(c(1, 7), grp_year), "one has units and the other does not")
     expect_no_error(age_cat_iv(units::set_units(c(1, 7), "year"), grp_year))
-    expect_error(age_cat_iv(units::set_units(c(1, 7), "day"), grp_year), "not compatible")
+    expect_error(age_cat_iv(units::set_units(c(1, 7), "day"), grp_year), "approximate")
+    expect_no_error(age_cat_iv(units::set_units(c(365, 730), "day"), grp_year, allow_approx = TRUE))
     expect_error(age_cat_iv(c(1, 7), grp_day), "one has units and the other does not")
 
     age_iv_year <- as.age_group(c(1, 7), unit = "year")
     age_iv_day <- as.age_group(c(1, 7), unit = "day")
     expect_no_error(age_cat_iv(age_iv_year, grp_year))
-    expect_error(age_cat_iv(age_iv_day, grp_year), "not compatible")
+    expect_error(age_cat_iv(age_iv_day, grp_year), "approximate")
+  }
+)
+
+test_that(
+  "age_cat_iv can convert group units to age units when requested",
+  {
+    grp_year <- as.age_group(c(0, 5, 10, Inf), unit = "year")
+    ages_day <- units::set_units(c(365, 365 * 8), "day")
+    expect_no_error(res <- age_cat_iv(ages_day, grp_year, convert_units = "group_to_age", allow_approx = TRUE))
+    expect_length(res, 2)
   }
 )
 
