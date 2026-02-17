@@ -176,7 +176,10 @@ age_group_to_char <- function(groups, sep = get_symbols(groups)[["sep"]] %||% "-
   ret
 }
 
-
+#' Coerce age_group to character vector
+#'
+#' Get a character vector from an age_group object.
+#'
 #' @param x  an age group object
 #' @param sep a separator to use for the age groups.  Default is '-'.  Typically this will come from the age_group object.
 #'
@@ -187,7 +190,9 @@ as.character.age_group <- function(x, ...){
   if(! rlang::is_empty(x)) age_group_to_char(x, sep = syms$sep, above = syms$above, below = syms$below) else character(0)
 }
 
-
+#' Coerce age_group to a nominal factor
+#'
+#'
 #' @return a nominal factor of age groups.
 #' @exportS3Method generics::as.factor age_group
 #' @examples
@@ -211,6 +216,8 @@ as.factor.age_group <- function(x, ...){
   return(fac)
 }
 
+#' Coerce age_group to ordered factor
+#'
 #' @return an ordinal factor of age groups.
 #' @exportS3Method generics::as.ordered age_group
 as.ordered.age_group <- function(x, ...){
