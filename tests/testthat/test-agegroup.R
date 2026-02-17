@@ -147,6 +147,33 @@ test_that(
 )
 
 test_that(
+  "age_group unit attribute and display",
+  {
+    grp <- as.age_group(c(0, 5, 10, Inf), unit = "year")
+    expect_identical(attr(grp, "unit"), "year")
+    expect_true(all(grepl("\\[year\\]$", format(grp))))
+  }
+)
+
+test_that(
+  "age_cat_iv validates age and age_group unit compatibility",
+  {
+    grp_year <- as.age_group(c(0, 5, 10, Inf), unit = "year")
+    grp_day <- as.age_group(c(0, 5, 10, Inf), unit = "day")
+
+    expect_error(age_cat_iv(c(1, 7), grp_year), "one has units and the other does not")
+    expect_no_error(age_cat_iv(units::set_units(c(1, 7), "year"), grp_year))
+    expect_error(age_cat_iv(units::set_units(c(1, 7), "day"), grp_year), "not compatible")
+    expect_error(age_cat_iv(c(1, 7), grp_day), "one has units and the other does not")
+
+    age_iv_year <- as.age_group(c(1, 7), unit = "year")
+    age_iv_day <- as.age_group(c(1, 7), unit = "day")
+    expect_no_error(age_cat_iv(age_iv_year, grp_year))
+    expect_error(age_cat_iv(age_iv_day, grp_year), "not compatible")
+  }
+)
+
+test_that(
   "Sorting age_group tests",
   {
     # group that isnot in order
@@ -162,4 +189,3 @@ test_that(
 
   }
 )
-

@@ -25,7 +25,7 @@ vec_cast.ivs_iv.age_group <- function(x, to, ...){
 #' @keywords internal
 #' @export
 vec_cast.age_group.ivs_iv <- function(x, to, ...){
-  new_age_group(iv_start(x), iv_end(x), symbols = list(below = "0-", sep = "-", above = "+"))
+  new_age_group(iv_start(x), iv_end(x), symbols = list(below = "0-", sep = "-", above = "+"), unit = get_unit(to))
 }
 
 #' @exportS3Method base::as.integer age_group
@@ -49,6 +49,7 @@ as.integer.age_group <- function(x, ...){
 #'  * below: '<'
 #'  * sep:   'through , 'thru', 'to', '-'
 #'  * above: '>', '+', 'plus'
+#' @param unit optional character string identifying the age unit (e.g. "year", "month", "day").
 #'
 #' @details
 #' The age_group class is based on numeric intervals, specifically the ivs class. An [introduction to
@@ -93,20 +94,20 @@ as.integer.age_group <- function(x, ...){
 #' ag_num
 #'
 #' @export
-as.age_group <- function(x, below = "0-", sep = "-", above = "+") {
+as.age_group <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
   UseMethod("as.age_group")
 }
 
 #' @rdname as.age_group
 #' @exportS3Method as.age_group factor
-as.age_group.factor <- function(x, below = "0-", sep = "-", above = "+") {
+as.age_group.factor <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
   as.character(x) |>
-    as.age_group.character(below = below, sep = sep, above = above)
+    as.age_group.character(below = below, sep = sep, above = above, unit = unit)
 }
 
 #' @rdname as.age_group
 #' @exportS3Method as.age_group character
-as.age_group.character <- function(x, below = "0-", sep = "-", above = "+") {
+as.age_group.character <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
   x <- str_trim(x, side = "both") |> str_to_lower()
 
   # check that the correct symbols are present
@@ -156,7 +157,7 @@ as.age_group.character <- function(x, below = "0-", sep = "-", above = "+") {
   }
 
   ends[!str_detect(x, "^<")] <- ends[!str_detect(x, "^<")] + 1
-  ret <- new_age_group(starts, ends, symbols)
+  ret <- new_age_group(starts, ends, symbols, unit = unit)
 
   return(ret)
 }
@@ -165,14 +166,14 @@ as.age_group.character <- function(x, below = "0-", sep = "-", above = "+") {
 # this function passes the vector to the as.age_group.double() function.
 #' @rdname as.age_group
 #' @exportS3Method as.age_group integer
-as.age_group.integer <- function(x, below = "0-", sep = "-", above = "+") {
+as.age_group.integer <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
   x <- as.double(x)
-  as.age_group.double(x, below, sep, above)
+  as.age_group.double(x, below, sep, above, unit = unit)
 }
 
 #' @rdname as.age_group
 #' @exportS3Method as.age_group double
-as.age_group.double <- function(x, below = "0-", sep = "-", above = "+") {
+as.age_group.double <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
   assert_that(is.double(x))
   assert_that(min(x, na.rm = TRUE) >= 0)
 
@@ -197,13 +198,14 @@ as.age_group.double <- function(x, below = "0-", sep = "-", above = "+") {
   }
   rm(valid_syms)
 
-  new_age_group(start = start, end = end, symbols = syms)
+  new_age_group(start = start, end = end, symbols = syms, unit = unit)
 }
 
 #' @rdname as.age_group
 #' @exportS3Method as.age_group ivs_iv
-as.age_group.ivs_iv <- function(x, below = "0-", sep = "-", above = "+") {
+as.age_group.ivs_iv <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
   syms <- list("below" = below, "sep" = sep, "above" = above)
+  unit <- unit %||% attr(x, "unit")
   x <- na.omit(x)
-  new_age_group(ivs::iv_start(x), ivs::iv_end(x), syms)
+  new_age_group(ivs::iv_start(x), ivs::iv_end(x), syms, unit = unit)
 }

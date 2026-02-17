@@ -31,6 +31,7 @@ get_all <- compose(
 
 # internal convenience function to get the attribute 'symbols' list from an age_group object
 get_symbols <- purrr::attr_getter("symbols")
+get_unit <- purrr::attr_getter("unit")
 
 #' Create an interval age_group
 #'
@@ -53,13 +54,15 @@ get_symbols <- purrr::attr_getter("symbols")
 #' @keywords internal
 new_age_group <- function(start = NULL,
                           end = NULL,
-                          symbols = list(below = "0-", sep = "-", above = "+")){
-  if(is.null(start) & is.null(end)) return(ivs::new_iv(start, end, class = "age_group", symbols = symbols) )
+                          symbols = list(below = "0-", sep = "-", above = "+"),
+                          unit = NULL){
+  if(is.null(start) & is.null(end)) return(ivs::new_iv(start, end, class = "age_group", symbols = symbols, unit = unit) )
   assert_that(is.double(start))
   assert_that(is.double(end))
   assert_that(rlang::is_list(symbols) & (length(symbols) == 3))
+  if(!is.null(unit)) assert_that(assertthat::is.string(unit))
 
-  ret <- ivs::new_iv(start, end, class = "age_group", symbols = symbols)
+  ret <- ivs::new_iv(start, end, class = "age_group", symbols = symbols, unit = unit)
 
   return(ret)
 }
@@ -84,14 +87,14 @@ vec_ptype_full.age_group <- function(x, ...) "age_group"
 #' @exportS3Method vctrs::vec_restore
 vec_restore.age_group <- function(x, to, ...){
   # restore the age_group object
-  ret <- new_age_group(start = field(x, "start"), end = field(x, "end"), symbols = get_symbols(to))
+  ret <- new_age_group(start = field(x, "start"), end = field(x, "end"), symbols = get_symbols(to), unit = get_unit(to))
   return(ret)
 }
 
 #' @keywords internal
 #' @exportS3Method ivs::iv_restore
 iv_restore.age_group <- function(x, to, ...){
-  ret <- new_age_group(start = field(x, "start"), end = field(x, "end"), symbols = get_symbols(to))
+  ret <- new_age_group(start = field(x, "start"), end = field(x, "end"), symbols = get_symbols(to), unit = get_unit(to))
   return(ret)
 }
 

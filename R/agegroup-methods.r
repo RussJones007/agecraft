@@ -35,6 +35,27 @@ age_cat_iv_haystack <- function(age_group) {
   sort(age_group)
 }
 
+age_cat_iv_age_unit <- function(age) {
+  if(is.age_group(age)) return(get_unit(age))
+  units_attr <- attr(age, "units")
+  if(is.null(units_attr)) return(NULL)
+  as.character(units_attr[["numerator"]] %||% units_attr)
+}
+
+age_cat_iv_validate_units <- function(age, age_group) {
+  age_unit <- age_cat_iv_age_unit(age)
+  group_unit <- get_unit(age_group)
+
+  if(is.null(age_unit) && is.null(group_unit)) return(invisible(NULL))
+  if(is.null(age_unit) || is.null(group_unit)) {
+    stop('Age and age_group units are not compatible: one has units and the other does not')
+  }
+  if(!identical(age_unit, group_unit)) {
+    stop('Age and age_group units are not compatible')
+  }
+  invisible(NULL)
+}
+
 # convert iv locate output to an ordered factor aligned to input needle order.
 age_cat_iv_to_factor <- function(locations, age_group, n_needles, multiple = c("error", "first", "last")) {
   multiple <- match.arg(multiple)
@@ -68,6 +89,7 @@ age_cat_iv.default <- function(age, age_group, multiple = c("error", "first", "l
 #' @exportS3Method
 age_cat_iv.numeric <- function(age, age_group, multiple = c("error", "first", "last")){
   age_group <- age_cat_iv_haystack(age_group)
+  age_cat_iv_validate_units(age = age, age_group = age_group)
   locations <- ivs::iv_locate_between(
     needles = as.numeric(age),
     haystack = age_group
@@ -82,12 +104,19 @@ age_cat_iv.integer <- function(age, age_group, multiple = c("error", "first", "l
 
 #' @exportS3Method
 age_cat_iv.units <- function(age, age_group, multiple = c("error", "first", "last")){
-  age_cat_iv.numeric(age = as.numeric(age), age_group = age_group, multiple = multiple)
+  age_group <- age_cat_iv_haystack(age_group)
+  age_cat_iv_validate_units(age = age, age_group = age_group)
+  locations <- ivs::iv_locate_between(
+    needles = as.numeric(age),
+    haystack = age_group
+  )
+  age_cat_iv_to_factor(locations = locations, age_group = age_group, n_needles = length(age), multiple = multiple)
 }
 
 #' @exportS3Method
 age_cat_iv.age_group <- function(age, age_group, multiple = c("error", "first", "last")){
   age_group <- age_cat_iv_haystack(age_group)
+  age_cat_iv_validate_units(age = age, age_group = age_group)
   locations <- ivs::iv_locate_overlaps(
     needles = age,
     haystack = age_group,

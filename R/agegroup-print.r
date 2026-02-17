@@ -7,7 +7,16 @@
 #' @exportS3Method
 format.age_group <- function(x, ...){
   ch <- as.character.age_group(x)
+  unit <- get_unit(x)
+  if(!is.null(unit)) ch <- paste0(ch, " [", unit, "]")
   ch
+}
+
+#' @exportS3Method
+print.age_group <- function(x, ...){
+  out <- format.age_group(x, ...)
+  print(out, quote = FALSE)
+  invisible(x)
 }
 
 # Function from iv age to character age groups ---------------------------------------------------------------
