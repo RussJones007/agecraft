@@ -1,0 +1,77 @@
+---
+title: "A public-health age workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{A public-health age workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(agecraft)
+```
+
+## Calculate calendar ages
+
+Use an explicit reference date for reproducible reporting.
+
+```{r calendar}
+birth <- as.Date(c("2020-02-29", "1980-04-14", "2010-09-15", NA))
+reference <- as.Date("2025-03-01")
+age <- calculate_age(birth, reference, "year")
+age
+```
+
+Leap birthdays reach their next year on March 1 in non-leap years. Reversed dates
+raise an error. Missing observations remain missing. Months use calendar
+anniversaries, including the last day of short months; elapsed-day conversion
+with the units package is an approximation of calendar months or years.
+
+## Assign reporting groups
+
+```{r groups}
+groups <- as.age_group(age.groups$Annual, unit = "year")
+category <- age_cat_iv(age, groups)
+data.frame(birth, age, category)
+table(category, useNA = "ifany")
+```
+
+The bundled groups are preserved from the original rage package. They are legacy
+reporting conventions and should be confirmed against the reporting system's
+current specification. The package records their available provenance without
+claiming an unverified official version or endorsement.
+
+## Resolve overlaps explicitly
+
+```{r overlaps}
+overlapping <- as.age_group(c("0-9", "5-14"), unit = "year")
+age_cat_iv(units::set_units(c(3, 7, 12), "year"), overlapping, multiple = "first")
+```
+
+The default `multiple = "error"` rejects ambiguity. `first` and `last` refer to
+sorted interval order, not the original input order.
+
+## Keep units explicit
+
+```{r units}
+days <- calculate_age(as.Date("2025-01-01"), as.Date("2025-02-15"), "day")
+day_groups <- as.age_group(c(0, 7, 14, 30, 60, Inf), unit = "day")
+age_cat_iv(days, day_groups)
+```
+
+Both sides must have units or both must be unitless. `convert_units` selects which
+side to convert. Conversions between month/year and smaller units require
+`allow_approx = TRUE`; calculate ages directly in the reporting unit when possible.
+
+## Combine observations safely
+
+```{r combine}
+one <- as.age_group(c("0-4", "5-9"), unit = "year")
+two <- as.age_group("10-14", unit = "year")
+vctrs::vec_c(one, two)
+generics::as.ordered(one[c(2, 1)])
+```
+
+Concatenation preserves class and units; incompatible units raise an error.
+Ordered factor conversion keeps observation order and sorts the factor levels.

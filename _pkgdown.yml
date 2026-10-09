@@ -1,0 +1,23 @@
+template:
+  bootstrap: 5
+reference:
+  - title: Age calculation and categorization
+    contents:
+      - calculate_age
+      - age_auto_unit
+      - age_cat_iv
+      - age.groups
+  - title: Age group vectors
+    contents:
+      - as.age_group
+      - age_group_to_char
+      - as.character.age_group
+      - as.factor.age_group
+      - as.ordered.age_group
+      - valid_age_group_symbol
+      - new_age_group
+  - title: Compatibility wrappers
+    contents:
+      - calc_age
+      - age_cat
+      - age.cat

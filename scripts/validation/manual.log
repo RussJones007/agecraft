@@ -1,0 +1,563 @@
+Hmm ... looks like a package
+Converting Rd files to LaTeX .
+Creating pdf output from LaTeX ...
+Warning in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
+  texi2dvi script/program not available, using emulation
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./Rd2.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-22>
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+No file Rd2.aux.
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+No file Rd2.toc.
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/var/lib/texmf/f
+onts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvip
+s/base/8r.enc}] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
+[2]
+Overfull \hbox (66.6991pt too wide) in paragraph at lines 136--141
+\T1/ptm/m/n/10 known source-version dates is in-stalled at []\T1/pcr/m/n/10 sys
+tem.file("extdata", "age-group-provenance.csv",
+[3]
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 208--208
+ []\T1/pcr/m/n/10 age_cat(ages, lower = 0, upper = 70, by = 10, sep = "-", abov
+e.char = " +")
+[4] [5]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 272--272
+ [] \T1/pcr/m/n/9 age_vec  <- calculate_age(start = birth_days, end = as.Date("
+2025-12-25"))[]
+
+Overfull \hbox (133.98029pt too wide) in paragraph at lines 276--276
+ [] \T1/pcr/m/n/9 age_2 <- calculate_age(start = as.Date("1959-07-04"), end = a
+s.Date("1969-07-04"), unit = "week")[]
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [6] [7]
+Overfull \hbox (24.78088pt too wide) in paragraph at lines 398--398
+ []  \T1/pcr/m/n/10 unit = c("year", "day", "hour", "minute", "month", "second"
+, "week")[]
+[8]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 455--455
+ [] \T1/pcr/m/n/9 age_vec  <- calculate_age(start = birth_days, end = as.Date("
+2025-12-25"))[]
+
+Overfull \hbox (133.98029pt too wide) in paragraph at lines 459--459
+ [] \T1/pcr/m/n/9 age_2 <- calculate_age(start = as.Date("1959-07-04"), end = a
+s.Date("1969-07-04"), unit = "week")[]
+[9]
+Overfull \hbox (24.78088pt too wide) in paragraph at lines 496--496
+ []  \T1/pcr/m/n/10 unit = c("year", "day", "hour", "minute", "month", "second"
+, "week")[]
+[10] [11]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 579--579
+ [] \T1/pcr/m/n/9 age_vec  <- calculate_age(start = birth_days, end = as.Date("
+2025-12-25"))[]
+
+Overfull \hbox (133.98029pt too wide) in paragraph at lines 583--583
+ [] \T1/pcr/m/n/9 age_2 <- calculate_age(start = as.Date("1959-07-04"), end = a
+s.Date("1969-07-04"), unit = "week")[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 620--620
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 623--623
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+[12]
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 626--626
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 629--629
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 632--632
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 635--635
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (18.72867pt too wide) in paragraph at lines 641--645
+[]\T1/ptm/m/n/10 for as.age_group() a char-ac-ter, fac-tor, nu-meric vec-tor or
+ in-ter-val vec-tor [][][]\T1/pcr/m/n/10 ivs::iv()[][][][]\T1/ptm/m/n/10 .
+[13]
+Overfull \hbox (3.81766pt too wide) in paragraph at lines 717--719
+[]\T1/ptm/m/n/10 For a char-ac-ter vec-tor rep-re-sent-ing age groups, are all
+of the non-digit sym-bols valid for an age_group
+[14]
+No file Rd2.ind.
+[15] (./Rd2.aux)
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)
+pdfTeX warning (dest): name{Rfn.ivs::iv\(\)} has been referenced but does not e
+xist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.lubridate::now\(\)} has been referenced but doe
+s not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.units::units\(\)} has been referenced but does
+not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.units::set.Rul.units\(\)} has been referenced b
+ut does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.units::units} has been referenced but does not
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.cut} has been referenced but does not exist, re
+placed by a fixed one
+
+</usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri
+8a.pfb>
+Output written on Rd2.pdf (15 pages, 101685 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.17 [TeX Live 2023] (kpathsea + Thai support).
+Scanning input file Rd2.idx....done (38 entries accepted, 0 rejected).
+Sorting entries....done (208 comparisons).
+Generating output file Rd2.ind....done (62 lines written, 0 warnings).
+Output written in Rd2.ind.
+Transcript written in Rd2.ilg.
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./Rd2.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-22>
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./Rd2.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (./Rd2.out) (./Rd2.out) (./Rd2.toc
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/var/lib/texmf/f
+onts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvip
+s/base/8r.enc}]) (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [2]
+Overfull \hbox (66.6991pt too wide) in paragraph at lines 136--141
+\T1/ptm/m/n/10 known source-version dates is in-stalled at []\T1/pcr/m/n/10 sys
+tem.file("extdata", "age-group-provenance.csv",
+[3] [4]
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 208--208
+ []\T1/pcr/m/n/10 age_cat(ages, lower = 0, upper = 70, by = 10, sep = "-", abov
+e.char = " +")
+[5]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 272--272
+ [] \T1/pcr/m/n/9 age_vec  <- calculate_age(start = birth_days, end = as.Date("
+2025-12-25"))[]
+
+Overfull \hbox (133.98029pt too wide) in paragraph at lines 276--276
+ [] \T1/pcr/m/n/9 age_2 <- calculate_age(start = as.Date("1959-07-04"), end = a
+s.Date("1969-07-04"), unit = "week")[]
+[6] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [7]
+Overfull \hbox (24.78088pt too wide) in paragraph at lines 398--398
+ []  \T1/pcr/m/n/10 unit = c("year", "day", "hour", "minute", "month", "second"
+, "week")[]
+[8]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 455--455
+ [] \T1/pcr/m/n/9 age_vec  <- calculate_age(start = birth_days, end = as.Date("
+2025-12-25"))[]
+
+Overfull \hbox (133.98029pt too wide) in paragraph at lines 459--459
+ [] \T1/pcr/m/n/9 age_2 <- calculate_age(start = as.Date("1959-07-04"), end = a
+s.Date("1969-07-04"), unit = "week")[]
+[9]
+Overfull \hbox (24.78088pt too wide) in paragraph at lines 496--496
+ []  \T1/pcr/m/n/10 unit = c("year", "day", "hour", "minute", "month", "second"
+, "week")[]
+[10] [11]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 579--579
+ [] \T1/pcr/m/n/9 age_vec  <- calculate_age(start = birth_days, end = as.Date("
+2025-12-25"))[]
+
+Overfull \hbox (133.98029pt too wide) in paragraph at lines 583--583
+ [] \T1/pcr/m/n/9 age_2 <- calculate_age(start = as.Date("1959-07-04"), end = a
+s.Date("1969-07-04"), unit = "week")[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 620--620
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 623--623
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+[12]
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 626--626
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 629--629
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 632--632
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 635--635
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (18.72867pt too wide) in paragraph at lines 641--645
+[]\T1/ptm/m/n/10 for as.age_group() a char-ac-ter, fac-tor, nu-meric vec-tor or
+ in-ter-val vec-tor [][][]\T1/pcr/m/n/10 ivs::iv()[][][][]\T1/ptm/m/n/10 .
+[13]
+Overfull \hbox (3.81766pt too wide) in paragraph at lines 717--719
+[]\T1/ptm/m/n/10 For a char-ac-ter vec-tor rep-re-sent-ing age groups, are all
+of the non-digit sym-bols valid for an age_group
+[14] (./Rd2.ind [15] [16]) (./Rd2.aux)
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)
+pdfTeX warning (dest): name{Rfn.ivs::iv\(\)} has been referenced but does not e
+xist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.lubridate::now\(\)} has been referenced but doe
+s not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.units::units\(\)} has been referenced but does
+not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.units::set.Rul.units\(\)} has been referenced b
+ut does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.units::units} has been referenced but does not
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.cut} has been referenced but does not exist, re
+placed by a fixed one
+
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texlive
+/texmf-dist/fonts/type1/urw/courier/ucrro8a.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw
+/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.p
+fb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (16 pages, 123133 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.17 [TeX Live 2023] (kpathsea + Thai support).
+Scanning input file Rd2.idx....done (38 entries accepted, 0 rejected).
+Sorting entries....done (208 comparisons).
+Generating output file Rd2.ind....done (62 lines written, 0 warnings).
+Output written in Rd2.ind.
+Transcript written in Rd2.ilg.
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./Rd2.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-22>
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./Rd2.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (./Rd2.out) (./Rd2.out) (./Rd2.toc
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/var/lib/texmf/f
+onts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvip
+s/base/8r.enc}]) (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [2]
+Overfull \hbox (66.6991pt too wide) in paragraph at lines 136--141
+\T1/ptm/m/n/10 known source-version dates is in-stalled at []\T1/pcr/m/n/10 sys
+tem.file("extdata", "age-group-provenance.csv",
+[3] [4]
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 208--208
+ []\T1/pcr/m/n/10 age_cat(ages, lower = 0, upper = 70, by = 10, sep = "-", abov
+e.char = " +")
+[5]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 272--272
+ [] \T1/pcr/m/n/9 age_vec  <- calculate_age(start = birth_days, end = as.Date("
+2025-12-25"))[]
+
+Overfull \hbox (133.98029pt too wide) in paragraph at lines 276--276
+ [] \T1/pcr/m/n/9 age_2 <- calculate_age(start = as.Date("1959-07-04"), end = a
+s.Date("1969-07-04"), unit = "week")[]
+[6] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [7]
+Overfull \hbox (24.78088pt too wide) in paragraph at lines 398--398
+ []  \T1/pcr/m/n/10 unit = c("year", "day", "hour", "minute", "month", "second"
+, "week")[]
+[8]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 455--455
+ [] \T1/pcr/m/n/9 age_vec  <- calculate_age(start = birth_days, end = as.Date("
+2025-12-25"))[]
+
+Overfull \hbox (133.98029pt too wide) in paragraph at lines 459--459
+ [] \T1/pcr/m/n/9 age_2 <- calculate_age(start = as.Date("1959-07-04"), end = a
+s.Date("1969-07-04"), unit = "week")[]
+[9]
+Overfull \hbox (24.78088pt too wide) in paragraph at lines 496--496
+ []  \T1/pcr/m/n/10 unit = c("year", "day", "hour", "minute", "month", "second"
+, "week")[]
+[10] [11]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 579--579
+ [] \T1/pcr/m/n/9 age_vec  <- calculate_age(start = birth_days, end = as.Date("
+2025-12-25"))[]
+
+Overfull \hbox (133.98029pt too wide) in paragraph at lines 583--583
+ [] \T1/pcr/m/n/9 age_2 <- calculate_age(start = as.Date("1959-07-04"), end = a
+s.Date("1969-07-04"), unit = "week")[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 620--620
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 623--623
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+[12]
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 626--626
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 629--629
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 632--632
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 635--635
+ []\T1/pcr/m/n/10 as.age_group(x, below = "0-", sep = "-", above = "+", unit =
+NULL)[]
+
+Overfull \hbox (18.72867pt too wide) in paragraph at lines 641--645
+[]\T1/ptm/m/n/10 for as.age_group() a char-ac-ter, fac-tor, nu-meric vec-tor or
+ in-ter-val vec-tor [][][]\T1/pcr/m/n/10 ivs::iv()[][][][]\T1/ptm/m/n/10 .
+[13]
+Overfull \hbox (3.81766pt too wide) in paragraph at lines 717--719
+[]\T1/ptm/m/n/10 For a char-ac-ter vec-tor rep-re-sent-ing age groups, are all
+of the non-digit sym-bols valid for an age_group
+[14] (./Rd2.ind [15] [16]) (./Rd2.aux) )
+(see the transcript file for additional information)
+pdfTeX warning (dest): name{Rfn.ivs::iv\(\)} has been referenced but does not e
+xist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.lubridate::now\(\)} has been referenced but doe
+s not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.units::units\(\)} has been referenced but does
+not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.units::set.Rul.units\(\)} has been referenced b
+ut does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.units::units} has been referenced but does not
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Rfn.cut} has been referenced but does not exist, re
+placed by a fixed one
+
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texlive
+/texmf-dist/fonts/type1/urw/courier/ucrro8a.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw
+/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.p
+fb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (16 pages, 123634 bytes).
+Transcript written on Rd2.log.
+Saving output to ‘/tmp/agecraft-reference.pdf’ ...
+Done

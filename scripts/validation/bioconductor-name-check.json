@@ -1,0 +1,42 @@
+[
+  {
+    "url": "https://bioconductor.statistik.tu-dortmund.de/packages/3.23/bioc/src/contrib/PACKAGES.gz",
+    "count": 2385,
+    "matches": []
+  },
+  {
+    "url": "https://bioconductor.statistik.tu-dortmund.de/packages/3.23/data/annotation/src/contrib/PACKAGES.gz",
+    "count": 928,
+    "matches": []
+  },
+  {
+    "url": "https://bioconductor.statistik.tu-dortmund.de/packages/3.23/data/experiment/src/contrib/PACKAGES.gz",
+    "count": 434,
+    "matches": []
+  },
+  {
+    "url": "https://bioconductor.statistik.tu-dortmund.de/packages/3.23/workflows/src/contrib/PACKAGES.gz",
+    "count": 25,
+    "matches": []
+  },
+  {
+    "url": "https://bioconductor.statistik.tu-dortmund.de/packages/3.24/bioc/src/contrib/PACKAGES.gz",
+    "count": 2413,
+    "matches": []
+  },
+  {
+    "url": "https://bioconductor.statistik.tu-dortmund.de/packages/3.24/data/annotation/src/contrib/PACKAGES.gz",
+    "count": 926,
+    "matches": []
+  },
+  {
+    "url": "https://bioconductor.statistik.tu-dortmund.de/packages/3.24/data/experiment/src/contrib/PACKAGES.gz",
+    "count": 433,
+    "matches": []
+  },
+  {
+    "url": "https://bioconductor.statistik.tu-dortmund.de/packages/3.24/workflows/src/contrib/PACKAGES.gz",
+    "count": 26,
+    "matches": []
+  }
+]

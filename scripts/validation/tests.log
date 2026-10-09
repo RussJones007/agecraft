@@ -1,0 +1,34 @@
+ℹ Loading agecraft
+Failed to connect to bus: Operation not permitted
+Warning message:
+In system("timedatectl", intern = TRUE) :
+  running command 'timedatectl' had status 1
+ℹ Testing agecraft
+✔ | F W  S  OK | Context
+
+⠏ |          0 | Age_calculation
+⠹ |          3 | Age_calculation
+⠙ |         12 | Age_calculation
+⠧ |         28 | Age_calculation
+✔ |         31 | Age_calculation
+
+⠏ |          0 | agegroup
+⠼ |          5 | agegroup
+⠸ |         14 | agegroup
+⠹ |         33 | agegroup
+⠴ |         46 | agegroup
+⠸ |         54 | agegroup
+✔ |         56 | agegroup
+
+⠏ |          0 | calendar-boundaries
+⠸ |         14 | calendar-boundaries
+✔ |         21 | calendar-boundaries
+
+⠏ |          0 | vector-metadata
+⠸ |         14 | vector-metadata
+✔ |         30 | vector-metadata
+
+══ Results ═════════════════════════════════════════════════════════════════════
+Duration: 1.5 s
+
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 138 ]

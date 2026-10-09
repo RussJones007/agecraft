@@ -1,0 +1,37 @@
+Package: agecraft
+Type: Package
+Title: Age Calculation and Grouping
+Version: 0.1.0.9010
+Authors@R: person(
+    "Russ", "Jones",
+    role = c("aut", "cre"),
+    email = "RussJones007@gmail.com",
+    comment = NULL
+  )
+Description: Calculate ages from dates and date-times, represent age ranges as
+    interval vectors, and assign ages to ordered groups with explicit time units.
+    Includes reusable age-group definitions for public-health reporting.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Language: en
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+Depends:
+    R (>= 4.1.0)
+Imports:
+    assertthat,
+    generics,
+    ivs,
+    lubridate,
+    purrr,
+    rlang,
+    stringr,
+    units,
+    vctrs
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.0
+VignetteBuilder: knitr

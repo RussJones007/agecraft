@@ -1,0 +1,9 @@
+definition,cut_points_years,intended_use,source,source_version_date,package_snapshot,reviewed_on
+ILI,0;5;25;50;65;Inf,Legacy influenza-like-illness surveillance reporting,Original rage documentation attributes to ESSENCE/CDC ILI; official edition not recorded,Not recorded,rage 0.1.0.9009,2026-10-09
+IMM,0;1;5;10;15;20;30;40;50;60;Inf,Legacy immunization reporting,Original rage data-generation script; external specification not recorded,Not recorded,rage 0.1.0.9009,2026-10-09
+Yr.5,0;5;10;15;20;25;30;35;40;45;50;55;60;65;70;Inf,General five-year reporting bands,Algorithmic sequence in original rage data-generation script,Not recorded,rage 0.1.0.9009,2026-10-09
+Yr.10,0;10;20;30;40;50;60;70;Inf,General ten-year reporting bands,Algorithmic sequence in original rage data-generation script,Not recorded,rage 0.1.0.9009,2026-10-09
+Spec,0;1;5;10;20;40;60;Inf,Legacy special reporting groups,Original rage data-generation script; external specification not recorded,Not recorded,rage 0.1.0.9009,2026-10-09
+Annual,0;15;25;45;65;Inf,Legacy annual disease reporting,Original rage documentation; jurisdiction/report edition not recorded,Not recorded,rage 0.1.0.9009,2026-10-09
+School,0;5;11;14;19;24;30;40;50;60;70;Inf,Legacy school-age reporting,Original rage data-generation script; external specification not recorded,Not recorded,rage 0.1.0.9009,2026-10-09
+Covid,0;5;12;18;20;30;40;50;60;70;Inf,Legacy COVID-19 reporting,Original rage data-generation script; external specification not recorded,Not recorded,rage 0.1.0.9009,2026-10-09

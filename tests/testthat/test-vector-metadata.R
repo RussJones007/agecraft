@@ -1,0 +1,65 @@
+test_that("concatenation and data frame binding retain class, units and order", {
+  x <- as.age_group(c("10-14", "0-4"), unit = "days")
+  y <- as.age_group("5-9", unit = "day")
+  out <- vctrs::vec_c(x, y)
+  expect_s3_class(out, "age_group")
+  expect_identical(attr(out, "unit"), "day")
+  expect_identical(as.character(out), c("10-14", "0-4", "5-9"))
+  expect_identical(attr(vctrs::vec_slice(x, 2), "unit"), "day")
+  expect_identical(attr(x[2], "symbols"), attr(x, "symbols"))
+  bound <- vctrs::vec_rbind(data.frame(group = x), data.frame(group = y))
+  expect_s3_class(bound$group, "age_group")
+  expect_identical(attr(bound$group, "unit"), "day")
+  expect_identical(as.character(bound$group), as.character(out))
+  expect_identical(vctrs::vec_c(x[0], x), x)
+})
+
+test_that("incompatible metadata fails rather than being silently discarded", {
+  x <- as.age_group(c(0, 5, Inf), unit = "day")
+  y <- as.age_group(c(0, 5, Inf), unit = "year")
+  bare <- as.age_group(c(0, 5, Inf))
+  expect_error(vctrs::vec_c(x, y), "incompatible units")
+  expect_error(vctrs::vec_c(x, bare), "incompatible units")
+  expect_error(vctrs::vec_cast(x, y), "incompatible units")
+  expect_error(vctrs::vec_rbind(data.frame(group = x), data.frame(group = y)), "incompatible units")
+  expect_error(vctrs::vec_c(x, ivs::iv(0, 5)), "bare intervals")
+  expect_error(vctrs::vec_c(x, 1), "numeric cut points")
+})
+
+test_that("display negotiation is symmetric and casts use target metadata", {
+  x <- as.age_group(c(0, 5, Inf), sep = " to ", unit = "day")
+  y <- as.age_group(c(0, 5, Inf), sep = "-", unit = "day")
+  canonical <- list(below = "0-", sep = "-", above = "+")
+  expect_identical(attr(vctrs::vec_c(x, y), "symbols"), canonical)
+  expect_identical(attr(vctrs::vec_c(y, x), "symbols"), canonical)
+  expect_identical(attr(vctrs::vec_cast(x, y), "symbols"), attr(y, "symbols"))
+  plain <- vctrs::vec_cast(x, ivs::iv(double(), double()))
+  expect_false(is.age_group(plain))
+  expect_null(attr(plain, "unit"))
+  restored <- vctrs::vec_cast(plain, y)
+  expect_identical(restored, y)
+})
+
+test_that("factor coercion preserves observations while ordering levels by interval", {
+  x <- as.age_group(c("10-14", "0-4", "5-9", "0-4"), unit = "year")
+  f <- generics::as.factor(x)
+  o <- generics::as.ordered(x)
+  expect_identical(as.character(f), as.character(x))
+  expect_identical(as.character(o), as.character(x))
+  expect_identical(levels(o), c("0-4", "5-9", "10-14"))
+  expect_true(is.ordered(o))
+})
+
+test_that("missing slices retain metadata and format as missing", {
+  x <- as.age_group(c(0, 5, Inf), unit = "year")
+  y <- vctrs::vec_slice(x, c(1L, NA_integer_, 2L))
+  expect_identical(as.character(y), c("0-4", NA_character_, "5+"))
+  expect_identical(attr(y, "unit"), "year")
+  expect_identical(as.character(generics::as.ordered(y)), as.character(y))
+})
+
+test_that("deprecation state persists across calls", {
+  id <- "regression_deprecation"
+  expect_message(agecraft:::show_message_once(id, "deprecated once"), "deprecated once")
+  expect_message(agecraft:::show_message_once(id, "deprecated once"), NA)
+})

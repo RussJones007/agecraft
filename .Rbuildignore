@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^data-raw$
+^scripts$
+^REVIEW\.md$
+^MIGRATION\.md$
+^\.github$
+^build$
+^docs$
+^_pkgdown\.yml$
+^CURRENT_STATE\.md$

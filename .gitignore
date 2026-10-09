@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.httr-oauth
+.DS_Store
+.quarto
+scripts/dev.r
+build/
+docs/
+*.Rcheck/
+*.tar.gz
+inst/doc/
+vignettes/*.html
+vignettes/*.R
