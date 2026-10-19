@@ -23,3 +23,17 @@ test_that("migration previews code references and preserves unrelated text", {
   writeLines('age.groups <- list(); x <- age.groups', f)
   expect_true(all(tool$migrate_age_group_presets(f)$action == "local binding: review manually"))
 })
+
+test_that("migration preserves tabs, CRLF and function bindings", {
+  tool <- new.env(parent = baseenv())
+  sys.source(testthat::test_path("..", "..", "inst", "tools", "migrate-age-groups.R"), tool)
+  f <- tempfile(fileext = ".R")
+  con <- file(f, "wb")
+  writeBin(charToRaw("\tx <- age.groups$Annual\r\nf <- function(z) age.groups$ILI\r\n"), con)
+  close(con)
+  tool$migrate_age_group_presets(f, write = TRUE)
+  expect_identical(readBin(f, "raw", file.info(f)$size),
+    charToRaw("\tx <- age_group_presets$Annual\r\nf <- function(z) age_group_presets$ILI\r\n"))
+  writeLines("f <- function(age.groups) age.groups", f)
+  expect_true(all(tool$migrate_age_group_presets(f)$action == "local binding: review manually"))
+})

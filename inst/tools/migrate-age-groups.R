@@ -51,15 +51,30 @@ migrate_age_group_presets <- function(paths, write = FALSE) {
       for (e in rev(edits[order(vapply(edits, function(e) e$h$line1 * 1e6 + e$h$col1, numeric(1)))])) {
         h <- e$h
         line <- lines[h$line1]
-        lines[h$line1] <- paste0(substr(line, 1L, h$col1 - 1L), e$text, substring(line, h$col2 + 1L))
+        # R parser columns expand tabs to eight-column stops. Convert back to
+        # character positions before splicing, leaving whitespace unchanged.
+        chars <- strsplit(line, "", fixed = TRUE)[[1L]]
+        starts <- ends <- integer(length(chars))
+        column <- 1L
+        for (j in seq_along(chars)) {
+          starts[j] <- column
+          column <- if (chars[j] == "\t") column + 8L - ((column - 1L) %% 8L) else column + 1L
+          ends[j] <- column - 1L
+        }
+        first <- match(h$col1, starts); last <- match(h$col2, ends)
+        if (is.na(first) || is.na(last) || substr(line, first, last) != h$text) {
+          stop("Could not safely locate token in ", path, ":", h$line1)
+        }
+        lines[h$line1] <- paste0(substr(line, 1L, first - 1L), e$text, substring(line, last + 1L))
       }
       parse(text = lines) # Validate before changing the file.
       if (!file.copy(path, backup)) stop("Could not create backup: ", backup)
       # Preserve the original file's final newline convention.
       original <- readBin(path, "raw", n = file.info(path)$size)
       trailing <- length(original) && utils::tail(original, 1L) == as.raw(10L)
+      newline <- if (any(original == as.raw(13L))) "\r\n" else "\n"
       con <- file(path, "wb")
-      tryCatch(writeBin(charToRaw(paste0(paste(lines, collapse = "\n"), if (trailing) "\n" else "")), con),
+      tryCatch(writeBin(charToRaw(paste0(paste(lines, collapse = newline), if (trailing) newline else "")), con),
                finally = close(con))
     }
   }
