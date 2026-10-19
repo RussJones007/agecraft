@@ -1,0 +1,12 @@
+test_that("public construction preserves bounds, gaps, overlaps and labels", {
+  x <- age_group(c(1L, 10L, 12L, NA_integer_), c(5L, 15L, Inf, NA), unit = "years")
+  expect_identical(as.character(x), c("1-4", "10-14", "12+", NA_character_))
+  expect_identical(attr(x, "unit"), "year")
+  expect_length(age_group(), 0)
+  expect_identical(ivs::iv_end(age_group(c(1, 3), 5)), c(5, 5))
+  expect_error(age_group(1.5, 5), "whole numbers")
+  expect_error(age_group(1, 5.5), "whole numbers")
+  expect_error(age_group(NA_real_, 5), "both endpoints")
+  expect_error(age_group(5, 5), "start < end")
+  expect_identical(as.character(age_group(1, 5, sep = " to ")), "1 to 4")
+})

@@ -151,3 +151,21 @@ valid_age_group_symbol <- function(x){
   }
   return(ret)
 }
+
+#' Construct age groups directly from bounds
+#'
+#' Each interval includes start and excludes end. For example, bounds 1 and 5
+#' represent completed ages 1-4. Gaps and overlaps are preserved.
+#' @param start,end Nonnegative whole-number endpoints. A scalar end is recycled
+#'   to the length of start. Only end may be Inf. Missing pairs require two NAs.
+#' @param unit Optional time unit, such as "year" or "day".
+#' @param below,sep,above Display symbols, as in [as.age_group()].
+#' @return An age_group interval vector.
+#' @export
+#' @examples
+#' age_group(c(1, 10), c(5, Inf), unit = "year")
+age_group <- function(start = double(), end = double(), unit = NULL,
+                      below = "0-", sep = "-", above = "+") {
+  new_age_group(start, end, symbols = list(below = below, sep = sep, above = above),
+                unit = unit)
+}
