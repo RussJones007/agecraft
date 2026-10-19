@@ -32,7 +32,7 @@ with the units package is an approximation of calendar months or years.
 
 ```{r groups}
 groups <- as.age_group(age_group_presets$Annual, unit = "year")
-category <- age_cat_iv(age, groups)
+category <- categorize_age(age, by = groups)
 data.frame(birth, age, category)
 table(category, useNA = "ifany")
 ```
@@ -46,7 +46,7 @@ claiming an unverified official version or endorsement.
 
 ```{r overlaps}
 overlapping <- as.age_group(c("0-9", "5-14"), unit = "year")
-age_cat_iv(units::set_units(c(3, 7, 12), "year"), overlapping, multiple = "first")
+categorize_age(units::set_units(c(3, 7, 12), "year"), by = overlapping, multiple = "first")
 ```
 
 The default `multiple = "error"` rejects ambiguity. `first` and `last` refer to
@@ -57,7 +57,7 @@ sorted interval order, not the original input order.
 ```{r units}
 days <- calculate_age(as.Date("2025-01-01"), as.Date("2025-02-15"), "day")
 day_groups <- as.age_group(c(0, 7, 14, 30, 60, Inf), unit = "day")
-age_cat_iv(days, day_groups)
+categorize_age(days, by = day_groups)
 ```
 
 Both sides must have units or both must be unitless. `convert_units` selects which

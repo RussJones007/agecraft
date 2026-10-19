@@ -258,7 +258,7 @@ categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
 
 #' Calculate age with an automatically selected unit
 #'
-#' Returns days through day 30. Thereafter uses completed calendar years when
+#' By default, returns days through day 30. Thereafter uses completed calendar years when
 #' available, then completed calendar months, otherwise days. A leap birthday
 #' reaches its next year on March 1 in a non-leap year. Short-month anniversaries
 #' for month calculations fall on the last day of the month.
@@ -318,6 +318,7 @@ age_auto_unit <- function(birth, event, allowed_units = c("day", "month", "year"
 
 
 #' @inherit categorize_age
+#' @details This compatibility wrapper warns once per session. Use categorize_age().
 #' @export
 age_cat <- function(ages, lower = 0, upper=70, by = 10,
                     sep = "-", above.char = " +") {

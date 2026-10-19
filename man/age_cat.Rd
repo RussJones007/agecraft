@@ -40,19 +40,7 @@ the same length or one vector must have length one for scalar recycling.
 The categorize_age() function categorizes ages into age groups as an ordered and labeled factor.
 }
 \details{
-The \link[units:units]{units::units} package is used to set time units for ages. A different unit can be set on the returned vector
-from calculate_age() by using the \code{\link[units:set_units]{units::set_units()}} or the assignment form of the \code{\link[units:units]{units::units()}} functions.  This
-results in conversion of the vector values to the new time unit. You should exercise caution when converting time
-units. While seconds, days, and weeks can be accurately converted, months and year are approximated. The best
-practice is to use this function with the time unit that will be needed in subsequent analysis and avoid converting
-to or from months and years.
-
-Years and months count completed calendar anniversaries using civil dates.
-Leap birthdays reach their next year on March 1 in non-leap years. Month
-anniversaries use the last day of a shorter month. For POSIXct inputs,
-calendar calculations use the start time zone and ignore the time of day;
-smaller units measure elapsed time, so a daylight-saving day may be 23 or 25 hours.
-Missing pairs return NA. Empty, recyclable inputs return a zero-length units vector.
+This compatibility wrapper warns once per session. Use categorize_age().
 }
 \examples{
  # create 10 random birth dates

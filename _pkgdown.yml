@@ -9,6 +9,8 @@ reference:
       - age_group_presets
   - title: Age group vectors
     contents:
+      - age_group
+      - compare_age_groups
       - as.age_group
       - age_group_to_char
       - as.character.age_group

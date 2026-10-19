@@ -1,7 +1,7 @@
 # Public interface and compatibility
 
 The main workflow uses calculate_age(), categorize_age(), age_group(),
-as.age_group(), is.age_group(), and age_auto_unit(). Registered S3 methods
+as.age_group(), is.age_group(), age_auto_unit(), and compare_age_groups(). Registered S3 methods
 remain infrastructure. age_group_to_char() and valid_age_group_symbol() stay
 exported for compatibility; use as.character() and as.age_group() in new code.
 

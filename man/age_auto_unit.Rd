@@ -21,7 +21,7 @@ A numeric vector named "Day", "Week" (when enabled), "Month", or "Year" per obse
 Missing pairs return NA with a blank name; empty inputs return an empty vector.
 }
 \description{
-Returns days through day 30. Thereafter uses completed calendar years when
+By default, returns days through day 30. Thereafter uses completed calendar years when
 available, then completed calendar months, otherwise days. A leap birthday
 reaches its next year on March 1 in a non-leap year. Short-month anniversaries
 for month calculations fall on the last day of the month.

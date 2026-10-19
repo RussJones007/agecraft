@@ -6,7 +6,7 @@ test_that("presets preserve legacy values", {
 
 test_that("migration previews code references and preserves unrelated text", {
   tool <- new.env(parent = baseenv())
-  sys.source(testthat::test_path("..", "..", "inst", "tools", "migrate-age-groups.R"), tool)
+  sys.source(system.file("tools", "migrate-age-groups.R", package = "agecraft", mustWork = TRUE), tool)
   f <- tempfile(fileext = ".R")
   text <- c('# age.groups comment', 'x <- age.groups$Annual; y <- agecraft::age.groups$Yr.5',
             'z <- "age.groups"; a <- x$age.groups; b <- rage::age.groups')
@@ -26,7 +26,7 @@ test_that("migration previews code references and preserves unrelated text", {
 
 test_that("migration preserves tabs, CRLF and function bindings", {
   tool <- new.env(parent = baseenv())
-  sys.source(testthat::test_path("..", "..", "inst", "tools", "migrate-age-groups.R"), tool)
+  sys.source(system.file("tools", "migrate-age-groups.R", package = "agecraft", mustWork = TRUE), tool)
   f <- tempfile(fileext = ".R")
   con <- file(f, "wb")
   writeBin(charToRaw("\tx <- age.groups$Annual\r\nf <- function(z) age.groups$ILI\r\n"), con)

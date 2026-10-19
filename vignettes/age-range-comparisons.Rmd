@@ -1,0 +1,109 @@
+---
+title: "Compare age ranges across records, surveys, and studies"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Compare age ranges across records, surveys, and studies}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(agecraft)
+```
+
+All bounds are nonnegative whole numbers. An interval `[1,5)` includes 1 and
+excludes 5, and prints `1-4`. Units describe the age coordinates. Missing ranges
+have both bounds missing. Fractional bounds are rejected without rounding.
+
+## Genealogy: reconcile records at the same reference date
+
+Suppose two records imply that a person was aged `[20,25)` and `[23,28)` years
+on January 1, 1900. These bounds must already refer to that shared date. The
+package does not infer a birth-date range or advance a record's age to another
+date automatically.
+
+```{r genealogy}
+record_a <- age_group(20, 25, unit = "year")
+record_b <- age_group(23, 28, unit = "year")
+compare_age_groups(record_a, record_b) # [23,25), printed 23-24
+contradiction <- compare_age_groups(record_a, age_group(30, 35, unit = "year"),
+                                    keep_empty = TRUE)
+contradiction # status empty, missing intersection bounds
+```
+
+An empty intersection indicates contradictory ranges under these assumptions.
+A `missing` status instead indicates unavailable evidence. The default crosswalk
+omits both empty and missing pairs; `keep_empty = TRUE` distinguishes them.
+
+For relatives whose possible ages are `[20,25)` and `[40,45)` at the same date,
+the second person's age minus the first's is strictly between 15 and 25 years.
+Those are exclusive bounds on real-valued ages, not completed-age differences.
+
+```{r genealogy-gap}
+compare_age_groups(record_a, age_group(40, 45, unit = "year"), "age_gap")
+```
+
+## Sociology: compare survey definitions and uncertain assignment
+
+Survey A uses `[0,18)` and `[18,65)` years; survey B uses `[0,5)`, `[5,25)`,
+and `[25,65)`. The expected nonempty crosswalk contains `[0,5)`, `[5,18)`,
+`[18,25)`, and `[25,65)`, retaining the source row identifiers and labels.
+
+```{r surveys}
+a <- age_group(c(0, 18), c(18, 65), unit = "year")
+b <- age_group(c(0, 5, 25), c(5, 25, 65), unit = "year")
+compare_age_groups(a, b)
+```
+
+A reported age range `[17,19)` crosses A's boundary at 18: neither assignment
+is definite, while both are possible. Definite membership means containment;
+possible membership means nonempty overlap. Touching endpoints do not overlap.
+
+```{r uncertain-membership}
+reported <- age_group(17, 19, unit = "year")
+compare_age_groups(reported, a, "membership")
+compare_age_groups(reported, a, "membership", membership = "possible")
+# Request ambiguous = "warn" or "error" to flag multiple possible matches.
+categorize_age(reported, by = a, output = "interval") # Missing assignment
+```
+
+Age bands are not birth cohorts. A birth cohort requires a reference date and
+calendar assumptions; labelling a band alone does not establish cohort membership.
+
+## Economics: study coverage and household age gaps
+
+A study defines working age as `[18,65)` years. Published data use `[15,25)`,
+`[25,55)`, and `[55,75)`. Intersections are `[18,25)`, `[25,55)`, and `[55,65)`.
+The crosswalk does not determine what share of a published band's count belongs
+to the study: that requires finer observations or explicit allocation assumptions.
+
+```{r economics}
+study <- age_group(18, 65, unit = "year")
+published <- age_group(c(15, 25, 55), c(25, 55, 75), unit = "year")
+compare_age_groups(study, published)
+# Excluding [25,55) leaves disjoint [18,25) and [55,65) coverage:
+compare_age_groups(study, published[2], "difference")
+compare_age_groups(study, operation = "width") # 47 years of age coordinates
+```
+
+Household ages `[30,35)` and `[32,37)` measured at a common survey date permit
+a second-minus-first age gap strictly between -3 and 7 years. The order is
+unresolved because the ranges overlap. Missing evidence yields missing bounds.
+
+```{r household}
+person_a <- age_group(c(30, NA), c(35, NA), unit = "year")
+person_b <- age_group(32, 37, unit = "year")
+compare_age_groups(person_a, person_b, "age_gap")
+compare_age_groups(person_a, person_b, "ordering")
+```
+
+## Set coverage versus crosswalks
+
+`operation = "intersection"`, `"union"`, and `"difference"` operate on overall
+coverage using ivs set semantics; they can merge adjacent source groups and
+preserve gaps. Use `"crosswalk"` when the source-group identities matter.
+Comparisons require matching units, including on empty vectors. Convert inputs
+explicitly before comparison. Calendar shifting and automatic conversion of
+record ages to a shared date are intentionally deferred until their reference-date
+semantics are specified.
