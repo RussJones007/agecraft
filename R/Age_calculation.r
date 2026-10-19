@@ -35,7 +35,7 @@
 #'   second.
 #'
 #' @return for calculate_age(), the age as an "units" vector matching the unit parameter (e.g."year")
-#' @seealso [age.groups] for a pre-defined list of age groups that are often used.
+#' @seealso [age_group_presets] for a pre-defined list of age groups that are often used.
 #' @export
 #' @examples
 #'  # create 10 random birth dates
@@ -200,7 +200,7 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' data.frame(age = age_vec, grp10)
 #'
 #' # special age groups with a different age separator
-#' categorize_age(ages = age_vec,  sep = " to ", by = age.groups$Spec)
+#' categorize_age(ages = age_vec,  sep = " to ", by = age_group_presets$Spec)
 #'
 #' @export
 categorize_age <- function(ages, lower = 0, upper = 70, by = 10,

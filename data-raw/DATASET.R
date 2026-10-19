@@ -1,7 +1,7 @@
 ## code to prepare `DATASET` dataset goes here
 
 # Creates age.groups list
-age.groups <- list(
+age_group_presets <- list(
   ILI    = c(0,5,25,50,65, Inf),
   IMM    = c(0,1,5,10,15,20,30,40,50,60, Inf),
   Yr.5   = c(seq(from = 0,to = 70,by=5), Inf),
@@ -12,4 +12,5 @@ age.groups <- list(
   Covid  = c(0,5,12,18, 20,30,40,50, 60, 70, Inf)
 )
 
-usethis::use_data(age.groups, overwrite = TRUE)
+age.groups <- age_group_presets # Compatibility alias
+usethis::use_data(age_group_presets, age.groups, overwrite = TRUE)

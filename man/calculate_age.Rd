@@ -125,9 +125,9 @@ grp10
 data.frame(age = age_vec, grp10)
 
 # special age groups with a different age separator
-categorize_age(ages = age_vec,  sep = " to ", by = age.groups$Spec)
+categorize_age(ages = age_vec,  sep = " to ", by = age_group_presets$Spec)
 
 }
 \seealso{
-\link{age.groups} for a pre-defined list of age groups that are often used.
+\link{age_group_presets} for a pre-defined list of age groups that are often used.
 }

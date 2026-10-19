@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------------------------------------------->
 
 # Age group variables ----
-#' Age Groups List with Definitions
+#' Preset age-group definitions
 #'
 #' A named list of frequently used age group definitions.  The definitions are cut points that can be passed to the
 #' either [categorize_age()] or [cut()] functions.  These definitions are based on age groups by years and all
@@ -25,6 +25,9 @@
 #'   table with intended use, available sources, and unknown source-version dates
 #'   is installed at `system.file("extdata", "age-group-provenance.csv", package = "agecraft")`.
 #'   Cut points were retained unchanged on October 9, 2026.
+#' @details `age.groups` is a compatibility alias with identical entries. It will
+#'   remain available through the next non-development release; removal requires
+#'   a later announced breaking release. Use `age_group_presets` in new scripts.
 #' @format
 #' A named list of age groups
 #'
@@ -42,9 +45,12 @@
 #' @examples
 #'
 #' # Show the definition of some age groups
-#' age.groups$ILI
-#' age.groups$Annual
+#' age_group_presets$ILI
+#' age_group_presets$Annual
 #'
+"age_group_presets"
+
+#' @rdname age_group_presets
 "age.groups"
 
 

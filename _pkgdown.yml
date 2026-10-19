@@ -6,7 +6,7 @@ reference:
       - calculate_age
       - age_auto_unit
       - age_cat_iv
-      - age.groups
+      - age_group_presets
   - title: Age group vectors
     contents:
       - as.age_group

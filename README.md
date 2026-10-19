@@ -55,7 +55,7 @@ age_years <- calculate_age(start = birth_dates, end = ref_date, unit = "year")
 age_years
 
 # Categorize ages using included definitions
-categories <- categorize_age(ages = as.numeric(age_years), by = age.groups$Annual)
+categories <- categorize_age(ages = as.numeric(age_years), by = age_group_presets$Annual)
 categories
 
 # Work with the age_group S3 class
@@ -96,7 +96,7 @@ Also exported:
 
 ## Included age-group definitions
 
-The package includes `age.groups`, a named list of commonly used cut points:
+The package includes `age_group_presets`, a named list of commonly used cut points:
 
 -   `ILI`
 -   `IMM`
@@ -133,7 +133,7 @@ as.character(special_groups)
 
 # 4) Categorize ages using included definitions
 ages <- c(0, 1, 4, 8, 17, 23, 39, 54, 72, 88)
-categories <- categorize_age(ages = ages, by = age.groups$Annual)
+categories <- categorize_age(ages = ages, by = age_group_presets$Annual)
 categories
 
 # 5) Preserve units when categorizing
@@ -188,7 +188,7 @@ See the public-health workflow vignette with
 `vignette("public-health-workflow", package = "agecraft")` after installation
 with vignettes. Bundled definitions are legacy reporting conventions rather than
 current clinical guidance. Their provenance and limitations are recorded in
-`inst/extdata/age-group-provenance.csv` and the `age.groups` help page.
+`inst/extdata/age-group-provenance.csv` and the `age_group_presets` help page.
 
 ``` r
 devtools::document()
@@ -205,3 +205,26 @@ Version changes and installation are separate explicit steps; see
 ## License
 
 MIT (`LICENSE` file).
+
+## Migrating preset references
+
+`age_group_presets` replaces `age.groups`; entry names and cut points are
+unchanged. The old list remains available through the next non-development
+release. Removal requires a later announced breaking release.
+
+Preview targeted script edits with the installed helper:
+
+```r
+tool <- system.file("tools", "migrate-age-groups.R", package = "agecraft")
+source(tool)
+migrate_age_group_presets("analysis.R")
+# Apply reviewed edits, keeping analysis.R.bak:
+migrate_age_group_presets("analysis.R", write = TRUE)
+```
+
+The helper changes value references to the list, including
+`agecraft::age.groups`, and preserves entry selections. Comments and strings
+remain untouched; strings, local bindings, member names, and other package
+namespaces are flagged for review. It does not perform a general rage migration.
+Use it on R scripts; edit R Markdown/Quarto code chunks manually. Existing
+backups are never overwritten.

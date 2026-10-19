@@ -7,7 +7,7 @@
 age_cat(ages, lower = 0, upper = 70, by = 10, sep = "-", above.char = " +")
 }
 \arguments{
-\item{ages}{is a vector of integers or units.  If this is a units vector like that returned from the
+\item{ages}{A numeric, units, or interval vector.  If this is a units vector like that returned from the
 calculate_age() function, the return value will also be in that unit of time.}
 
 \item{lower}{is the lowest age (default is 0) to include}
@@ -28,7 +28,8 @@ not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf
 for calculate_age(), the age as an "units" vector matching the unit parameter (e.g."year")
 
 for categorize_age(), a vector of age groups as an ordered factor.  If the ages argument was a units vector,
-the returned factor will have the same units.
+the returned factor will have the same units. With output = "interval", an
+age_group vector in the grouping definition's units is returned.
 }
 \description{
 Functions to calculate age and age groups. The calculate_age() function returns the age from start to
@@ -84,9 +85,9 @@ grp10
 data.frame(age = age_vec, grp10)
 
 # special age groups with a different age separator
-categorize_age(ages = age_vec,  sep = " to ", by = age.groups$Spec)
+categorize_age(ages = age_vec,  sep = " to ", by = age_group_presets$Spec)
 
 }
 \seealso{
-\link{age.groups} for a pre-defined list of age groups that are often used.
+\link{age_group_presets} for a pre-defined list of age groups that are often used.
 }

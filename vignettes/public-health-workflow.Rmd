@@ -31,7 +31,7 @@ with the units package is an approximation of calendar months or years.
 ## Assign reporting groups
 
 ```{r groups}
-groups <- as.age_group(age.groups$Annual, unit = "year")
+groups <- as.age_group(age_group_presets$Annual, unit = "year")
 category <- age_cat_iv(age, groups)
 data.frame(birth, age, category)
 table(category, useNA = "ifany")

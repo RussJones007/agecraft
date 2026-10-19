@@ -24,7 +24,7 @@
 #' @examples
 #' # categorize each age into an age group
 #' ages <- c(0L, 82L, 1L, 1L, 93L, 83L, 76L, 57L, 59L, 67L, 0L, 64L, 60L, 0L)
-#' groups <- age_cat_iv(age = ages, age_group = age.groups$Yr.10)
+#' groups <- age_cat_iv(age = ages, age_group = age_group_presets$Yr.10)
 #' head(groups, 12)
 age_cat_iv <- function(age, age_group,
                        multiple = c("error", "first", "last"),
