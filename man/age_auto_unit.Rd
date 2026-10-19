@@ -4,14 +4,20 @@
 \alias{age_auto_unit}
 \title{Calculate age with an automatically selected unit}
 \usage{
-age_auto_unit(birth, event)
+age_auto_unit(birth, event, allowed_units = c("day", "month", "year"))
 }
 \arguments{
 \item{birth, event}{Date or POSIXct vectors, with scalar recycling. Date-times
 are converted to civil dates in their own time zones.}
+
+\item{allowed_units}{Units eligible for selection, including "day". The default
+preserves days through day 30, then completed years/months. Opt into weeks
+with c("day", "week", "month", "year"): choose completed years, then
+calendar months, then weeks (floor(days / 7)), otherwise days. Input order
+does not change this priority. Hours are not supported.}
 }
 \value{
-A numeric vector named "Day", "Month", or "Year" per observation.
+A numeric vector named "Day", "Week" (when enabled), "Month", or "Year" per observation.
 Missing pairs return NA with a blank name; empty inputs return an empty vector.
 }
 \description{
@@ -19,6 +25,19 @@ Returns days through day 30. Thereafter uses completed calendar years when
 available, then completed calendar months, otherwise days. A leap birthday
 reaches its next year on March 1 in a non-leap year. Short-month anniversaries
 for month calculations fall on the last day of the month.
+}
+\details{
+Surveillance systems often store a value and unit together, so 6
+days, 6 months and 6 years remain distinguishable. Values are whole numbers;
+unit labels are vector names, not a single common units attribute.
+}
+\examples{
+birth <- as.Date("2024-01-01")
+event <- birth + c(6, 7, 28, 31, 366, NA)
+age_auto_unit(birth, event, allowed_units = c("day", "week", "month", "year"))
+if (requireNamespace("tibble", quietly = TRUE)) {
+  tibble::enframe(age_auto_unit(birth, event), name = "age_unit", value = "age")
+}
 }
 \seealso{
 \code{\link[=calculate_age]{calculate_age()}}

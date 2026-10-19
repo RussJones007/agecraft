@@ -265,11 +265,31 @@ categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
 #'
 #' @param birth,event Date or POSIXct vectors, with scalar recycling. Date-times
 #'   are converted to civil dates in their own time zones.
-#' @return A numeric vector named "Day", "Month", or "Year" per observation.
+#' @param allowed_units Units eligible for selection, including "day". The default
+#'   preserves days through day 30, then completed years/months. Opt into weeks
+#'   with c("day", "week", "month", "year"): choose completed years, then
+#'   calendar months, then weeks (floor(days / 7)), otherwise days. Input order
+#'   does not change this priority. Hours are not supported.
+#' @details Surveillance systems often store a value and unit together, so 6
+#'   days, 6 months and 6 years remain distinguishable. Values are whole numbers;
+#'   unit labels are vector names, not a single common units attribute.
+#' @examples
+#' birth <- as.Date("2024-01-01")
+#' event <- birth + c(6, 7, 28, 31, 366, NA)
+#' age_auto_unit(birth, event, allowed_units = c("day", "week", "month", "year"))
+#' if (requireNamespace("tibble", quietly = TRUE)) {
+#'   tibble::enframe(age_auto_unit(birth, event), name = "age_unit", value = "age")
+#' }
+#' @return A numeric vector named "Day", "Week" (when enabled), "Month", or "Year" per observation.
 #'   Missing pairs return NA with a blank name; empty inputs return an empty vector.
 #' @seealso [calculate_age()]
 #' @export
-age_auto_unit <- function(birth, event) {
+age_auto_unit <- function(birth, event, allowed_units = c("day", "month", "year")) {
+  if (!is.character(allowed_units) || !length(allowed_units) || anyNA(allowed_units) ||
+      any(!allowed_units %in% c("day", "week", "month", "year")) ||
+      !"day" %in% allowed_units) {
+    stop("allowed_units must contain day and optionally week, month, year", call. = FALSE)
+  }
   if (!(inherits(birth, "Date") || inherits(birth, "POSIXct")) ||
       !(inherits(event, "Date") || inherits(event, "POSIXct"))) {
     stop("birth and event must be Date or POSIXct vectors", call. = FALSE)
@@ -278,10 +298,15 @@ age_auto_unit <- function(birth, event) {
   days <- as.numeric(calculate_age(dates$birth, dates$event, "day"))
   years <- as.numeric(calculate_age(dates$birth, dates$event, "year"))
   months <- as.numeric(calculate_age(dates$birth, dates$event, "month"))
-  use_year <- !is.na(days) & days > 30 & years >= 1
-  use_month <- !is.na(days) & days > 30 & !use_year & months >= 1
+  legacy_days <- !"week" %in% allowed_units
+  eligible <- !is.na(days) & (!legacy_days | days > 30)
+  use_year <- eligible & "year" %in% allowed_units & years >= 1
+  use_month <- eligible & "month" %in% allowed_units & !use_year & months >= 1
+  use_week <- !is.na(days) & "week" %in% allowed_units & !use_year & !use_month & days >= 7
   ages <- days
   labels <- rep("Day", length(days))
+  ages[use_week] <- floor(days[use_week] / 7)
+  labels[use_week] <- "Week"
   ages[use_month] <- months[use_month]
   labels[use_month] <- "Month"
   ages[use_year] <- years[use_year]
