@@ -35,18 +35,13 @@ get_unit <- purrr::attr_getter("unit")
 
 #' Create an interval age_group
 #'
-#' Creates an vector of age_group with minimal checking.  Other functions call this constructor where proper validation
-#' occurs. All ages can be represented as "group" of ages.  For example 4 years old is easily represented as '[4,5)'.
+#' Creates validated, right-open age intervals. Finite endpoints must be
+#' nonnegative whole numbers; endpoints are stored as doubles so that Inf can
+#' represent an open-ended upper age group, such as [85, Inf).
 #'
-#' @details
-#' Double vectors are used.  Integers were originally used as they are smaller and the idea that the ends and starts
-#' would always be integer types.  However integer is not consistent with the concept of an interval which encompasses
-#' all real numbers beginning with 'start' up to but not including 'end'.  Another very important reason to use use
-#' double instead of integer is the 'Inf' is supported in doubles but not integers.  Age groups that include an age and
-#' above are encoded as a right open interval using   'Inf'. For  example '85 +' is encoded as an interval like so '[85,
-#' Inf)'
-#'
-#' @param start,end are double vectors of the same length.
+#' @param start,end Nonnegative whole-number endpoints, stored as doubles.
+#'   `start` determines the interval count; a scalar `end` is recycled.
+#'   Only `end` may be Inf. Missing intervals have both endpoints missing.
 #' @param unit Optional age unit, such as year or day.
 #' @param symbols is a list of three with symbols for: separator, below, and above
 #'
@@ -57,15 +52,34 @@ new_age_group <- function(start = double(),
                           end = double(),
                           symbols = list(below = "0-", sep = "-", above = "+"),
                           unit = NULL){
-  assert_that(is.double(start))
-  assert_that(is.double(end))
-  assert_that(rlang::is_list(symbols) & (length(symbols) == 3))
-  if(!is.null(unit)) assert_that(assertthat::is.string(unit))
-  unit <- normalize_age_unit(unit)
-
-  ret <- ivs::new_iv(start, end, class = "age_group", symbols = symbols, unit = unit)
-
-  return(ret)
+  start <- vctrs::vec_cast(start, double())
+  end <- vctrs::vec_cast(end, double())
+  end <- vctrs::vec_recycle(end, length(start))
+  if (!is.list(symbols) || length(symbols) != 3L ||
+      !setequal(names(symbols), c("below", "sep", "above")) ||
+      !all(vapply(symbols, function(x) is.character(x) && length(x) == 1L && !is.na(x), logical(1)))) {
+    stop("`symbols` must contain scalar strings named below, sep, and above", call. = FALSE)
+  }
+  if (!is.null(unit) && (!is.character(unit) || length(unit) != 1L || is.na(unit) || !nzchar(trimws(unit)))) {
+    stop("`unit` must be NULL or a nonempty scalar string", call. = FALSE)
+  }
+  if (any(xor(is.na(start), is.na(end)))) {
+    stop("Missing intervals must have both endpoints missing", call. = FALSE)
+  }
+  present <- !is.na(start)
+  if (any(!is.finite(start[present]) | start[present] < 0) ||
+      any(end[present] == -Inf | end[present] < 0)) {
+    stop("Age endpoints must be nonnegative; only `end` may be Inf", call. = FALSE)
+  }
+  finite_end <- end[is.finite(end)]
+  if (any(start[present] != trunc(start[present])) || any(finite_end != trunc(finite_end))) {
+    stop("Age endpoints must be whole numbers", call. = FALSE)
+  }
+  if (any(start[present] >= end[present])) {
+    stop("Each interval must have start < end", call. = FALSE)
+  }
+  ivs::new_iv(start, end, class = "age_group", symbols = symbols,
+              unit = normalize_age_unit(unit))
 }
 
 #' @returns is.age_group returns either TRUE or FALSE
@@ -80,7 +94,10 @@ vec_ptype_abbr.age_group <- function(x, ...){"aGrp"}
 
 #' @keywords internal
 #' @exportS3Method vctrs::vec_ptype_full
-vec_ptype_full.age_group <- function(x, ...) "age_group"
+vec_ptype_full.age_group <- function(x, ...) {
+  unit <- get_unit(x)
+  if (is.null(unit)) "age_group" else paste0("age_group<", unit, ">")
+}
 
 # functions for restoring attributes -------------------------------------------------------------------------------
 

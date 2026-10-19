@@ -18,7 +18,7 @@ Version: **0.1.0.9010**, development package; R >= 4.1.0.
 
 ## Validation
 
-138 test expectations passed: zero failures, warnings, or skips.
+138 test expectations passed: zero failures, warnings, or skips.http://192.168.1.166:32400/web/index.html#
 `devtools::check(document = FALSE, cran = TRUE)` passed with **0 errors,
 0 warnings, and 0 notes**, including examples, installation, namespace loading,
 and vignette rebuilding. This Linux check used R 4.6.1 and `--no-manual`;

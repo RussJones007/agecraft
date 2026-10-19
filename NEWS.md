@@ -1,3 +1,15 @@
+# Development changes
+
+- Validate whole-number, nonnegative age-group endpoints and metadata. A scalar
+  upper endpoint is recycled to the number of starts; other size mismatches fail.
+- Handle empty and scalar numeric constructors; reject unordered, fractional,
+  duplicate, and missing cut points.
+- Preserve missing character, factor, and interval observations and existing
+  age-group display metadata; format missing values without adding unit text.
+- Include units in full vector type names and accept the documented `plus` suffix.
+- Keep unit-conversion matching intervals separate from whole-number age groups,
+  preserving original labels without rounding converted boundaries.
+
 # agecraft 0.1.0.9010
 
 * Rename the original rage package to agecraft; require R >= 4.1.0.

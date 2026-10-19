@@ -49,7 +49,7 @@ vec_ptype2.double.age_group <- function(x, y, ...) {
 
 #' @exportS3Method vctrs::vec_ptype2
 vec_ptype2.age_group.ivs_iv <- function(x, y, ...) {
-  stop("Convert bare intervals with as.age_group() before combining", call. = FALSE)
+  stop("Arguments must have the same class. Convert bare intervals with as.age_group() before combining or calling ivs::iv_set_intersect()", call. = FALSE)
 }
 
 #' @exportS3Method vctrs::vec_ptype2
@@ -95,7 +95,18 @@ as.integer.age_group <- function(x, ...){
 #' Combining age_group vectors preserves their class and unit. Units must match
 #' (including the presence or absence of units); convert explicitly beforehand.
 #' Differing display symbols fall back to canonical 0-, -, and + symbols.
+#' For [ivs::iv_set_intersect()], both arguments must have the same class:
+#' mixing an age_group with a bare ivs interval is an error in either order.
+#' Convert bare intervals with as.age_group() before intersecting; their units
+#' must also match the age groups.
 #' Casting to a bare ivs interval explicitly discards age metadata.
+#' Finite endpoints must be nonnegative whole numbers; fractional boundaries
+#' are rejected without rounding. Numeric cuts must be strictly increasing,
+#' with Inf allowed only at the end. A scalar finite cut creates a one-unit
+#' interval. Empty input creates an empty vector. Missing character, factor,
+#' and interval observations are preserved; numeric cut points cannot be missing.
+#' Existing age groups retain metadata unless explicitly overridden. Changing
+#' an existing non-NULL unit requires explicit conversion first.
 #'
 #' The age_group class is based on numeric intervals, specifically the ivs class. An [introduction to
 #' ivs](https://davisvaughan.github.io/ivs/articles/ivs.html) intervals explains what they are, notation, and the math
@@ -139,8 +150,8 @@ as.integer.age_group <- function(x, ...){
 #' ag_num
 #'
 #' @export
-as.age_group <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
-  UseMethod("as.age_group")
+as.age_group <- function(x = double(), below = "0-", sep = "-", above = "+", unit = NULL) {
+  UseMethod("as.age_group", x)
 }
 
 #' @rdname as.age_group
@@ -155,8 +166,12 @@ as.age_group.factor <- function(x, below = "0-", sep = "-", above = "+", unit = 
 as.age_group.character <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
   x <- str_trim(x, side = "both") |> str_to_lower()
 
+  grammar <- "^(?:[0-9]+|< *[0-9]+|[0-9]+ *[-] *[0-9]+|[0-9]+ *(?:through|thru|to) *[0-9]+|[0-9]+ *(?:plus|above|>|\\+)|all(?: ages)?|total)$"
+  if (any(!is.na(x) & !str_detect(x, grammar))) {
+    stop("These age groups in x are malformed: use nonnegative whole numbers and supported symbols", call. = FALSE)
+  }
   # check that the correct symbols are present
-  valid_syms <- valid_age_group_symbol(x)
+  valid_syms <- valid_age_group_symbol(x[!is.na(x)])
   if(isFALSE(valid_syms)){
     msg <- paste0('These age groups in x are malformed: "', get_problems(valid_syms), '"')
     stop(msg)
@@ -187,13 +202,13 @@ as.age_group.character <- function(x, below = "0-", sep = "-", above = "+", unit
   starts <- str_extract(x, regex("^(<|\\d{1,7}|all|total)", ignore_case = TRUE)) |>
     str_replace(pattern = regex("(all|total|<|-)", ignore_case = TRUE), replacement = "0") |>
     as.double()
-  ends <- str_extract(x, regex("(>|\\d{1,7}|all( ages)?|total|\\+|above)$", ignore_case = TRUE)) |>
-    str_replace(pattern = regex("(all( ages)?|total|>|\\+|above)", ignore_case = TRUE), replacement = "Inf") |>
+  ends <- str_extract(x, regex("(>|\\d{1,7}|all( ages)?|total|\\+|plus|above)$", ignore_case = TRUE)) |>
+    str_replace(pattern = regex("(all( ages)?|total|>|\\+|plus|above)", ignore_case = TRUE), replacement = "Inf") |>
     as.double()
 
   # check if any NAs exists and throw error with message
-  st_ndx <- is.na(starts)
-  en_ndx <- is.na(ends)
+  st_ndx <- !is.na(x) & is.na(starts)
+  en_ndx <- !is.na(x) & is.na(ends)
   if(any(st_ndx | en_ndx)) {
     ndx <- c(which(st_ndx), which(en_ndx)) |> unique() |> sort()
     err_age_groups <- x[ndx] |> paste(collapse = ", ") |> unique()
@@ -201,7 +216,8 @@ as.age_group.character <- function(x, below = "0-", sep = "-", above = "+", unit
     stop(msg)
   }
 
-  ends[!str_detect(x, "^<")] <- ends[!str_detect(x, "^<")] + 1
+  inclusive <- !is.na(x) & !str_detect(x, "^<")
+  ends[inclusive] <- ends[inclusive] + 1
   ret <- new_age_group(starts, ends, symbols, unit = unit)
 
   return(ret)
@@ -218,19 +234,21 @@ as.age_group.integer <- function(x, below = "0-", sep = "-", above = "+", unit =
 
 #' @rdname as.age_group
 #' @exportS3Method as.age_group double
-as.age_group.double <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
-  assert_that(is.double(x))
-  assert_that(min(x, na.rm = TRUE) >= 0)
-
-  start <- x[1:length(x)]
-  end <- c(x[2:length(x)], x[length(x)] + 1)
-
-  if(start[1] != 0) below = paste0(start[1], "-")   # age groups does not include 0
-
-  # if Inf is present at the end, then trim both start and end
-  if(end[length(end)] == Inf){
-    start <- start[seq_len(length(x)-1)]
-    end <- end[seq_len(length(x)-1)]
+as.age_group.double <- function(x = double(), below = "0-", sep = "-", above = "+", unit = NULL) {
+  if (anyNA(x) || any(x < 0) || any(is.finite(x) & x != trunc(x))) {
+    stop("Numeric cut points must be nonmissing, nonnegative whole numbers (or final Inf)", call. = FALSE)
+  }
+  if (is.unsorted(x, strictly = TRUE)) {
+    stop("Numeric cut points must be strictly increasing", call. = FALSE)
+  }
+  if (length(x) == 1L && is.infinite(x)) {
+    stop("Inf requires a finite preceding cut point", call. = FALSE)
+  }
+  start <- x
+  end <- if (length(x)) c(x[-1L], utils::tail(x, 1L) + 1) else double()
+  if (length(x) && is.infinite(utils::tail(x, 1L))) {
+    start <- utils::head(start, -1L)
+    end <- utils::head(end, -1L)
   }
 
   syms <- list("below" = below, "sep" = sep, "above" = above)
@@ -251,6 +269,19 @@ as.age_group.double <- function(x, below = "0-", sep = "-", above = "+", unit = 
 as.age_group.ivs_iv <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
   syms <- list("below" = below, "sep" = sep, "above" = above)
   unit <- unit %||% attr(x, "unit")
-  x <- stats::na.omit(x)
   new_age_group(ivs::iv_start(x), ivs::iv_end(x), syms, unit = unit)
+}
+
+#' @rdname as.age_group
+#' @exportS3Method as.age_group age_group
+as.age_group.age_group <- function(x, below = "0-", sep = "-", above = "+", unit = NULL) {
+  symbols <- get_symbols(x)
+  if (!missing(below)) symbols$below <- below
+  if (!missing(sep)) symbols$sep <- sep
+  if (!missing(above)) symbols$above <- above
+  if (missing(unit)) unit <- get_unit(x)
+  if (!identical(normalize_age_unit(unit), get_unit(x)) && !is.null(get_unit(x))) {
+    stop("Changing age units requires explicit conversion first", call. = FALSE)
+  }
+  new_age_group(ivs::iv_start(x), ivs::iv_end(x), symbols, unit)
 }

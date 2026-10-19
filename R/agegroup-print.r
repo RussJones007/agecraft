@@ -8,7 +8,7 @@
 format.age_group <- function(x, ...){
   ch <- as.character.age_group(x)
   unit <- get_unit(x)
-  if(!is.null(unit)) ch <- paste0(ch, " [", unit, "]")
+  if(!is.null(unit)) ch[!is.na(ch)] <- paste0(ch[!is.na(ch)], " [", unit, "]")
   ch
 }
 

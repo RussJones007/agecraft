@@ -8,11 +8,12 @@
 \alias{as.age_group.integer}
 \alias{as.age_group.double}
 \alias{as.age_group.ivs_iv}
+\alias{as.age_group.age_group}
 \title{Age groups class}
 \usage{
 is.age_group(x)
 
-as.age_group(x, below = "0-", sep = "-", above = "+", unit = NULL)
+as.age_group(x = double(), below = "0-", sep = "-", above = "+", unit = NULL)
 
 \method{as.age_group}{factor}(x, below = "0-", sep = "-", above = "+", unit = NULL)
 
@@ -20,9 +21,11 @@ as.age_group(x, below = "0-", sep = "-", above = "+", unit = NULL)
 
 \method{as.age_group}{integer}(x, below = "0-", sep = "-", above = "+", unit = NULL)
 
-\method{as.age_group}{double}(x, below = "0-", sep = "-", above = "+", unit = NULL)
+\method{as.age_group}{double}(x = double(), below = "0-", sep = "-", above = "+", unit = NULL)
 
 \method{as.age_group}{ivs_iv}(x, below = "0-", sep = "-", above = "+", unit = NULL)
+
+\method{as.age_group}{age_group}(x, below = "0-", sep = "-", above = "+", unit = NULL)
 }
 \arguments{
 \item{x}{for as.age_group() a character, factor, numeric vector or interval vector \code{\link[ivs:iv]{ivs::iv()}}. Character based age
@@ -53,7 +56,18 @@ age ranges as an numeric interval. The is.age_group() function tests whether a v
 Combining age_group vectors preserves their class and unit. Units must match
 (including the presence or absence of units); convert explicitly beforehand.
 Differing display symbols fall back to canonical 0-, -, and + symbols.
+For \code{\link[ivs:iv_set_intersect]{ivs::iv_set_intersect()}}, both arguments must have the same class:
+mixing an age_group with a bare ivs interval is an error in either order.
+Convert bare intervals with as.age_group() before intersecting; their units
+must also match the age groups.
 Casting to a bare ivs interval explicitly discards age metadata.
+Finite endpoints must be nonnegative whole numbers; fractional boundaries
+are rejected without rounding. Numeric cuts must be strictly increasing,
+with Inf allowed only at the end. A scalar finite cut creates a one-unit
+interval. Empty input creates an empty vector. Missing character, factor,
+and interval observations are preserved; numeric cut points cannot be missing.
+Existing age groups retain metadata unless explicitly overridden. Changing
+an existing non-NULL unit requires explicit conversion first.
 
 The age_group class is based on numeric intervals, specifically the ivs class. An \href{https://davisvaughan.github.io/ivs/articles/ivs.html}{introduction to ivs} intervals explains what they are, notation, and the math
 that can be done with them. Regarding notation,age groups are presented as "5-10"  to represent all ages beginning

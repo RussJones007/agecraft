@@ -12,7 +12,9 @@ new_age_group(
 )
 }
 \arguments{
-\item{start, end}{are double vectors of the same length.}
+\item{start, end}{Nonnegative whole-number endpoints, stored as doubles.
+\code{start} determines the interval count; a scalar \code{end} is recycled.
+Only \code{end} may be Inf. Missing intervals have both endpoints missing.}
 
 \item{symbols}{is a list of three with symbols for: separator, below, and above}
 
@@ -23,15 +25,8 @@ an age_group object represented as intervals. The attribute "symbols" is set and
 age_group when printed.
 }
 \description{
-Creates an vector of age_group with minimal checking.  Other functions call this constructor where proper validation
-occurs. All ages can be represented as "group" of ages.  For example 4 years old is easily represented as '[4,5)'.
-}
-\details{
-Double vectors are used.  Integers were originally used as they are smaller and the idea that the ends and starts
-would always be integer types.  However integer is not consistent with the concept of an interval which encompasses
-all real numbers beginning with 'start' up to but not including 'end'.  Another very important reason to use use
-double instead of integer is the 'Inf' is supported in doubles but not integers.  Age groups that include an age and
-above are encoded as a right open interval using   'Inf'. For  example '85 +' is encoded as an interval like so '[85,
-Inf)'
+Creates validated, right-open age intervals. Finite endpoints must be
+nonnegative whole numbers; endpoints are stored as doubles so that Inf can
+represent an open-ended upper age group, such as [85, Inf).
 }
 \keyword{internal}

@@ -185,11 +185,11 @@ categorize_age_impl <- function(ages, lower = 0, upper=70, by = 10,
 
   if(length(by) ==1){  # uniform span in age groups
     brks <- c(seq(lower, upper, by = by), Inf)
-    labs <- brks |> as.age_group(sep = sep, below = lower, above = above.char) |> as.character()
+    labs <- brks |> as.age_group(sep = sep, below = paste0(lower, "-"), above = above.char) |> as.character()
     ret  <-  cut(ages, breaks = brks,
               right = FALSE, labels = labs, ordered_result = T)
       } else {  # custom age cuts being used
-    labs   <- by |>  as.age_group(sep = sep, below = lower, above = above.char) |> as.character()
+    labs   <- by |>  as.age_group(sep = sep, below = paste0(lower, "-"), above = above.char) |> as.character()
     ret    <- cut(ages, breaks = by, right = FALSE,labels = labs, ordered_result = T)
       }
   if(!is.null(attr(ages, "units"))) attr(ret, "units") <- attr(ages, "units")[["numerator"]]

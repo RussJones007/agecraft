@@ -103,11 +103,9 @@ age_cat_iv_align_units <- function(age, age_group,
 
   if(convert_units == "age_to_group") {
     if(is.age_group(age) || inherits(age, "ivs_iv")) {
-      age <- new_age_group(
+      age <- ivs::iv(
         start = age_cat_iv_convert_values(ivs::iv_start(age), age_unit, group_unit),
-        end = age_cat_iv_convert_values(ivs::iv_end(age), age_unit, group_unit),
-        symbols = get_symbols(age),
-        unit = group_unit
+        end = age_cat_iv_convert_values(ivs::iv_end(age), age_unit, group_unit)
       )
     } else {
       if(!is.null(attr(age, "units"))) {
@@ -115,15 +113,14 @@ age_cat_iv_align_units <- function(age, age_group,
       }
     }
   } else {
-    age_group <- new_age_group(
+    haystack <- ivs::iv(
       start = age_cat_iv_convert_values(ivs::iv_start(age_group), group_unit, age_unit),
-      end = age_cat_iv_convert_values(ivs::iv_end(age_group), group_unit, age_unit),
-      symbols = get_symbols(age_group),
-      unit = age_unit
+      end = age_cat_iv_convert_values(ivs::iv_end(age_group), group_unit, age_unit)
     )
   }
 
-  list(age = age, age_group = age_group)
+  list(age = age, age_group = age_group,
+       haystack = if (convert_units == "group_to_age") haystack else age_group)
 }
 
 # convert iv locate output to an ordered factor aligned to input needle order.
@@ -171,7 +168,7 @@ age_cat_iv.numeric <- function(age, age_group,
   age_group <- aligned$age_group
   locations <- ivs::iv_locate_between(
     needles = as.numeric(age),
-    haystack = age_group
+    haystack = aligned$haystack %||% age_group
   )
   age_cat_iv_to_factor(locations = locations, age_group = age_group, n_needles = length(age), multiple = multiple)
 }
@@ -197,7 +194,7 @@ age_cat_iv.units <- function(age, age_group,
   age_group <- aligned$age_group
   locations <- ivs::iv_locate_between(
     needles = as.numeric(age),
-    haystack = age_group
+    haystack = aligned$haystack %||% age_group
   )
   age_cat_iv_to_factor(locations = locations, age_group = age_group, n_needles = length(age), multiple = multiple)
 }
@@ -212,9 +209,12 @@ age_cat_iv.age_group <- function(age, age_group,
                                     convert_units = convert_units, allow_approx = allow_approx)
   age <- aligned$age
   age_group <- aligned$age_group
+  # Unit conversion may produce fractional matching boundaries. Use bare
+  # intervals internally and retain the original whole-number group labels.
+  haystack <- aligned$haystack %||% age_group
   locations <- ivs::iv_locate_overlaps(
-    needles = age,
-    haystack = age_group,
+    needles = ivs::iv(ivs::iv_start(age), ivs::iv_end(age)),
+    haystack = ivs::iv(ivs::iv_start(haystack), ivs::iv_end(haystack)),
     type = "within"
   )
   age_cat_iv_to_factor(locations = locations, age_group = age_group, n_needles = length(age), multiple = multiple)
