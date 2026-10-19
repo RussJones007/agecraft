@@ -160,7 +160,7 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
                     .sep = "-", .above.char = " +") {
   show_message_once("age_dot_cat_deprecated",
                     paste("The age.cat() function is deprecated and will eventually be removed. \n",
-                          "Use categorize_age() or age_cat() instead. This message is shown once during the session.")
+                          "Use categorize_age() instead. This message is shown once during the session.")
   )
   categorize_age(ages = .ages, lower = .lower, upper = .upper, by = .by,
                  sep = .sep, above.char = .above.char)
@@ -270,10 +270,8 @@ age_auto_unit <- function(birth, event) {
 #' @export
 age_cat <- function(ages, lower = 0, upper=70, by = 10,
                     sep = "-", above.char = " +") {
-  show_message_once("age_cat_deprecated",
-                    paste("The age_cat() function is deprecated and will eventually be removed. \n",
-                          "Use categorize_age() instead. This message is shown once during the session.")
-  )
+  warn_deprecated_once("age_cat_deprecated",
+                        "The age_cat() function is deprecated; use categorize_age() instead.")
   categorize_age(ages = ages, lower = lower, upper = upper, by = by,
                  sep = sep, above.char = above.char)
 }

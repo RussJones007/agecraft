@@ -39,7 +39,7 @@ test_that(
   {
     ages <- 82:0 |>
       units::set_units("year")
-    expect_message(ann_cat <- age_cat(ages = ages, by = age.groups$Annual), regexp = "^The age_cat")
+    expect_warning(ann_cat <- age_cat(ages = ages, by = age.groups$Annual), regexp = "^The age_cat")
     ann_table  <- ann_cat |> table()
     expect_message(ann_cat2 <- age.cat(.ages = ages, .by = 10), regexp = "^The age\\.cat")
     expect_true(!is.null(attr(ann_cat, "units")))

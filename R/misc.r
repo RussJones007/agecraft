@@ -58,3 +58,10 @@ show_message_once <- function(list_item, msg) {
   .msg_once_list[[list_item]] <- TRUE
   invisible(NULL)
 }
+
+warn_deprecated_once <- function(id, text) {
+  if (isTRUE(.msg_once_list[[id]])) return(invisible(NULL))
+  warning(text, call. = FALSE)
+  .msg_once_list[[id]] <- TRUE
+  invisible(NULL)
+}
