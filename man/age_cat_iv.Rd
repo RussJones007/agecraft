@@ -22,7 +22,10 @@ vectors are internally converted to intervals as an age_group vector.}
 One of "error" (default), "first", or "last".}
 
 \item{convert_units}{which side to convert when \code{age} and \code{age_group} units differ.
-One of "age_to_group" (default), "group_to_age", or "none".}
+One of "age_to_group" (default), "group_to_age", or "none".
+Groups without units are interpreted in the units of \code{age}, when present,
+without changing their interval boundaries. Unitless ages with explicitly
+unit-bearing groups remain an error.}
 
 \item{allow_approx}{logical; if FALSE (default), block conversions between fine units
 (second/minute/hour/day/week) and coarse units (month/year) because they are approximate.}

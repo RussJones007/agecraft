@@ -174,6 +174,27 @@ test_that(
   }
 )
 
+test_that("unitless groups inherit age units without rescaling boundaries", {
+  groups <- as.age_group(c(0, 5, 10, Inf))
+  expected <- age_cat_iv(c(0, 5, 10, NA, -1), groups)
+  for (mode in c("age_to_group", "group_to_age", "none")) {
+    expect_identical(
+      age_cat_iv(units::set_units(c(0, 5, 10, NA, -1), "month"),
+                 groups, convert_units = mode),
+      expected
+    )
+  }
+  expect_null(attr(groups, "unit"))
+  expect_identical(
+    age_cat_iv(as.age_group(c("0-4", "5-9"), unit = "year"), groups),
+    age_cat_iv(as.age_group(c("0-4", "5-9")), groups)
+  )
+  expect_identical(
+    age_cat_iv(units::set_units(c(1, 7), "day"), c(0, 5, 10, Inf)),
+    age_cat_iv(c(1, 7), groups)
+  )
+})
+
 test_that(
   "age_cat_iv can convert group units to age units when requested",
   {

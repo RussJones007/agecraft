@@ -14,6 +14,9 @@
 #'   One of "error" (default), "first", or "last".
 #' @param convert_units which side to convert when `age` and `age_group` units differ.
 #'   One of "age_to_group" (default), "group_to_age", or "none".
+#'   Groups without units are interpreted in the units of `age`, when present,
+#'   without changing their interval boundaries. Unitless ages with explicitly
+#'   unit-bearing groups remain an error.
 #' @param allow_approx logical; if FALSE (default), block conversions between fine units
 #'   (second/minute/hour/day/week) and coarse units (month/year) because they are approximate.
 #'
@@ -86,6 +89,10 @@ age_cat_iv_align_units <- function(age, age_group,
   group_unit <- normalize_age_unit(get_unit(age_group))
 
   if(is.null(age_unit) && is.null(group_unit)) return(list(age = age, age_group = age_group))
+  if(is.null(group_unit)) {
+    attr(age_group, "unit") <- age_unit
+    return(list(age = age, age_group = age_group))
+  }
   if(is.null(age_unit) || is.null(group_unit)) {
     stop('Age and age_group units are not compatible: one has units and the other does not')
   }
