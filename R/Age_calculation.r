@@ -166,38 +166,17 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
                  sep = .sep, above.char = .above.char)
 }
 
-categorize_age_impl <- function(ages, lower = 0, upper=70, by = 10,
-                                sep = "-", above.char = " +") {
-
-  if(!is.numeric(ages)) stop('Argument: "ages" must be numeric')
-  if(!is.numeric(lower)) stop('Argument: "lower" must be numeric')
-  if(!is.numeric(upper)) stop('Argument: "upper" must be numeric')
-
-  by_is_numeric <- is.numeric(by)
-  by_is_age_group <- is.age_group(by)
-  if(!(by_is_numeric || by_is_age_group)) {
-    stop('Argument: "by" must be numeric cut points or an age_group vector')
-  }
-
-  if(by_is_age_group) {
-    ret <- age_cat_iv(age = ages, age_group = by)
-  } else
-
-  if(length(by) ==1){  # uniform span in age groups
-    brks <- c(seq(lower, upper, by = by), Inf)
-    labs <- brks |> as.age_group(sep = sep, below = paste0(lower, "-"), above = above.char) |> as.character()
-    ret  <-  cut(ages, breaks = brks,
-              right = FALSE, labels = labs, ordered_result = T)
-      } else {  # custom age cuts being used
-    labs   <- by |>  as.age_group(sep = sep, below = paste0(lower, "-"), above = above.char) |> as.character()
-    ret    <- cut(ages, breaks = by, right = FALSE,labels = labs, ordered_result = T)
-      }
-  if(!is.null(attr(ages, "units"))) attr(ret, "units") <- attr(ages, "units")[["numerator"]]
-  return(ret)
-}
-
-#' @param ages is a vector of integers or units.  If this is a units vector like that returned from the
+#' @param ages A numeric, units, or interval vector.  If this is a units vector like that returned from the
 #' calculate_age() function, the return value will also be in that unit of time.
+#' @param multiple How to resolve multiple matches: "error", "first", or "last",
+#'   in sorted interval order.
+#' @param convert_units Which side to convert: "age_to_group", "group_to_age",
+#'   or "none". Numeric cuts inherit the input age unit.
+#' @param allow_approx Allow approximate conversion between month/year and smaller units.
+#' @param output "factor" (default) returns an ordered factor; "interval" returns
+#'   the matched age_group per observation, in the original group units. Both
+#'   preserve input order, repeats and missing/unmatched observations. Interval
+#'   inputs match only when completely contained in a group.
 #' @param lower is the lowest age (default is 0) to include
 #' @param upper is the max age (default is 70), above which the ages are aggregated
 #' @param by may be a single number for the span of ages in each age group (e.g. '5' creates five year age groups) or a
@@ -209,7 +188,8 @@ categorize_age_impl <- function(ages, lower = 0, upper=70, by = 10,
 #' @param above.char is the character used for the upper summary group.  It can be '>', '+', 'plus' and 'above'
 #' @rdname calculate_age
 #' @return for categorize_age(), a vector of age groups as an ordered factor.  If the ages argument was a units vector,
-#'   the returned factor will have the same units.
+#'   the returned factor will have the same units. With output = "interval", an
+#'   age_group vector in the grouping definition's units is returned.
 #' @examples
 #'
 #' #age_vec <- c(25, 23, 20, 1, 0, 7, 10, 50, 50, 52, 54, 56,34)
@@ -223,11 +203,57 @@ categorize_age_impl <- function(ages, lower = 0, upper=70, by = 10,
 #' categorize_age(ages = age_vec,  sep = " to ", by = age.groups$Spec)
 #'
 #' @export
-categorize_age <- function(ages, lower = 0, upper=70, by = 10,
-                    sep = "-", above.char = " +") {
-  categorize_age_impl(ages = ages, lower = lower, upper = upper, by = by,
-                      sep = sep, above.char = above.char)
+categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
+                           sep = "-", above.char = " +",
+                           multiple = c("error", "first", "last"),
+                           convert_units = c("age_to_group", "group_to_age", "none"),
+                           allow_approx = FALSE, output = c("factor", "interval")) {
+  output <- match.arg(output)
+  multiple <- match.arg(multiple)
+  convert_units <- match.arg(convert_units)
+  if (inherits(ages, "Date") || inherits(ages, "POSIXt") ||
+      !(is.numeric(ages) || inherits(ages, "ivs_iv"))) {
+    stop("ages must be numeric or an interval vector", call. = FALSE)
   }
+  if (!is.logical(allow_approx) || length(allow_approx) != 1L || is.na(allow_approx)) {
+    stop("allow_approx must be TRUE or FALSE", call. = FALSE)
+  }
+  if (is.age_group(by)) {
+    groups <- sort(by)
+  } else {
+    if (!is.numeric(by) || !length(by) || anyNA(by)) {
+      stop("by must be a positive width, numeric cut points, or an age_group", call. = FALSE)
+    }
+    if (length(by) == 1L) {
+      if (!is.finite(by) || by <= 0 || length(lower) != 1L || length(upper) != 1L ||
+          !is.numeric(lower) || !is.numeric(upper) || is.na(lower) || is.na(upper) ||
+          !is.finite(lower) || !is.finite(upper) || lower < 0 || upper < lower) {
+        stop("Use a positive finite width and finite bounds with 0 <= lower <= upper", call. = FALSE)
+      }
+      cuts <- c(seq(lower, upper, by = by), Inf)
+    } else cuts <- by
+    # Validate cuts without adding the converter's final single-age interval.
+    as.age_group(cuts)
+    groups <- age_group(utils::head(cuts, -1L), utils::tail(cuts, -1L),
+                        unit = age_cat_iv_age_unit(ages),
+                        below = paste0(lower, "-"), sep = sep, above = above.char)
+  }
+  aligned <- age_cat_iv_align_units(ages, groups, convert_units, allow_approx)
+  haystack <- aligned$haystack %||% groups
+  locations <- if (inherits(aligned$age, "ivs_iv")) {
+    ivs::iv_locate_overlaps(
+      ivs::iv(ivs::iv_start(aligned$age), ivs::iv_end(aligned$age)),
+      ivs::iv(ivs::iv_start(haystack), ivs::iv_end(haystack)), type = "within")
+  } else {
+    ivs::iv_locate_between(as.numeric(aligned$age), haystack)
+  }
+  idx <- age_match_indices(locations, length(ages), multiple)
+  if (output == "interval") return(groups[idx])
+  ret <- factor(idx, levels = seq_along(groups), labels = as.character(groups), ordered = TRUE)
+  unit <- age_cat_iv_age_unit(ages)
+  if (!is.null(unit)) attr(ret, "units") <- unit
+  ret
+}
 
 
 #' Calculate age with an automatically selected unit

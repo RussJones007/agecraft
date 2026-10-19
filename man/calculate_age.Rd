@@ -17,7 +17,11 @@ categorize_age(
   upper = 70,
   by = 10,
   sep = "-",
-  above.char = " +"
+  above.char = " +",
+  multiple = c("error", "first", "last"),
+  convert_units = c("age_to_group", "group_to_age", "none"),
+  allow_approx = FALSE,
+  output = c("factor", "interval")
 )
 }
 \arguments{
@@ -30,7 +34,7 @@ end must also be POSIXct.}
 \item{unit}{A character string of the age unit to use like: year (default), month, week, day, hour, minute, or
 second.}
 
-\item{ages}{is a vector of integers or units.  If this is a units vector like that returned from the
+\item{ages}{A numeric, units, or interval vector.  If this is a units vector like that returned from the
 calculate_age() function, the return value will also be in that unit of time.}
 
 \item{lower}{is the lowest age (default is 0) to include}
@@ -46,12 +50,26 @@ not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf
 'to'.}
 
 \item{above.char}{is the character used for the upper summary group.  It can be '>', '+', 'plus' and 'above'}
+
+\item{multiple}{How to resolve multiple matches: "error", "first", or "last",
+in sorted interval order.}
+
+\item{convert_units}{Which side to convert: "age_to_group", "group_to_age",
+or "none". Numeric cuts inherit the input age unit.}
+
+\item{allow_approx}{Allow approximate conversion between month/year and smaller units.}
+
+\item{output}{"factor" (default) returns an ordered factor; "interval" returns
+the matched age_group per observation, in the original group units. Both
+preserve input order, repeats and missing/unmatched observations. Interval
+inputs match only when completely contained in a group.}
 }
 \value{
 for calculate_age(), the age as an "units" vector matching the unit parameter (e.g."year")
 
 for categorize_age(), a vector of age groups as an ordered factor.  If the ages argument was a units vector,
-the returned factor will have the same units.
+the returned factor will have the same units. With output = "interval", an
+age_group vector in the grouping definition's units is returned.
 }
 \description{
 Functions to calculate age and age groups. The calculate_age() function returns the age from start to

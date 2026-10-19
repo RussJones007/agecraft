@@ -124,7 +124,7 @@ age_cat_iv_align_units <- function(age, age_group,
 }
 
 # convert iv locate output to an ordered factor aligned to input needle order.
-age_cat_iv_to_factor <- function(locations, age_group, n_needles, multiple = c("error", "first", "last")) {
+age_match_indices <- function(locations, n_needles, multiple = c("error", "first", "last")) {
   multiple <- match.arg(multiple)
 
   if(anyDuplicated(locations$needles)) {
@@ -142,6 +142,11 @@ age_cat_iv_to_factor <- function(locations, age_group, n_needles, multiple = c("
 
   idx <- rep.int(NA_integer_, n_needles)
   idx[locations$needles] <- locations$haystack
+  idx
+}
+
+age_cat_iv_to_factor <- function(locations, age_group, n_needles, multiple = c("error", "first", "last")) {
+  idx <- age_match_indices(locations, n_needles, multiple)
   factor(x = idx,
          levels = seq_along(age_group),
          labels = as.character(age_group),
