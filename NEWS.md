@@ -1,14 +1,82 @@
-# Development changes
+# agecraft 0.1.0.9011
 
-- Validate whole-number, nonnegative age-group endpoints and metadata. A scalar
-  upper endpoint is recycled to the number of starts; other size mismatches fail.
-- Handle empty and scalar numeric constructors; reject unordered, fractional,
-  duplicate, and missing cut points.
+## Public interface
+
+- Add exported `age_group(start, end, unit = NULL, below = "0-", sep = "-",
+  above = "+")` for direct construction from whole-number bounds. Gaps and
+  overlaps are retained. Intervals include the lower bound and exclude the upper:
+  `[1,5)` prints `1-4`. Only upper bounds may be infinite; fractions are rejected
+  without rounding. A scalar end is recycled to the length of start.
+- Add `output = c("factor", "interval")` to `categorize_age()`. The default
+  remains an ordered factor. Interval output returns a matched `age_group` for
+  each observation, preserving input order, repeated assignments, missing and
+  unmatched observations, and the grouping definition's units.
+- Expose `multiple`, `convert_units`, and `allow_approx` through
+  `categorize_age()`, and support interval inputs with complete-containment
+  matching. Numeric cut points inherit input age units. Overlap resolution uses
+  sorted group order. `age_cat_iv()` remains available with its existing API.
+- Retain `age_cat()` with a real once-per-session deprecation warning.
+  `calc_age()` and `age.cat()` retain once-per-session messages; all legacy
+  guidance now directs users to `calculate_age()` or `categorize_age()`.
+  Wrappers remain available through the next non-development release; removal
+  requires a later announced breaking release.
+
+## Presets and script migration
+
+- Introduce `age_group_presets` as the preferred name for `age.groups`, retaining
+  identical entry names and numeric cut points. `age.groups` remains a
+  compatibility alias through the next non-development release; removal requires
+  a later announced breaking release.
+- Include the targeted `tools/migrate-age-groups.R` helper in the installed
+  package. Preview replacements of code references before writing; writes keep
+  `.bak` backups and refuse to overwrite existing backups. Preserve comments,
+  strings, tabs, and Windows line endings. Flag strings, local bindings, member
+  names and other package namespaces for manual review. This helper operates on
+  R scripts and does not perform a general rage migration.
+
+## Automatic age units
+
+- Add `allowed_units` to `age_auto_unit()` to opt into weeks while preserving
+  the existing day/month/year default and named numeric return structure.
+  With weeks enabled, select completed years, then completed calendar months,
+  then completed weeks, otherwise days. Missing ages retain blank unit names.
+- Explain the surveillance value/unit use case and add a `tibble::enframe()`
+  example with `age_unit` and `age` columns. Automatic hours remain unsupported.
+
+## Interval analysis
+
+- Add `compare_age_groups()` with operations for source-labelled crosswalks,
+  definite/possible membership, definite ordering, possible age-gap bounds,
+  coverage intersection/union/difference, and interval widths.
+- Crosswalks retain both source row identifiers and labels and nonempty
+  intersections. Optionally retain empty/missing pairs with explicit status.
+  Coverage set operations may merge touching groups while preserving gaps.
+- Definite membership requires containment; possible membership requires
+  nonempty overlap. Optional warnings or errors flag multiple memberships and
+  unresolved ordering. Touching right-open intervals do not overlap.
+- Age-gap bounds describe the second age minus the first, with exclusive
+  endpoints and explicit units. Widths use the age-coordinate unit rather than
+  inferring elapsed calendar durations. Comparisons require matching units.
+- Explain that crosswalks cannot allocate aggregate counts without additional
+  data or assumptions. Calendar shifting remains deferred pending explicit
+  reference-date semantics.
+
+## Validation and documentation
+
+- Validate nonnegative whole-number endpoints and metadata, reject malformed
+  and fractional labels/cuts, and require both endpoints of missing intervals
+  to be missing. Handle empty and scalar conversions; reject unordered,
+  duplicate and missing numeric cut points.
 - Preserve missing character, factor, and interval observations and existing
-  age-group display metadata; format missing values without adding unit text.
-- Include units in full vector type names and accept the documented `plus` suffix.
-- Keep unit-conversion matching intervals separate from whole-number age groups,
-  preserving original labels without rounding converted boundaries.
+  display metadata. Missing formatted ages do not acquire unit text. Include
+  units in full vector type names and accept the documented `plus` suffix.
+- Keep temporary fractional unit-conversion boundaries separate from stored
+  age groups, preserving original labels without rounding.
+- Expand the README migration guide, retain S3 infrastructure and compatibility
+  exports, update preset references, and add genealogy, sociology and economics
+  worked examples with explicit units, endpoints, uncertainty and reference dates.
+- Add regression tests covering constructor contracts, both categorization
+  outputs, unit negotiation, migration edits, automatic weeks and comparisons.
 
 # agecraft 0.1.0.9010
 

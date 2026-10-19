@@ -1,40 +1,45 @@
-# agecraft current state — 2026-10-09
+# agecraft current state — 2026-10-18
 
-Version: **0.1.0.9010**, development package; R >= 4.1.0.
+Version: **0.1.0.9011**, incremented with `usethis::use_version("dev")`.
+Requires R >= 4.1.0.
 
 ## Implemented
 
-- Standalone renamed agecraft package with source, data, documentation, and tests.
-- Corrected documentation examples, dependency declarations, and check notes.
-- Explicit age-group unit negotiation, metadata preservation, safe casting, and
-  observation-preserving factor coercion, including missing intervals.
-- Calendar-based year/month calculations, explicit reversed-date errors, local
-  time-zone handling, and non-overlapping automatic unit selection.
-- Documented legacy wrappers with persistent once-per-session messages.
-- Focused regression tests, a runnable public-health vignette, NEWS, migration
-  notes, data provenance for every grouping, portable build/release scripts,
-  pkgdown configuration, and a five-job GitHub Actions check matrix.
-- Bundled age.groups data retained byte-for-byte from rage.
+- Public whole-number `age_group()` constructor; fractional bounds remain errors.
+  `[1,5)` is labelled `1-4`. Gaps, overlaps, units and missing pairs are supported.
+- `categorize_age()` supports factor or per-observation interval output,
+  containment of interval inputs, overlap resolution and unit conversion controls.
+- `age_group_presets` replaces the preferred list name; `age.groups` remains an
+  identical compatibility alias. The installed targeted R-script migration helper
+  previews edits, preserves comments/strings/line endings and writes backups.
+- `age_auto_unit()` supports opt-in weeks with configurable eligible units,
+  retaining the legacy default and named numeric output.
+- `compare_age_groups()` supports labelled crosswalks, definite/possible
+  membership, ordering, exclusive age-gap bounds, set operations and widths.
+- `age_cat()` warns once per session. Deprecated wrappers and the old preset
+  name remain through the next non-development release; removal requires a
+  later announced breaking release. S3 infrastructure remains registered.
+- README migration guidance, API policy, NEWS and two runnable vignettes cover
+  public health, genealogy, sociology and economics.
 
 ## Validation
 
-138 test expectations passed: zero failures, warnings, or skips.http://192.168.1.166:32400/web/index.html#
-`devtools::check(document = FALSE, cran = TRUE)` passed with **0 errors,
-0 warnings, and 0 notes**, including examples, installation, namespace loading,
-and vignette rebuilding. This Linux check used R 4.6.1 and `--no-manual`;
-remote CRAN incoming checks were not enabled. The 16-page PDF reference manual
-compiled successfully using installed fonts (`R_RD4PDF=times,hyper`). Logs are
-in scripts/validation/.
+All **259 test expectations pass**, including installed-package tests, with no
+failures, warnings or skips. Final `devtools::check(document = FALSE, cran = TRUE,
+manual = TRUE, remote = FALSE)` on R 4.6.1 reports **0 errors, 0 warnings, 1 note**.
+The note is unavailable HTML Tidy validation because the system lacks `tidy`.
+Examples, both vignette rebuilds and the PDF manual pass. The manual uses
+`R_RD4PDF=times,hyper`; remote system-clock verification was disabled.
+The check log is saved in `scripts/validation/check-0.1.0.9011.log`.
 
-## Remaining release work
+## Repository and remaining work
 
-- Execute the CI matrix on GitHub to confirm macOS, Windows, and other R versions.
-- Run remote incoming/CRAN checks and choose a non-development release version.
-- Confirm external source editions for legacy public-health groupings: they were
-  not recorded by rage. The provenance table explicitly marks these unknown.
-- Default PDF-manual generation requires the missing system font package
-  inconsolata; the reference can be built with `R_RD4PDF=times,hyper`.
+Repository: https://github.com/RussJones007/agecraft . The local `main` history
+contains separate implementation commits; the pre-existing remote `master`
+history is preserved. Cross-platform GitHub Actions results are separate from
+local validation and are not claimed here.
 
-GitHub account verified: RussJones007. SSH push authentication works. Repository
-creation awaits a signed-in browser session; no GitHub repository URL is claimed
-until creation succeeds. The user has requested repository creation and push.
+Calendar shifting, automatic hours, fractional age-group bounds and a general
+rage-script converter are outside this implementation. Preset provenance still
+has unknown external source editions; these are legacy reporting conventions,
+not current clinical guidance. CRAN incoming checks have not been run.
