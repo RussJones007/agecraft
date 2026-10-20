@@ -61,7 +61,7 @@ normalize_age_unit <- function(x) {
 }
 
 age_cat_iv_age_unit <- function(age) {
-  if(is.age_group(age)) return(get_unit(age))
+  if(is.age_group(age) || is_age(age)) return(get_unit(age))
   units_attr <- attr(age, "units")
   if(is.null(units_attr)) return(NULL)
   normalize_age_unit(units_attr[["numerator"]] %||% units_attr)
@@ -116,6 +116,8 @@ age_cat_iv_align_units <- function(age, age_group,
         start = age_cat_iv_convert_values(ivs::iv_start(age), age_unit, group_unit),
         end = age_cat_iv_convert_values(ivs::iv_end(age), age_unit, group_unit)
       )
+    } else if (is_age(age)) {
+      age <- as_age(age, unit = group_unit, allow_approx = allow_approx)
     } else {
       if(!is.null(attr(age, "units"))) {
         age <- units::set_units(age, group_unit, mode = "standard")

@@ -65,6 +65,38 @@ as.character(ag)
 
 ## Core Concepts
 
+### `age` S3 class
+
+`age` stores fractional numeric ages with one time unit per vector. Its default
+print and format methods show completed whole units while classification and
+comparison use full stored precision.
+
+```r
+x <- age(c(0.02, 0.5, 2.75, NA), unit = "year")
+x                            # displays 0 year, 0 year, 2 year, NA
+as.numeric(x)                # 0.02, 0.5, 2.75, NA
+as.integer(x)                # 0, 0, 2, NA
+format(x, fractional = TRUE) # show the stored fractions
+
+groups <- age_group(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
+names(groups) <- c("Neonate", "Infant", "Toddler")
+categorize_age(x, by = groups)
+# Neonate Infant Toddler <NA>
+```
+
+Use `as_age()` to convert numeric, `age`, or time-`units` vectors, and `is_age()`
+to identify them. Unit aliases are normalized. Names, units and precision survive
+vector operations. Combine and compare only matching units; explicitly convert
+first with `as_age(x, unit = "day", allow_approx = TRUE)`. Month/year conversions
+to finer units require `allow_approx = TRUE` because they use unit conversion
+rather than actual birthdays. Means, extrema and rounding retain the class;
+arithmetic and other mathematical transformations require explicit numeric or
+units conversion. Bare numbers are not implicitly combined with ages.
+
+This class accepts numeric ages; it does not introduce a fractional calculation
+from dates. Wrapping the completed-year output of `calculate_age()` or
+`age_auto_unit()` cannot recover sub-year precision.
+
 ### `age_group` S3 class
 
 `age_group` stores age ranges as right-open intervals:
@@ -81,6 +113,8 @@ You can construct `age_group` vectors from:
 -   `ivs::iv()` interval vectors
 
 ## Main functions
+
+-   `age(x, unit = "year")`, `as_age(x, unit = NULL, allow_approx = FALSE)`, `is_age(x)`
 
 -   `calculate_age(start, end = lubridate::now(), unit = ...)`
 -   `categorize_age(ages, lower = 0, upper = 70, by = 10, sep = "-", above.char = " +")`
