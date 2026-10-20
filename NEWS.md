@@ -2,6 +2,10 @@
 
 ## Getting started
 
+- Refresh README around the current date-to-age-to-named-category workflow,
+  documenting fractional ages, output choices, both classes, conversion rules,
+  presets, interval analysis, automatic reporting units, and migration paths.
+
 - Add a beginner-friendly introductory vignette covering the age class,
   calculation from birth and reference/event dates, selectable units, all three
   output formats, supplied group definitions, named and fractional groups,

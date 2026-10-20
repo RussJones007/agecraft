@@ -1,6 +1,8 @@
 # agecraft
 
-Renamed from the original `rage` package. Development version 0.1.0.9013. Requires R 4.1.0 or later.
+Calculate ages, keep their units and precision, and turn them into useful named
+categories. **agecraft** brings these common steps together for public health,
+education, population research, and other work with age data.
 
 <!-- badges: start -->
 
@@ -8,381 +10,311 @@ Renamed from the original `rage` package. Development version 0.1.0.9013. Requir
 
 <!-- badges: end -->
 
-`agecraft` is an R package for age-focused data work:
+The package provides:
 
--   calculate ages from dates or date-times in multiple units
--   represent age groups with a dedicated S3 class (`age_group`)
--   categorize ages into ordered age-group factors
--   reuse common public-health age-group definitions
+- Calendar-based fractional ages from birth and reference or event dates.
+- An **`age`** class that retains fractions while displaying completed whole units.
+- An **`age_group`** class with explicit units, fractional interval boundaries,
+  and optional category names.
+- Classification into ordered factors for tables and analysis, or matched intervals
+  when you need to retain the boundaries.
+- Reusable group definitions, automatic reporting-unit selection, and interval
+  comparisons such as crosswalks, membership, and coverage operations.
 
-## Why this package
+Both classes use the [vctrs](https://vctrs.r-lib.org/) framework. Group intervals
+build on [ivs](https://davisvaughan.github.io/ivs/), and explicit unit conversions
+use [units](https://r-quantities.github.io/units/). Requires R 4.1.0 or later.
+The package is under active development; see [NEWS](NEWS.md) for API changes.
 
-Age data often needs consistent handling across analysis steps. `agecraft` provides a single workflow for:
-
-1.  computing age from time values
-2.  converting between human-readable age labels and interval-based age groups
-3.  assigning individuals or events into standard age categories
-
-Internally, `age_group` is built on [`ivs`](https://davisvaughan.github.io/ivs/) intervals, so age ranges behave like first-class interval vectors. Age units are provided by the [`units`](https://r-quantities.github.io/units/) package.
-
-## Installation
-
-`agecraft` is not currently on CRAN.
-
-Install from a local checkout:
-
-``` r
-# from the project root
-devtools::install()
-```
-
-For development from a local clone:
-
-``` r
-# install.packages("devtools")
-devtools::load_all()
-```
-
-## Quick Start
-
-``` r
-library(agecraft)
-
-# Calculate age in years
-birth_dates <- as.Date(c("1980-04-14", "2000-01-02", "2018-11-30"))
-ref_date <- as.Date("2025-12-25")
-age_years <- calculate_age(start = birth_dates, end = ref_date, unit = "year")
-age_years
-
-# Categorize ages using included definitions
-categories <- categorize_age(ages = as.numeric(age_years), by = age_group_presets$Annual)
-categories
-
-# Work with the age_group S3 class
-ag <- as.age_group(c("< 5", "5-9", "10-14", "15-19", "20+"))
-as.character(ag)
-```
-
-For a beginner-friendly walkthrough of dates, output formats, supplied groups,
-and named categories, read [Getting started with agecraft](vignettes/getting-started.Rmd).
-After installing the package with vignettes, open it in R with
-`vignette("getting-started", package = "agecraft")`.
-For a deeper walkthrough using one sample data frame, see
-[Working with age and age_group classes](vignettes/age-and-age-group.Rmd), or
-`vignette("age-and-age-group", package = "agecraft")`.
-
-## Core Concepts
-
-### `age` S3 class
-
-`age` stores fractional numeric ages with one time unit per vector. Its default
-print and format methods show completed whole units while classification and
-comparison use full stored precision.
+## Start with dates, finish with named categories
 
 ```r
-x <- age(c(0.02, 0.5, 2.75, NA), unit = "year")
-x                            # displays 0 year, 0 year, 2 year, NA
-as.numeric(x)                # 0.02, 0.5, 2.75, NA
-as.integer(x)                # 0, 0, 2, NA
-format(x, fractional = TRUE) # show the stored fractions
+library(agecraft)
 
-groups <- age_group(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
-names(groups) <- c("Neonate", "Infant", "Toddler")
-categorize_age(x, by = groups)
-# Neonate Infant Toddler <NA>
+visits <- data.frame(
+  birth_date = as.Date(c("2024-01-01", "2023-01-01", "2020-01-01")),
+  visit_date = rep(as.Date("2024-07-02"), 3)
+)
+
+# Keep fractional ages and their year unit; display completed whole years.
+visits$age <- calculate_age(visits$birth_date, visits$visit_date, unit = "year")
+
+# Include each lower bound and exclude each upper bound.
+groups <- age_group(start = c(0, 1, 3), end = c(1, 3, 6), unit = "year")
+names(groups) <- c("Infant", "Toddler", "Young child")
+
+visits$category <- categorize_age(visits$age, by = groups)
+visits
+table(visits$category)
+# Infant      Toddler  Young child
+#      1            1            1
 ```
 
-Use `as_age()` to convert numeric, `age`, or time-`units` vectors, and `is_age()`
-to identify them. Unit aliases are normalized. Names, units and precision survive
-vector operations. Combine and compare only matching units; explicitly convert
-first with `as_age(x, unit = "day", allow_approx = TRUE)`. Month/year conversions
-to finer units require `allow_approx = TRUE` because they use unit conversion
-rather than actual birthdays. Means, extrema and rounding retain the class;
-arithmetic and other mathematical transformations require explicit numeric or
-units conversion. Bare numbers are not implicitly combined with ages.
+Names become the labels in the ordered factor and its frequency table. The
+example boundaries are illustrative; choose definitions that fit your analysis.
+An interval `[1, 3)` starts on the first birthday and ends just before the third.
+Its ordinary interval label is `1-2`.
 
-`calculate_age()` returns an `age` vector by default. For years, it stores
-completed birthdays plus the fraction of civil days between consecutive birthdays;
-months use the analogous calendar anniversaries. Smaller units use fractional
-elapsed time. Leap birthdays fall on March 1 in non-leap years, and months roll
-back to the last day of a shorter month. Calendar calculations ignore time of day
-and use the starting time zone.
+## Installation and guides
+
+From a local checkout:
+
+```r
+# install.packages("devtools")
+devtools::install(build_vignettes = TRUE)
+```
+
+For development in the repository, use `devtools::load_all()`.
+
+| Guide | What it covers |
+|:--|:--|
+| [Getting started](vignettes/getting-started.Rmd) | A beginner workflow: dates, output choices, supplied groups, names, and tables |
+| [Working with age and age_group](vignettes/age-and-age-group.Rmd) | Both classes in detail, using one sample data frame throughout |
+| [A public-health age workflow](vignettes/public-health-workflow.Rmd) | Reporting groups, units, and overlapping definitions |
+| [Comparing age ranges](vignettes/age-range-comparisons.Rmd) | Crosswalks, membership, ordering, age gaps, and interval coverage |
+
+After installing with vignettes, use
+`vignette("getting-started", package = "agecraft")` or
+`vignette("age-and-age-group", package = "agecraft")`.
+
+## Calculate ages and choose the return format
+
+`calculate_age(start, end, unit)` accepts Date or POSIXct vectors. Supply a
+birth date for `start` and a reference or event date for `end`. A single date is
+reused across the other vector; otherwise the lengths must match. Omit `end`
+for the current date-time, or supply `Sys.Date()` for today's date explicitly.
+
+Supported units are `"year"` (default), `"month"`, `"week"`, `"day"`, `"hour"`,
+`"minute"`, and `"second"`.
+
+| `output` | Return value | Values stored |
+|:--|:--|:--|
+| `"age"` (default) | An `age` vector with one explicit unit | Fractional ages; completed whole units displayed |
+| `"numeric"` | Plain numeric values | Completed whole units, without unit metadata |
+| `"units"` | A units-package vector | Completed whole units, preserving the previous return format |
 
 ```r
 x <- calculate_age(as.Date("2024-01-01"), as.Date("2024-07-02"))
-as.numeric(x) # 0.5
-as.integer(x) # 0
+x                            # displays 0 year
+as.numeric(x)                # 0.5: full fractional precision
+as.integer(x)                # 0: completed whole units
+format(x, fractional = TRUE) # display the fraction
+
 calculate_age(as.Date("2024-01-01"), as.Date("2024-07-02"), output = "numeric")
-# 0 (plain completed ages)
-calculate_age(as.Date("2024-01-01"), as.Date("2024-07-02"), output = "units")
-# completed ages with units, preserving the previous return format
+# 0
 ```
 
-The default return class and extracted numeric precision have changed. Use
-`output = "units"` when existing code needs the previous completed-age units vector.
-`calc_age()` and `age_auto_unit()` retain their existing completed-age output.
-Wrapping their values cannot recover sub-year precision.
+`as.numeric(x)` on an age object retains its fractions. It is different from
+asking `calculate_age()` for `output = "numeric"`, which returns completed ages.
+Missing date pairs return `NA`; empty recyclable inputs return an empty vector.
+An end date before its start raises an error.
 
-### `age_group` S3 class
+### Calendar conventions
 
-`age_group` stores age ranges as right-open intervals:
+Fractional years are completed birthdays plus the fraction of civil days between
+the previous and next birthdays. February 29 birthdays advance on March 1 in
+non-leap years. Fractional months use calendar month anniversaries, falling on
+the last day of shorter months. Anniversaries are anchored to the original birth
+date to avoid drift.
 
--   `"0-4"` is represented as `[0, 5)`
--   `"14"` (single year) is represented as `[14, 15)`
--   `"85+"` is represented as `[85, Inf)`
--   `"All"`/`"total"` is represented as `[0, Inf)`
+For POSIXct inputs, years and months use civil dates in the starting time zone
+and ignore time of day. Smaller units measure elapsed time: a day is 24 hours
+and a week is seven such days. Daylight-saving transitions can therefore yield
+fractional days. When `start` is Date, `end` is converted with `as.Date()`;
+when `start` is POSIXct, `end` must also be POSIXct.
 
-You can construct `age_group` vectors from:
+## Work with age vectors and units
 
--   character/factor labels (`"< 5"`, `"10-14"`, `"65+"`, `"All"`)
--   numeric cut points (`c(0, 5, 10, 15, Inf)`)
--   `ivs::iv()` interval vectors
+Use `age()` to construct from plain numeric values, `as_age()` to convert
+numeric, age, or time-units vectors, and `is_age()` to identify the class.
 
-## Main functions
+```r
+reported_ages <- age(c(0.5, 2.75, NA), unit = "year")
+is_age(reported_ages)
+attr(reported_ages, "unit")
 
--   `age(x, unit = "year")`, `as_age(x, unit = NULL, allow_approx = FALSE)`, `is_age(x)`
-
--   `calculate_age(start, end = lubridate::now(), unit = ..., output = "age")`
--   `categorize_age(ages, lower = 0, upper = 70, by = 10, sep = "-", above.char = " +")`
--   `as.age_group(x, below = "0-", sep = "-", above = "+")`
--   `is.age_group(x)`
--   `age_group_to_char(groups, ...)`
--   `age_auto_unit(birth, event, allowed_units = c("day", "month", "year"))`
--   `age_group(start, end, unit = NULL, ...)`
--   `compare_age_groups(x, y, operation = ...)`
-
-Also exported:
-
--   `age_cat()` and `age.cat()` are deprecated wrappers for `categorize_age()`
--   `calc_age()` is a deprecated wrapper for `calculate_age()`; `age_cat()` warns once per session; the other wrappers emit messages once per session
-
-## Included age-group definitions
-
-The package includes `age_group_presets`, a named list of commonly used cut points:
-
--   `ILI`
--   `IMM`
--   `Yr.5`
--   `Yr.10`
--   `Spec`
--   `Annual`
--   `School`
--   `Covid`
-
-These are numeric break vectors (typically ending in `Inf`) intended for `categorize_age()` or `cut()`.
-
-## More Examples
-
-``` r
-library(agecraft)
-
-# 1) Calculate age in years
-birth_dates <- as.Date(c("1980-04-14", "2000-01-02", "2018-11-30"))
-ref_date <- as.Date("2025-12-25")
-age_years <- calculate_age(start = birth_dates, end = ref_date, unit = "year")
-age_years
-
-# 2) Convert labels to age_group and back
-labs <- c("< 5", "5-9", "10-14", "15-19", "20+")
-ag <- as.age_group(labs)
-ag
-as.character(ag)
-
-# 3) Build age groups from cut points
-cuts <- c(0, 1, 5, 10, 20, 40, 60, Inf)
-special_groups <- as.age_group(cuts)
-as.character(special_groups)
-
-# 4) Categorize ages using included definitions
-ages <- c(0, 1, 4, 8, 17, 23, 39, 54, 72, 88)
-categories <- categorize_age(ages = ages, by = age_group_presets$Annual)
-categories
-
-# 5) Preserve units when categorizing
-age_days <- calculate_age(start = as.Date("2025-01-01"), end = as.Date("2025-02-15"), unit = "day")
-age_days
-categorize_age(ages = age_days, by = c(0, 7, 14, 30, 60, Inf))
+elapsed_days <- age(c(7, 10.5, 14), unit = "day")
+as_age(elapsed_days, unit = "week")
 ```
 
-## Notes
+Names, units, and fractional precision survive slicing, sorting, repetition,
+concatenation, and data-frame binding. Combining or comparing age vectors requires
+matching units. Means, extrema, and rounding retain the class; general arithmetic
+and other mathematical transformations require explicit numeric extraction or
+conversion to units vectors. Negative and infinite ages are rejected.
 
--   When `start` is `Date`, `calculate_age()` converts `end` with `as.Date()`. When `start` is `POSIXct`, `end` must also be `POSIXct`.
--   Vector lengths are recycled when one side has length 1. Missing pairs return `NA`; empty recyclable inputs return a zero-length vector. Reversed dates are rejected.
--   Converting elapsed days to months or years with `as_age()` (or `units::set_units()` for units vectors) is approximate. Calculate calendar ages directly in the required unit instead.
+Conversions between finer units and months/years require `allow_approx = TRUE`:
 
-## Interval matching and units
-
-``` r
-groups <- as.age_group(c(0, 5, 18, 65, Inf), unit = "year")
-age_years <- calculate_age(as.Date(c("2020-01-01", "1980-01-01")),
-                           as.Date("2025-01-01"))
-age_cat_iv(age_years, groups)
+```r
+approximate_days <- as_age(reported_ages, unit = "day", allow_approx = TRUE)
+as.numeric(approximate_days)
 ```
 
-`age_cat_iv()` supports numeric ages and intervals. Overlapping definitions raise
-an error by default; `multiple = "first"` or `"last"` selects a match in sorted
-interval order. Unmatched and missing ages return `NA`.
+The fractional part is now a fraction of a day. Conversion uses the units
+package's factors, not the original birth and event dates. For exact elapsed
+days, calculate directly from those dates with `calculate_age(..., unit = "day")`.
 
-Units must exist on both sides or neither side. `convert_units = "age_to_group"`
-(the default) or `"group_to_age"` converts one side; `"none"` rejects differing
-units. Conversions between month/year and smaller elapsed units require
-`allow_approx = TRUE`.
+## Define groups with boundaries, units, and names
 
-Concatenation and data-frame binding preserve `age_group` and its units.
-Different units, or mixing unit-bearing and unitless groups, raise errors.
-Different display symbols use canonical `0-`, `-`, and `+` formatting.
-Explicit casting to a bare `ivs` interval discards age metadata.
+`age_group(start, end, unit)` constructs right-open intervals directly. Fractional
+bounds are preserved without rounding; `[0, 0.077)` displays explicitly, while
+whole-number intervals retain completed-age labels such as `1-4` for `[1, 5)`.
+One unit applies to every interval in a group vector; `NULL` leaves the unit
+unspecified. Only upper bounds may be infinite. A scalar `end` is recycled to the length of
+`start`; starts are not recycled. Missing intervals require both bounds to be
+missing.
 
-## Calendar conventions
-
-Years use completed birthdays, with February 29 birthdays advancing on March 1
-in a non-leap year. Months use calendar anniversaries, falling on the last day of
-a shorter month. For date-times, calendar ages use the start time zone and ignore
-time of day; smaller units use elapsed time, including daylight-saving effects.
-
-By default, `age_auto_unit()` reports days through day 30, then completed years if available,
-then completed months, otherwise days. Its numeric result has `Day`, `Month`, or
-`Year` names, with blank names for missing pairs.
-
-## Documentation and development
-
-See the public-health workflow vignette with
-`vignette("public-health-workflow", package = "agecraft")` after installation
-with vignettes. Bundled definitions are legacy reporting conventions rather than
-current clinical guidance. Their provenance and limitations are recorded in
-`inst/extdata/age-group-provenance.csv` and the `age_group_presets` help page.
-
-``` r
-devtools::document()
-devtools::test()
-devtools::check()
-# Optional local reference website (install pkgdown first):
-pkgdown::build_site()
+```r
+fine_groups <- age_group(c(0, 0.077, 1, 3), c(0.077, 1, 3, 6), unit = "year")
+names(fine_groups) <- c("Neonate", "Infant", "Toddler", "Young child")
+fine_ages <- age(c(0.02, 0.5, 2, 4, NA), unit = "year")
+categorize_age(fine_ages, by = fine_groups)
+# Neonate Infant Toddler Young child <NA>
 ```
 
-`Rscript scripts/build.r` only builds a source archive into `build/`.
-Version changes and installation are separate explicit steps; see
-`scripts/release.md`. CI checks Linux, macOS, and Windows when hosted on GitHub.
+The `0.077`-year cutoff approximates 28 days. Use day-based ages and groups when
+an exact day boundary matters. Classification uses the stored fractional values,
+even when several ages display as `0 year`.
 
-## License
+Use `as.age_group()` for supported completed-age labels, factors of those labels,
+numeric cut points, or `ivs::iv()` intervals:
 
-MIT (`LICENSE` file).
+```r
+as.age_group(c("< 5", "5-9", "10+"), unit = "year")
+as.age_group(c(0, 5, 10, Inf), unit = "year")
+```
 
-## Migrating preset references
+A final `Inf` in numeric cuts produces an open-ended final group. With a final
+finite cut, `as.age_group()` adds a final one-unit interval. Use explicit
+`age_group(start, end)` bounds when every upper boundary must be specified.
 
-`age_group_presets` replaces `age.groups`; entry names and cut points are
-unchanged. The old list remains available through the next non-development
-release. Removal requires a later announced breaking release.
+### Supplied age-group definitions
 
-Preview targeted script edits with the installed helper:
+`age_group_presets` is a named list of numeric cut points: `ILI`, `IMM`, `Yr.5`,
+`Yr.10`, `Spec`, `Annual`, `School`, and `Covid`. Assign their intended unit when
+constructing groups:
+
+```r
+reporting_groups <- as.age_group(age_group_presets$Yr.5, unit = "year")
+categorize_age(visits$age, by = reporting_groups)
+```
+
+These are inherited reporting conventions. Their provenance and limitations are
+recorded in `inst/extdata/age-group-provenance.csv` and the `age_group_presets`
+help page. Confirm that a definition fits your reporting requirements.
+
+## Classification and interval analysis
+
+`categorize_age()` returns an ordered factor by default. Nonblank group names
+supply its labels; blank or missing names fall back to interval labels. Distinct
+intervals require unique resulting labels. Levels follow sorted interval order.
+Unmatched or missing observations return `NA`.
+
+To keep one matched interval per observation, including repeats and missing
+assignments, request interval output:
+
+```r
+matched <- categorize_age(visits$age, by = groups, output = "interval")
+matched
+names(matched)
+```
+
+Gaps and overlaps are allowed. Multiple matches raise an error by default;
+`multiple = "first"` or `"last"` selects a match in sorted interval order.
+Interval inputs must be completely contained in a group to match.
+`age_cat_iv()` provides the alternative interval-classification interface.
+
+Groups with unspecified units inherit the age vector's unit for matching.
+Unitless numeric ages with explicitly unit-bearing groups are rejected. When
+specified units differ, `convert_units = "age_to_group"` (default) or
+`"group_to_age"` converts one side; `"none"` rejects conversion. Approximate
+conversions require `allow_approx = TRUE`.
+
+`compare_age_groups()` supports crosswalks, definite or possible membership,
+ordering, possible age-gap bounds, intersection, union, difference, and widths:
+
+```r
+broad_groups <- age_group(c(0, 18, 65), c(18, 65, Inf), unit = "year")
+compare_age_groups(broad_groups, operation = "width")
+head(compare_age_groups(reporting_groups, broad_groups, operation = "crosswalk"))
+```
+
+Comparison requires matching units. Widths use the interval's coordinate unit;
+they are not exact calendar-day durations. Crosswalks describe overlaps but
+cannot redistribute aggregate counts without additional information.
+
+For group vectors, slicing, sorting, concatenation, and casts preserve names and
+units. Combining groups requires matching units, including whether a unit is
+specified. Interval set operations can merge or split groups, so they discard
+category names. Explicit casting to a bare ivs interval discards age metadata.
+
+## Select a reporting unit automatically
+
+`age_auto_unit()` returns a **named numeric vector of completed ages**. Its names
+identify the selected unit, rather than participants or categories. It does not
+return the fractional `age` class.
+
+```r
+birth <- as.Date("2024-01-01")
+events <- birth + c(6, 7, 28, 31, 366, NA)
+age_auto_unit(birth, events, allowed_units = c("day", "week", "month", "year"))
+```
+
+By default, allowed units are day/month/year: ages through 30 days remain in
+days, then completed years are preferred, followed by completed months, otherwise
+days. Include `"week"` to select completed years, then calendar months, then weeks,
+then days. Omit `"month"` for day/week/year reporting. `"day"` is required.
+Missing ages have blank unit names; automatic hours are unsupported.
+
+## Migrating existing code
+
+The package was renamed from `rage`. Replace `library(rage)` with
+`library(agecraft)` and update package-qualified calls.
+
+| Previous interface | Current recommendation |
+|:--|:--|
+| `calc_age()` | `calculate_age()` |
+| `age.cat()`, `age_cat()` | `categorize_age()` |
+| `age.groups$Yr.5` | `age_group_presets$Yr.5` |
+| Label or interval conversion | `as.age_group()` |
+| Direct start/end bounds | `age_group()` |
+
+`calculate_age()` now defaults to fractional `age` output. Use `output = "units"`
+for the previous completed-age units vector, or `output = "numeric"` for plain
+completed ages. `calc_age()` and `age_auto_unit()` retain completed-age outputs.
+
+The deprecated wrappers and `age.groups` remain available through the next
+non-development release; removal requires a later announced breaking release.
+`age_cat()` warns once per session. `calc_age()` and `age.cat()` emit messages
+once per session.
+
+For targeted preset-reference changes in R scripts, preview the installed helper:
 
 ```r
 tool <- system.file("tools", "migrate-age-groups.R", package = "agecraft")
 source(tool)
 migrate_age_group_presets("analysis.R")
-# Apply reviewed edits, keeping analysis.R.bak:
-migrate_age_group_presets("analysis.R", write = TRUE)
+# After reviewing: migrate_age_group_presets("analysis.R", write = TRUE)
 ```
 
-The helper changes value references to the list, including
-`agecraft::age.groups`, and preserves entry selections. Comments and strings
-remain untouched; strings, local bindings, member names, and other package
-namespaces are flagged for review. It does not perform a general rage migration.
-Use it on R scripts; edit R Markdown/Quarto code chunks manually. Existing
-backups are never overwritten.
+The helper preserves list entry selections, comments, strings, and line endings.
+Strings, local bindings, member names, and other package namespaces are flagged
+for review. Writes keep `.bak` backups and refuse to overwrite existing backups.
+It is a targeted R-script helper; edit R Markdown/Quarto chunks manually.
 
-## Changes for users migrating from rage
-
-`agecraft` is a refactor of `rage`. Replace `library(rage)` with
-`library(agecraft)` and update package-qualified calls. R >= 4.1.0 is required.
-
-| Previous interface | Current recommendation |
-| --- | --- |
-| `calc_age()` | `calculate_age()` |
-| `age.cat()`, `age_cat()` | `categorize_age()` |
-| `age.groups$Yr.5` | `age_group_presets$Yr.5` |
-| Label or interval conversion | `as.age_group()` (retained) |
-| Direct start/end bounds | `age_group()` (new) |
-
-The wrappers and old preset list remain available through the next
-non-development release. Removal requires a later announced breaking release.
-`age_cat()` now produces a warning once per session; `calc_age()` and `age.cat()`
-retain once-per-session messages. Preset entry names and numeric values are unchanged.
-
-`calculate_age()` now returns a fractional `age` vector by default. Request
-`output = "units"` for the previous completed-age units vector or `output = "numeric"`
-for plain completed ages. It rejects reversed dates, uses
-calendar birthdays/month anniversaries, and preserves missing pairs.
-Empty recyclable inputs return an empty vector. These behaviors differ from the
-original rage code; check analyses that depended on negative ages or month-end
-arithmetic. Combining age groups now enforces compatible units, while factor
-conversion preserves observation order and missing values.
-
-`categorize_age()` still returns an ordered factor by default. New
-`output = "interval"` returns one matched `age_group` per input observation,
-including repeated and missing assignments, in the grouping definition's units.
-It is not the unique list of group definitions. Advanced `multiple`,
-`convert_units`, and `allow_approx` arguments expose the interval matching controls
-through the main interface. Interval inputs require complete containment.
+## Development
 
 ```r
-groups <- age_group(c(1, 5), c(5, Inf), unit = "year")
-ages <- units::set_units(c(2, 7, NA, 2), "year")
-categorize_age(ages, by = groups, output = "interval")
+devtools::document()
+devtools::test()
+devtools::check()
 ```
 
-Age-group bounds can be fractional and are preserved without rounding. Whole-number
-bounds retain completed-age labels: `[1,5)` prints `1-4`. Intervals with fractional
-endpoints print explicitly, for example `[0, 0.077)`. Negative bounds and incomplete
-missing pairs remain errors. Only upper bounds may be infinite. A scalar upper
-bound is recycled to the length of the starts; starts are not recycled. Gaps and
-overlaps are retained, with the existing multiple-match controls.
-`as.age_group()` accepts fractional numeric cut points and interval bounds;
-legacy character labels continue to use whole completed ages.
+`Rscript scripts/build.r` builds a source archive into `build/`. Version changes
+and installation are separate steps; see `scripts/release.md`. Optional reference
+site generation uses `pkgdown::build_site()`. GitHub CI is configured for Linux,
+macOS, and Windows.
 
-Assign category names with `names()`. Both classification functions use nonblank
-names as factor labels, falling back to interval labels for blank or missing names.
-Levels follow sorted interval order. Distinct intervals must have unique resulting
-labels, including fallback labels, so categories cannot silently merge.
+## License
 
-```r
-groups <- age_group(c(0, 0.077, 1, 3), c(0.077, 1, 3, 6), unit = "year")
-names(groups) <- c("Neonate", "Infant", "Toddler", "Young child")
-ages <- units::set_units(c(0.02, 0.5, 2, 4, NA), "year")
-categorize_age(ages, by = groups)
-# Neonate Infant Toddler Young child <NA>
-# Levels: Neonate < Infant < Toddler < Young child
-```
-
-The `0.077`-year cutoff approximates 28 days. Supply fractional ages in the same
-unit: `calculate_age()` now supplies fractional ages by default. `age_auto_unit()`
-still reports completed units. A fractional-year cutoff is approximate; use elapsed
-days when an exact day boundary is required.
-
-Names follow observations through slicing, sorting, concatenation, coercion, and
-`output = "interval"`. `generics::as.factor()` and `generics::as.ordered()` also use
-the names. Character conversion retains interval descriptions. Names do not alter
-interval equality or sorting, and interval set operations discard names because
-their results may combine or split the original categories.
-
-Weeks are opt-in, so existing automatic-unit results retain their defaults:
-
-```r
-birth <- as.Date("2024-01-01")
-event <- birth + c(6, 7, 28, 31, 366, NA)
-age_auto_unit(birth, event, allowed_units = c("day", "week", "month", "year"))
-tibble::enframe(age_auto_unit(birth, event), name = "age_unit", value = "age")
-```
-
-With weeks enabled, selection uses completed years, then calendar months, then
-completed weeks, then days. The result remains a named numeric vector. This
-value/unit pattern supports surveillance records where 6 days, months and years
-have different meanings. Hours remain unsupported in automatic selection.
-
-`compare_age_groups()` adds crosswalks, definite/possible membership, ordering,
-age-gap bounds, coverage intersection/union/difference, and width. Both sides
-must have identical units (or both be unitless). See
-`vignette("age-range-comparisons", package = "agecraft")` for genealogy,
-sociology and economics examples. Crosswalks cannot redistribute aggregate
-counts without additional information. Calendar shifting and a general rage
-script converter remain future work.
+MIT. See [LICENSE](LICENSE).
