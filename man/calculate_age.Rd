@@ -8,7 +8,8 @@
 calculate_age(
   start,
   end = lubridate::now(),
-  unit = c("year", "day", "hour", "minute", "month", "second", "week")
+  unit = c("year", "day", "hour", "minute", "month", "second", "week"),
+  output = c("age", "units", "numeric")
 )
 
 categorize_age(
@@ -34,6 +35,15 @@ end must also be POSIXct.}
 \item{unit}{A character string of the age unit to use like: year (default), month, week, day, hour, minute, or
 second.}
 
+\item{output}{For calculate_age(): "age" (default) retains fractions in an age
+vector; "numeric" returns completed ages as plain doubles; "units" returns
+completed ages with units, preserving the previous format.
+For categorize_age(): "factor" (default) returns an ordered factor; "interval" returns
+the matched age_group per observation, in the original group units. Both
+preserve input order, repeats and missing/unmatched observations. Interval
+inputs match only when completely contained in a group. Named groups use
+their nonblank names as factor labels; other groups use interval labels.}
+
 \item{ages}{A numeric, units, or interval vector.  If this is a units vector like that returned from the
 calculate_age() function, the return value will also be in that unit of time.}
 
@@ -58,15 +68,10 @@ in sorted interval order.}
 or "none". Numeric cuts inherit the input age unit.}
 
 \item{allow_approx}{Allow approximate conversion between month/year and smaller units.}
-
-\item{output}{"factor" (default) returns an ordered factor; "interval" returns
-the matched age_group per observation, in the original group units. Both
-preserve input order, repeats and missing/unmatched observations. Interval
-inputs match only when completely contained in a group. Named groups use
-their nonblank names as factor labels; other groups use interval labels.}
 }
 \value{
-for calculate_age(), the age as an "units" vector matching the unit parameter (e.g."year")
+For calculate_age(), an age vector by default. With output = "units",
+a completed-age units vector; with output = "numeric", completed ages as doubles.
 
 for categorize_age(), a vector of age groups as an ordered factor.  If the ages argument was a units vector,
 the returned factor will have the same units. With output = "interval", an
@@ -81,19 +86,23 @@ the same length or one vector must have length one for scalar recycling.
 The categorize_age() function categorizes ages into age groups as an ordered and labeled factor.
 }
 \details{
-The \link[units:units]{units::units} package is used to set time units for ages. A different unit can be set on the returned vector
-from calculate_age() by using the \code{\link[units:set_units]{units::set_units()}} or the assignment form of the \code{\link[units:units]{units::units()}} functions.  This
-results in conversion of the vector values to the new time unit. You should exercise caution when converting time
-units. While seconds, days, and weeks can be accurately converted, months and year are approximated. The best
-practice is to use this function with the time unit that will be needed in subsequent analysis and avoid converting
-to or from months and years.
+By default the result is an \code{\link[=age]{age()}} vector retaining fractional precision
+while displaying completed whole units. Use \code{as.numeric()} to extract its
+fractional values or \code{as.integer()} for completed units. Explicit conversion
+with \code{\link[=as_age]{as_age()}} guards approximate conversions involving months and years.
+Request output = "units" for the previous completed-unit return format, or
+output = "numeric" for completed ages as plain numbers.
 
-Years and months count completed calendar anniversaries using civil dates.
-Leap birthdays reach their next year on March 1 in non-leap years. Month
-anniversaries use the last day of a shorter month. For POSIXct inputs,
-calendar calculations use the start time zone and ignore the time of day;
-smaller units measure elapsed time, so a daylight-saving day may be 23 or 25 hours.
-Missing pairs return NA. Empty, recyclable inputs return a zero-length units vector.
+Fractional years are completed birthdays plus the fraction of civil days
+between the previous and next birthdays. Leap birthdays reach their next
+year on March 1 in non-leap years. Fractional months analogously use calendar
+month anniversaries, rolling back to the final day of shorter months.
+Both anniversaries are anchored to the original start date.
+For POSIXct inputs, calendar calculations use the start time zone and ignore
+time of day; smaller units measure elapsed time, so a daylight-saving day
+may be 23 or 25 hours. Days use 24 hours and weeks use seven such days.
+Missing pairs return NA; empty recyclable inputs return zero-length vectors.
+calc_age() retains its legacy completed-unit units output.
 }
 \examples{
  # create 10 random birth dates
@@ -114,7 +123,7 @@ Missing pairs return NA. Empty, recyclable inputs return a zero-length units vec
  age_2
 
 
- age_2 <- units::set_units(age_2, "year")
+ age_2 <- as_age(age_2, "year", allow_approx = TRUE)
  age_2
 
 

@@ -7,6 +7,7 @@
 test_that(
   desc = "Age calculation using calc_age that returns a units object",
   code = {
+    completed_age <- function(...) calculate_age(..., output = "units")
     # set up variables to test
     ages <- 82:0 |>
       units::set_units("year")
@@ -17,18 +18,18 @@ test_that(
       units::set_units("day")
     end_dates_days <- birth_dates[1:length(end_date_days_add)] + as.integer(end_date_days_add)
     expect_message(calc_age(start = birth_dates, end_dates, unit = "day"), regexp = "^The calc_age")
-    day_ages <- calculate_age(start = birth_dates, end_dates, unit = "day")
+    day_ages <- completed_age(start = birth_dates, end_dates, unit = "day")
     expect_s3_class(day_ages, "units")
     expect_equal(attr(day_ages, "units")$numerator, "d")
-    expect_error(calculate_age("04-14-1960"), "is.Date")
-    expect_equal(attr(calculate_age(as.Date("1960-04-14")), "units")[["numerator"]], "year")
+    expect_error(completed_age("04-14-1960"), "is.Date")
+    expect_equal(attr(completed_age(as.Date("1960-04-14")), "units")[["numerator"]], "year")
     #expect_equal(age.calc(.start = birth_dates, .end = end_dates), ages)
-    expect_equal(calculate_age(birth_dates, end_dates), ages)
-    expect_length(calculate_age(birth_dates, end_dates), length(birth_dates))
-    expect_type(calculate_age(birth_dates, end_dates), "double")
-    expect_equal(object = attr(calculate_age(birth_dates[1:5], unit = "day"), which = "units")$numerator,
+    expect_equal(completed_age(birth_dates, end_dates), ages)
+    expect_length(completed_age(birth_dates, end_dates), length(birth_dates))
+    expect_type(completed_age(birth_dates, end_dates), "double")
+    expect_equal(object = attr(completed_age(birth_dates[1:5], unit = "day"), which = "units")$numerator,
                  expected = "d")
-    expect_equal(calculate_age(birth_dates[1:length(end_date_days_add)],
+    expect_equal(completed_age(birth_dates[1:length(end_date_days_add)],
                           end_dates_days, unit = "day"), end_date_days_add)
   }
 )

@@ -27,6 +27,11 @@ age
 ```
 
 Leap birthdays reach their next year on March 1 in non-leap years.
+The default result is an `age` vector that retains fractions while displaying
+completed whole years. Use `as.numeric(age)` to extract the fractions or
+`as.integer(age)` for completed years. Request `output = "numeric"` for plain
+completed ages or `output = "units"` for the previous completed-age units output.
+Fractional years measure the fraction of civil days between consecutive birthdays.
 Reversed dates raise an error. Missing observations remain missing.
 Months use calendar anniversaries, including the last day of short
 months; elapsed-day conversion with the units package is an

@@ -1,6 +1,6 @@
 # agecraft
 
-Renamed from the original `rage` package. Development version 0.1.0.9011. Requires R 4.1.0 or later.
+Renamed from the original `rage` package. Development version 0.1.0.9013. Requires R 4.1.0 or later.
 
 <!-- badges: start -->
 
@@ -93,9 +93,27 @@ rather than actual birthdays. Means, extrema and rounding retain the class;
 arithmetic and other mathematical transformations require explicit numeric or
 units conversion. Bare numbers are not implicitly combined with ages.
 
-This class accepts numeric ages; it does not introduce a fractional calculation
-from dates. Wrapping the completed-year output of `calculate_age()` or
-`age_auto_unit()` cannot recover sub-year precision.
+`calculate_age()` returns an `age` vector by default. For years, it stores
+completed birthdays plus the fraction of civil days between consecutive birthdays;
+months use the analogous calendar anniversaries. Smaller units use fractional
+elapsed time. Leap birthdays fall on March 1 in non-leap years, and months roll
+back to the last day of a shorter month. Calendar calculations ignore time of day
+and use the starting time zone.
+
+```r
+x <- calculate_age(as.Date("2024-01-01"), as.Date("2024-07-02"))
+as.numeric(x) # 0.5
+as.integer(x) # 0
+calculate_age(as.Date("2024-01-01"), as.Date("2024-07-02"), output = "numeric")
+# 0 (plain completed ages)
+calculate_age(as.Date("2024-01-01"), as.Date("2024-07-02"), output = "units")
+# completed ages with units, preserving the previous return format
+```
+
+The default return class and extracted numeric precision have changed. Use
+`output = "units"` when existing code needs the previous completed-age units vector.
+`calc_age()` and `age_auto_unit()` retain their existing completed-age output.
+Wrapping their values cannot recover sub-year precision.
 
 ### `age_group` S3 class
 
@@ -116,7 +134,7 @@ You can construct `age_group` vectors from:
 
 -   `age(x, unit = "year")`, `as_age(x, unit = NULL, allow_approx = FALSE)`, `is_age(x)`
 
--   `calculate_age(start, end = lubridate::now(), unit = ...)`
+-   `calculate_age(start, end = lubridate::now(), unit = ..., output = "age")`
 -   `categorize_age(ages, lower = 0, upper = 70, by = 10, sep = "-", above.char = " +")`
 -   `as.age_group(x, below = "0-", sep = "-", above = "+")`
 -   `is.age_group(x)`
@@ -182,7 +200,7 @@ categorize_age(ages = age_days, by = c(0, 7, 14, 30, 60, Inf))
 
 -   When `start` is `Date`, `calculate_age()` converts `end` with `as.Date()`. When `start` is `POSIXct`, `end` must also be `POSIXct`.
 -   Vector lengths are recycled when one side has length 1. Missing pairs return `NA`; empty recyclable inputs return a zero-length vector. Reversed dates are rejected.
--   Converting elapsed days to months or years with `units::set_units()` is approximate. Calculate calendar ages directly in the required unit instead.
+-   Converting elapsed days to months or years with `as_age()` (or `units::set_units()` for units vectors) is approximate. Calculate calendar ages directly in the required unit instead.
 
 ## Interval matching and units
 
@@ -283,8 +301,10 @@ non-development release. Removal requires a later announced breaking release.
 `age_cat()` now produces a warning once per session; `calc_age()` and `age.cat()`
 retain once-per-session messages. Preset entry names and numeric values are unchanged.
 
-`calculate_age()` returns a units vector. It rejects reversed dates, uses
-completed calendar birthdays/month anniversaries, and preserves missing pairs.
+`calculate_age()` now returns a fractional `age` vector by default. Request
+`output = "units"` for the previous completed-age units vector or `output = "numeric"`
+for plain completed ages. It rejects reversed dates, uses
+calendar birthdays/month anniversaries, and preserves missing pairs.
 Empty recyclable inputs return an empty vector. These behaviors differ from the
 original rage code; check analyses that depended on negative ages or month-end
 arithmetic. Combining age groups now enforces compatible units, while factor
@@ -327,9 +347,9 @@ categorize_age(ages, by = groups)
 ```
 
 The `0.077`-year cutoff approximates 28 days. Supply fractional ages in the same
-unit: `calculate_age()` and `age_auto_unit()` report completed units, so their
-whole-year values cannot distinguish neonatal and infant ages. This change does
-not introduce a fractional calendar-age calculation or a new year-length convention.
+unit: `calculate_age()` now supplies fractional ages by default. `age_auto_unit()`
+still reports completed units. A fractional-year cutoff is approximate; use elapsed
+days when an exact day boundary is required.
 
 Names follow observations through slicing, sorting, concatenation, coercion, and
 `output = "interval"`. `generics::as.factor()` and `generics::as.ordered()` also use

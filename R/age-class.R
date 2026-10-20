@@ -22,10 +22,11 @@
 #' mathematical transformations are unsupported: use explicit numeric extraction
 #' or units vectors for calculations and construct an age from the result.
 #'
-#' This class does not calculate fractional ages from dates. Existing
-#' [calculate_age()] and [age_auto_unit()] still return completed units; wrapping
-#' those values cannot recover fractional precision. Fractional years are not
-#' exact elapsed days without an explicit calendar convention.
+#' [calculate_age()] constructs ages from dates, using calendar fractions for
+#' years and months and elapsed time for smaller units. [age_auto_unit()] and
+#' calculate_age(output = "units") still return completed units; wrapping those
+#' values cannot recover fractional precision. Converting fractional years to
+#' days is approximate and differs from calculating elapsed days from dates.
 #' @return `age()` and `as_age()` return an age vector. `is_age()` returns a scalar
 #'   logical indicating whether x inherits from age.
 #' @export

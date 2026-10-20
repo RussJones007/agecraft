@@ -25,7 +25,8 @@ not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf
 \item{above.char}{is the character used for the upper summary group.  It can be '>', '+', 'plus' and 'above'}
 }
 \value{
-for calculate_age(), the age as an "units" vector matching the unit parameter (e.g."year")
+For calculate_age(), an age vector by default. With output = "units",
+a completed-age units vector; with output = "numeric", completed ages as doubles.
 
 for categorize_age(), a vector of age groups as an ordered factor.  If the ages argument was a units vector,
 the returned factor will have the same units. With output = "interval", an
@@ -61,7 +62,7 @@ This compatibility wrapper warns once per session. Use categorize_age().
  age_2
 
 
- age_2 <- units::set_units(age_2, "year")
+ age_2 <- as_age(age_2, "year", allow_approx = TRUE)
  age_2
 
 

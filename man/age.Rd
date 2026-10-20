@@ -44,10 +44,11 @@ ages. Means, extrema and rounding retain the class. Arithmetic and other
 mathematical transformations are unsupported: use explicit numeric extraction
 or units vectors for calculations and construct an age from the result.
 
-This class does not calculate fractional ages from dates. Existing
-\code{\link[=calculate_age]{calculate_age()}} and \code{\link[=age_auto_unit]{age_auto_unit()}} still return completed units; wrapping
-those values cannot recover fractional precision. Fractional years are not
-exact elapsed days without an explicit calendar convention.
+\code{\link[=calculate_age]{calculate_age()}} constructs ages from dates, using calendar fractions for
+years and months and elapsed time for smaller units. \code{\link[=age_auto_unit]{age_auto_unit()}} and
+calculate_age(output = "units") still return completed units; wrapping those
+values cannot recover fractional precision. Converting fractional years to
+days is approximate and differs from calculating elapsed days from dates.
 }
 \examples{
 x <- age(c(0.02, 0.5, 2.75, NA), unit = "year")
