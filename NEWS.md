@@ -1,11 +1,13 @@
-# agecraft 0.1.0.9013
+# agecraft 0.1.0.9014
 
-## Getting started
+## Documentation and examples
+
+- Update the package Description to summarize fractional age calculation,
+  explicit units, named interval groups, classification, and range comparisons.
 
 - Refresh README around the current date-to-age-to-named-category workflow,
   documenting fractional ages, output choices, both classes, conversion rules,
   presets, interval analysis, automatic reporting units, and migration paths.
-
 - Add a beginner-friendly introductory vignette covering the age class,
   calculation from birth and reference/event dates, selectable units, all three
   output formats, supplied group definitions, named and fractional groups,
@@ -14,6 +16,13 @@
   explain age construction and calculation, precision versus display, extraction,
   unit conversions, vector operations, interval definitions, names, classification,
   factor and interval outputs, and interval comparison functions.
+
+- Verify both new vignettes render and are included in the built source package.
+  Execute all 10 README workflow example blocks and verify local documentation
+  links. This increment updates documentation and package metadata; calculation
+  and class behavior remain as introduced in 0.1.0.9013.
+
+# agecraft 0.1.0.9013
 
 ## Date calculation returns age vectors
 

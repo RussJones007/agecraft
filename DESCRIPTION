@@ -1,16 +1,18 @@
 Package: agecraft
 Type: Package
 Title: Age Calculation and Grouping
-Version: 0.1.0.9013
+Version: 0.1.0.9014
 Authors@R: person(
     "Russ", "Jones",
     role = c("aut", "cre"),
     email = "RussJones007@gmail.com",
     comment = NULL
   )
-Description: Calculate ages from dates and date-times, represent age ranges as
-    interval vectors, and assign ages to ordered groups with explicit time units.
-    Includes reusable age-group definitions for public-health reporting.
+Description: Calculate calendar and elapsed ages from dates and date-times,
+    retaining fractional precision with explicit time units. Represent age ranges
+    as intervals with fractional boundaries and optional names, classify ages
+    into ordered categories, and compare age ranges. Includes reusable age-group
+    definitions and explicit unit conversion.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
