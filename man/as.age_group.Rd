@@ -61,8 +61,8 @@ mixing an age_group with a bare ivs interval is an error in either order.
 Convert bare intervals with as.age_group() before intersecting; their units
 must also match the age groups.
 Casting to a bare ivs interval explicitly discards age metadata.
-Finite endpoints must be nonnegative whole numbers; fractional boundaries
-are rejected without rounding. Numeric cuts must be strictly increasing,
+Finite endpoints must be nonnegative numbers; fractional boundaries
+are preserved without rounding. Numeric cuts must be strictly increasing,
 with Inf allowed only at the end. A scalar finite cut creates a one-unit
 interval. Empty input creates an empty vector. Missing character, factor,
 and interval observations are preserved; numeric cut points cannot be missing.

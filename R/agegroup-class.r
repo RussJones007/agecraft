@@ -36,10 +36,10 @@ get_unit <- purrr::attr_getter("unit")
 #' Create an interval age_group
 #'
 #' Creates validated, right-open age intervals. Finite endpoints must be
-#' nonnegative whole numbers; endpoints are stored as doubles so that Inf can
+#' nonnegative numbers; endpoints are stored as doubles so that Inf can
 #' represent an open-ended upper age group, such as [85, Inf).
 #'
-#' @param start,end Nonnegative whole-number endpoints, stored as doubles.
+#' @param start,end Nonnegative numeric endpoints, stored as doubles.
 #'   `start` determines the interval count; a scalar `end` is recycled.
 #'   Only `end` may be Inf. Missing intervals have both endpoints missing.
 #' @param unit Optional age unit, such as year or day.
@@ -70,10 +70,6 @@ new_age_group <- function(start = double(),
   if (any(!is.finite(start[present]) | start[present] < 0) ||
       any(end[present] == -Inf | end[present] < 0)) {
     stop("Age endpoints must be nonnegative; only `end` may be Inf", call. = FALSE)
-  }
-  finite_end <- end[is.finite(end)]
-  if (any(start[present] != trunc(start[present])) || any(finite_end != trunc(finite_end))) {
-    stop("Age endpoints must be whole numbers", call. = FALSE)
   }
   if (any(start[present] >= end[present])) {
     stop("Each interval must have start < end", call. = FALSE)
@@ -156,7 +152,7 @@ valid_age_group_symbol <- function(x){
 #'
 #' Each interval includes start and excludes end. For example, bounds 1 and 5
 #' represent completed ages 1-4. Gaps and overlaps are preserved.
-#' @param start,end Nonnegative whole-number endpoints. A scalar end is recycled
+#' @param start,end Nonnegative numeric endpoints. A scalar end is recycled
 #'   to the length of start. Only end may be Inf. Missing pairs require two NAs.
 #' @param unit Optional time unit, such as "year" or "day".
 #' @param below,sep,above Display symbols, as in [as.age_group()].

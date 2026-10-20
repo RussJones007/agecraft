@@ -8,7 +8,7 @@ test_that("factor and interval outputs preserve assignment and observation order
   expect_length(categorize_age(numeric(), output = "interval"), 0)
   expect_identical(as.character(categorize_age(c(0, 5, 10), by = c(0, 5, 10))), c("0-4", "5-9", NA))
   expect_error(categorize_age(1, by = 0), "positive")
-  expect_error(categorize_age(1, by = c(0, 2.5)), "whole numbers")
+  expect_identical(as.character(categorize_age(1, by = c(0, 2.5))), "[0, 2.5)")
 })
 
 test_that("advanced matching controls work through the main interface", {

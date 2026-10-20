@@ -100,8 +100,8 @@ as.integer.age_group <- function(x, ...){
 #' Convert bare intervals with as.age_group() before intersecting; their units
 #' must also match the age groups.
 #' Casting to a bare ivs interval explicitly discards age metadata.
-#' Finite endpoints must be nonnegative whole numbers; fractional boundaries
-#' are rejected without rounding. Numeric cuts must be strictly increasing,
+#' Finite endpoints must be nonnegative numbers; fractional boundaries
+#' are preserved without rounding. Numeric cuts must be strictly increasing,
 #' with Inf allowed only at the end. A scalar finite cut creates a one-unit
 #' interval. Empty input creates an empty vector. Missing character, factor,
 #' and interval observations are preserved; numeric cut points cannot be missing.
@@ -235,8 +235,8 @@ as.age_group.integer <- function(x, below = "0-", sep = "-", above = "+", unit =
 #' @rdname as.age_group
 #' @exportS3Method as.age_group double
 as.age_group.double <- function(x = double(), below = "0-", sep = "-", above = "+", unit = NULL) {
-  if (anyNA(x) || any(x < 0) || any(is.finite(x) & x != trunc(x))) {
-    stop("Numeric cut points must be nonmissing, nonnegative whole numbers (or final Inf)", call. = FALSE)
+  if (anyNA(x) || any(x < 0)) {
+    stop("Numeric cut points must be nonmissing, nonnegative numbers (or final Inf)", call. = FALSE)
   }
   if (is.unsorted(x, strictly = TRUE)) {
     stop("Numeric cut points must be strictly increasing", call. = FALSE)

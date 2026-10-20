@@ -14,7 +14,7 @@ age_group(
 )
 }
 \arguments{
-\item{start, end}{Nonnegative whole-number endpoints. A scalar end is recycled
+\item{start, end}{Nonnegative numeric endpoints. A scalar end is recycled
 to the length of start. Only end may be Inf. Missing pairs require two NAs.}
 
 \item{unit}{Optional time unit, such as "year" or "day".}

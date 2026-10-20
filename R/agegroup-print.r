@@ -52,18 +52,22 @@ age_group_to_char <- function(groups, sep = get_symbols(groups)[["sep"]] %||% "-
   multi_ages <- !missing & (starts != (ends - 1))
   ret[multi_ages] <- paste0(starts[multi_ages], sep, ends[multi_ages] - 1)
 
+  # Fractional bounds use explicit right-open notation, never end minus one.
+  fractional <- !missing & (starts != trunc(starts) | (is.finite(ends) & ends != trunc(ends)))
+  ret[fractional] <- paste0("[", starts[fractional], ", ", ends[fractional], ")")
+
   # use a single age when separator is not needed
-  single <- !missing & !multi_ages
+  single <- !missing & !multi_ages & !fractional
   ret[single] <- starts[single]
 
   # if any of the mutli age groups starts with zero and the '<' below character is present in symbols, then format the
   # group to use the below symbol and the end of the group to show less than that age.
-  zero_present <- !missing & (starts <= 0 & 0 < ends) & str_detect(below, "^<")
+  zero_present <- !missing & !fractional & (starts <= 0 & 0 < ends) & str_detect(below, "^<")
   if(any(zero_present)) ret[zero_present] <- paste0(below, iv_end(groups[zero_present]))
   rm(zero_present)
 
   # check for using the above character when any group ends with Inf, then use the above symbol
-  inf_present <- !missing & (ends == Inf)
+  inf_present <- !missing & !fractional & (ends == Inf)
   if(any(inf_present)) ret[inf_present] <- paste0(iv_start(groups[inf_present]), above)
 
   # represent all ages as a single label

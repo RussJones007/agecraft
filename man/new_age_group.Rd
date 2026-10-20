@@ -12,7 +12,7 @@ new_age_group(
 )
 }
 \arguments{
-\item{start, end}{Nonnegative whole-number endpoints, stored as doubles.
+\item{start, end}{Nonnegative numeric endpoints, stored as doubles.
 \code{start} determines the interval count; a scalar \code{end} is recycled.
 Only \code{end} may be Inf. Missing intervals have both endpoints missing.}
 
@@ -26,7 +26,7 @@ age_group when printed.
 }
 \description{
 Creates validated, right-open age intervals. Finite endpoints must be
-nonnegative whole numbers; endpoints are stored as doubles so that Inf can
+nonnegative numbers; endpoints are stored as doubles so that Inf can
 represent an open-ended upper age group, such as [85, Inf).
 }
 \keyword{internal}
