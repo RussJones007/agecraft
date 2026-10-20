@@ -102,6 +102,8 @@ vec_ptype_full.age_group <- function(x, ...) {
 vec_restore.age_group <- function(x, to, ...){
   # restore the age_group object
   ret <- new_age_group(start = field(x, "start"), end = field(x, "end"), symbols = get_symbols(to), unit = get_unit(to))
+  labels <- x[[".group_names"]]
+  if (!is.null(labels) && any(x[[".group_named"]], na.rm = TRUE)) attr(ret, "group_names") <- labels
   return(ret)
 }
 
@@ -156,12 +158,58 @@ valid_age_group_symbol <- function(x){
 #'   to the length of start. Only end may be Inf. Missing pairs require two NAs.
 #' @param unit Optional time unit, such as "year" or "day".
 #' @param below,sep,above Display symbols, as in [as.age_group()].
+#' @details
+#' Fractional bounds are preserved. Intervals with fractional endpoints display
+#' as `[start, end)`; whole-number bounds retain completed-age labels such as 1-4.
+#' Assign category labels with `names(x) <- labels`. Classification and factor
+#' coercion use nonblank names, falling back to interval labels for missing or
+#' blank names. Distinct intervals must have unique resulting factor labels.
+#' Names follow observations through slicing, sorting, concatenation and casts;
+#' interval set operations discard names because they can create new intervals.
+#' Names do not change interval equality or ordering.
 #' @return An age_group interval vector.
 #' @export
 #' @examples
 #' age_group(c(1, 10), c(5, Inf), unit = "year")
+#' groups <- age_group(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
+#' names(groups) <- c("Neonate", "Infant", "Toddler")
+#' categorize_age(units::set_units(c(0.02, 0.5, 2), "year"), by = groups)
 age_group <- function(start = double(), end = double(), unit = NULL,
                       below = "0-", sep = "-", above = "+") {
   new_age_group(start, end, symbols = list(below = below, sep = sep, above = above),
                 unit = unit)
 }
+
+# Record vectors cannot use the physical names attribute: it identifies fields.
+# Expose observation names through names(), and carry them in the slicing proxy.
+#' @exportS3Method base::names age_group
+names.age_group <- function(x) attr(x, "group_names")
+
+#' @exportS3Method base::`names<-` age_group
+`names<-.age_group` <- function(x, value) {
+  if (!is.null(value)) {
+    value <- as.character(value)
+    if (length(value) > length(x)) stop("Too many group names", call. = FALSE)
+    length(value) <- length(x)
+  }
+  attr(x, "group_names") <- value
+  x
+}
+
+#' @exportS3Method vctrs::vec_proxy
+vec_proxy.age_group <- function(x, ...) {
+  fields <- unclass(x)
+  vctrs::new_data_frame(list(start = fields[["start"]], end = fields[["end"]],
+                            .group_names = names(x) %||% rep(NA_character_, length(fields[["start"]])),
+                            .group_named = rep(!is.null(names(x)), length(fields[["start"]]))))
+}
+
+# Names describe observations, not interval identity or chronological order.
+#' @exportS3Method vctrs::vec_proxy_equal
+vec_proxy_equal.age_group <- function(x, ...) {
+  fields <- unclass(x)
+  vctrs::new_data_frame(list(start = fields[["start"]], end = fields[["end"]]))
+}
+
+#' @exportS3Method vctrs::vec_proxy_compare
+vec_proxy_compare.age_group <- function(x, ...) vec_proxy_equal.age_group(x)

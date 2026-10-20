@@ -12,7 +12,8 @@
 \item{...}{Reserved for future extensions; currently ignored.}
 }
 \value{
-an ordinal factor of age groups.
+An ordinal factor using nonblank group names, otherwise interval labels.
+Levels follow interval order; distinct intervals require unique labels.
 }
 \description{
 Coerce age_group to ordered factor

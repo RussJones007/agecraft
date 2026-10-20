@@ -28,6 +28,19 @@ An age_group interval vector.
 Each interval includes start and excludes end. For example, bounds 1 and 5
 represent completed ages 1-4. Gaps and overlaps are preserved.
 }
+\details{
+Fractional bounds are preserved. Intervals with fractional endpoints display
+as \verb{[start, end)}; whole-number bounds retain completed-age labels such as 1-4.
+Assign category labels with \code{names(x) <- labels}. Classification and factor
+coercion use nonblank names, falling back to interval labels for missing or
+blank names. Distinct intervals must have unique resulting factor labels.
+Names follow observations through slicing, sorting, concatenation and casts;
+interval set operations discard names because they can create new intervals.
+Names do not change interval equality or ordering.
+}
 \examples{
 age_group(c(1, 10), c(5, Inf), unit = "year")
+groups <- age_group(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
+names(groups) <- c("Neonate", "Infant", "Toddler")
+categorize_age(units::set_units(c(0.02, 0.5, 2), "year"), by = groups)
 }

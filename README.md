@@ -269,12 +269,39 @@ ages <- units::set_units(c(2, 7, NA, 2), "year")
 categorize_age(ages, by = groups, output = "interval")
 ```
 
-Age-group bounds remain whole numbers: `[1,5)` prints `1-4`, representing ages
-from 1 up to 5 exclusively. Unit-aware formatting adds the unit. Fractional
-bounds, negative bounds, and incomplete missing pairs are errors; they are not
-rounded. Only upper bounds may be infinite. A scalar upper bound is recycled
-to the length of the starts; starts are not recycled. Gaps and overlaps are retained.
-`as.age_group()` remains the converter for labels, factors, cut points and intervals.
+Age-group bounds can be fractional and are preserved without rounding. Whole-number
+bounds retain completed-age labels: `[1,5)` prints `1-4`. Intervals with fractional
+endpoints print explicitly, for example `[0, 0.077)`. Negative bounds and incomplete
+missing pairs remain errors. Only upper bounds may be infinite. A scalar upper
+bound is recycled to the length of the starts; starts are not recycled. Gaps and
+overlaps are retained, with the existing multiple-match controls.
+`as.age_group()` accepts fractional numeric cut points and interval bounds;
+legacy character labels continue to use whole completed ages.
+
+Assign category names with `names()`. Both classification functions use nonblank
+names as factor labels, falling back to interval labels for blank or missing names.
+Levels follow sorted interval order. Distinct intervals must have unique resulting
+labels, including fallback labels, so categories cannot silently merge.
+
+```r
+groups <- age_group(c(0, 0.077, 1, 3), c(0.077, 1, 3, 6), unit = "year")
+names(groups) <- c("Neonate", "Infant", "Toddler", "Young child")
+ages <- units::set_units(c(0.02, 0.5, 2, 4, NA), "year")
+categorize_age(ages, by = groups)
+# Neonate Infant Toddler Young child <NA>
+# Levels: Neonate < Infant < Toddler < Young child
+```
+
+The `0.077`-year cutoff approximates 28 days. Supply fractional ages in the same
+unit: `calculate_age()` and `age_auto_unit()` report completed units, so their
+whole-year values cannot distinguish neonatal and infant ages. This change does
+not introduce a fractional calendar-age calculation or a new year-length convention.
+
+Names follow observations through slicing, sorting, concatenation, coercion, and
+`output = "interval"`. `generics::as.factor()` and `generics::as.ordered()` also use
+the names. Character conversion retains interval descriptions. Names do not alter
+interval equality or sorting, and interval set operations discard names because
+their results may combine or split the original categories.
 
 Weeks are opt-in, so existing automatic-unit results retain their defaults:
 

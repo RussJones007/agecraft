@@ -34,7 +34,9 @@ vec_ptype2.age_group.age_group <- function(x, y, ...) {
 #' @exportS3Method vctrs::vec_cast
 vec_cast.age_group.age_group <- function(x, to, ...) {
   age_group_common_unit(x, to)
-  new_age_group(ivs::iv_start(x), ivs::iv_end(x), get_symbols(to), unit = get_unit(to))
+  ret <- new_age_group(ivs::iv_start(x), ivs::iv_end(x), get_symbols(to), unit = get_unit(to))
+  names(ret) <- names(x)
+  ret
 }
 
 #' @exportS3Method vctrs::vec_ptype2
@@ -65,7 +67,9 @@ vec_cast.ivs_iv.age_group <- function(x, to, ...) {
 
 #' @exportS3Method vctrs::vec_cast
 vec_cast.age_group.ivs_iv <- function(x, to, ...) {
-  new_age_group(ivs::iv_start(x), ivs::iv_end(x), get_symbols(to), unit = get_unit(to))
+  ret <- new_age_group(ivs::iv_start(x), ivs::iv_end(x), get_symbols(to), unit = get_unit(to))
+  names(ret) <- names(x)
+  ret
 }
 
 #' @exportS3Method base::as.integer age_group
@@ -283,5 +287,7 @@ as.age_group.age_group <- function(x, below = "0-", sep = "-", above = "+", unit
   if (!identical(normalize_age_unit(unit), get_unit(x)) && !is.null(get_unit(x))) {
     stop("Changing age units requires explicit conversion first", call. = FALSE)
   }
-  new_age_group(ivs::iv_start(x), ivs::iv_end(x), symbols, unit)
+  ret <- new_age_group(ivs::iv_start(x), ivs::iv_end(x), symbols, unit)
+  names(ret) <- names(x)
+  ret
 }

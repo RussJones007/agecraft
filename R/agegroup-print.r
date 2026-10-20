@@ -95,7 +95,8 @@ as.character.age_group <- function(x, ...){
 #'
 #' @param x An age_group vector.
 #' @param ... Reserved for future extensions; currently ignored.
-#' @return a nominal factor of age groups.
+#' @return A nominal factor using nonblank group names, otherwise interval labels.
+#'   Levels follow interval order; distinct intervals require unique labels.
 #' @exportS3Method generics::as.factor age_group
 #' @examples
 #'
@@ -108,15 +109,16 @@ as.character.age_group <- function(x, ...){
 #' ag_ord
 #'
 as.factor.age_group <- function(x, ...) {
-  factor(as.character(x), levels = unique(as.character(sort(x))))
+  factor(age_group_labels(x), levels = unique(age_group_labels(sort(x))))
 }
 
 #' Coerce age_group to ordered factor
 #'
 #' @param x An age_group vector.
 #' @param ... Reserved for future extensions; currently ignored.
-#' @return an ordinal factor of age groups.
+#' @return An ordinal factor using nonblank group names, otherwise interval labels.
+#'   Levels follow interval order; distinct intervals require unique labels.
 #' @exportS3Method generics::as.ordered age_group
 as.ordered.age_group <- function(x, ...) {
-  factor(as.character(x), levels = unique(as.character(sort(x))), ordered = TRUE)
+  factor(age_group_labels(x), levels = unique(age_group_labels(sort(x))), ordered = TRUE)
 }

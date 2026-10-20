@@ -176,7 +176,8 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' @param output "factor" (default) returns an ordered factor; "interval" returns
 #'   the matched age_group per observation, in the original group units. Both
 #'   preserve input order, repeats and missing/unmatched observations. Interval
-#'   inputs match only when completely contained in a group.
+#'   inputs match only when completely contained in a group. Named groups use
+#'   their nonblank names as factor labels; other groups use interval labels.
 #' @param lower is the lowest age (default is 0) to include
 #' @param upper is the max age (default is 70), above which the ages are aggregated
 #' @param by may be a single number for the span of ages in each age group (e.g. '5' creates five year age groups) or a
@@ -249,7 +250,7 @@ categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
   }
   idx <- age_match_indices(locations, length(ages), multiple)
   if (output == "interval") return(groups[idx])
-  ret <- factor(idx, levels = seq_along(groups), labels = as.character(groups), ordered = TRUE)
+  ret <- factor(idx, levels = seq_along(groups), labels = age_group_labels(groups), ordered = TRUE)
   unit <- age_cat_iv_age_unit(ages)
   if (!is.null(unit)) attr(ret, "units") <- unit
   ret

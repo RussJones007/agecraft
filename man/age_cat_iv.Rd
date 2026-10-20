@@ -31,7 +31,9 @@ unit-bearing groups remain an error.}
 (second/minute/hour/day/week) and coarse units (month/year) because they are approximate.}
 }
 \value{
-an ordered factor with where each age is in an age_group.
+An ordered factor identifying each age group, ordered by interval.
+Nonblank group names supply labels; missing or blank names fall back to
+interval labels. Distinct intervals must have unique resulting labels.
 }
 \description{
 Uses \link[ivs:iv]{ivs::iv} to categorize into interval age groups.

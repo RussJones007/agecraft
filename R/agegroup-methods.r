@@ -20,7 +20,9 @@
 #' @param allow_approx logical; if FALSE (default), block conversions between fine units
 #'   (second/minute/hour/day/week) and coarse units (month/year) because they are approximate.
 #'
-#' @return an ordered factor with where each age is in an age_group.
+#' @return An ordered factor identifying each age group, ordered by interval.
+#'   Nonblank group names supply labels; missing or blank names fall back to
+#'   interval labels. Distinct intervals must have unique resulting labels.
 #' @keywords internal
 #' @export
 #'
@@ -156,7 +158,7 @@ age_cat_iv_to_factor <- function(locations, age_group, n_needles, multiple = c("
   idx <- age_match_indices(locations, n_needles, multiple)
   factor(x = idx,
          levels = seq_along(age_group),
-         labels = as.character(age_group),
+         labels = age_group_labels(age_group),
          ordered = TRUE)
 }
 
@@ -222,7 +224,7 @@ age_cat_iv.age_group <- function(age, age_group,
   age <- aligned$age
   age_group <- aligned$age_group
   # Unit conversion may produce fractional matching boundaries. Use bare
-  # intervals internally and retain the original whole-number group labels.
+  # intervals internally and retain the original group labels.
   haystack <- aligned$haystack %||% age_group
   locations <- ivs::iv_locate_overlaps(
     needles = ivs::iv(ivs::iv_start(age), ivs::iv_end(age)),
@@ -264,4 +266,23 @@ age_cat_iv.Date <- function(age, age_group,
                             convert_units = c("age_to_group", "group_to_age", "none"),
                             allow_approx = FALSE){
   stop('Argument: "age" as Date is not supported for age_cat_iv()')
+}
+
+# Classification labels are separate from the interval's character rendering.
+age_group_labels <- function(x) {
+  labels <- as.character(x)
+  supplied <- names(x)
+  if (!is.null(supplied)) {
+    use <- !is.na(supplied) & nzchar(trimws(supplied)) & !is.na(labels)
+    labels[use] <- supplied[use]
+  }
+  # Repeated observations of the same interval can share a label, but different
+  # categories must never collapse silently into a single factor level.
+  present <- !is.na(labels)
+  definitions <- unique(data.frame(start = ivs::iv_start(x)[present],
+                                   end = ivs::iv_end(x)[present], label = labels[present]))
+  if (anyDuplicated(definitions$label)) {
+    stop("Distinct age groups must have unique factor labels", call. = FALSE)
+  }
+  labels
 }

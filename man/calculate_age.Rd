@@ -62,7 +62,8 @@ or "none". Numeric cuts inherit the input age unit.}
 \item{output}{"factor" (default) returns an ordered factor; "interval" returns
 the matched age_group per observation, in the original group units. Both
 preserve input order, repeats and missing/unmatched observations. Interval
-inputs match only when completely contained in a group.}
+inputs match only when completely contained in a group. Named groups use
+their nonblank names as factor labels; other groups use interval labels.}
 }
 \value{
 for calculate_age(), the age as an "units" vector matching the unit parameter (e.g."year")

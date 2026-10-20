@@ -12,7 +12,8 @@
 \item{...}{Reserved for future extensions; currently ignored.}
 }
 \value{
-a nominal factor of age groups.
+A nominal factor using nonblank group names, otherwise interval labels.
+Levels follow interval order; distinct intervals require unique labels.
 }
 \description{
 Coerce age_group to a nominal factor
