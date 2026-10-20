@@ -6,6 +6,10 @@
   calculation from birth and reference/event dates, selectable units, all three
   output formats, supplied group definitions, named and fractional groups,
   frequency tables, and explicit unit conversion. Link the guide from README.
+- Add a companion class guide using a shared fictional visit data frame to
+  explain age construction and calculation, precision versus display, extraction,
+  unit conversions, vector operations, interval definitions, names, classification,
+  factor and interval outputs, and interval comparison functions.
 
 ## Date calculation returns age vectors
 

@@ -67,6 +67,9 @@ For a beginner-friendly walkthrough of dates, output formats, supplied groups,
 and named categories, read [Getting started with agecraft](vignettes/getting-started.Rmd).
 After installing the package with vignettes, open it in R with
 `vignette("getting-started", package = "agecraft")`.
+For a deeper walkthrough using one sample data frame, see
+[Working with age and age_group classes](vignettes/age-and-age-group.Rmd), or
+`vignette("age-and-age-group", package = "agecraft")`.
 
 ## Core Concepts
 
