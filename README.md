@@ -63,6 +63,11 @@ ag <- as.age_group(c("< 5", "5-9", "10-14", "15-19", "20+"))
 as.character(ag)
 ```
 
+For a beginner-friendly walkthrough of dates, output formats, supplied groups,
+and named categories, read [Getting started with agecraft](vignettes/getting-started.Rmd).
+After installing the package with vignettes, open it in R with
+`vignette("getting-started", package = "agecraft")`.
+
 ## Core Concepts
 
 ### `age` S3 class

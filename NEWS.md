@@ -1,5 +1,12 @@
 # agecraft 0.1.0.9013
 
+## Getting started
+
+- Add a beginner-friendly introductory vignette covering the age class,
+  calculation from birth and reference/event dates, selectable units, all three
+  output formats, supplied group definitions, named and fractional groups,
+  frequency tables, and explicit unit conversion. Link the guide from README.
+
 ## Date calculation returns age vectors
 
 - Change `calculate_age()` to return the fractional `age` class by default.

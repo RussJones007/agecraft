@@ -1,0 +1,278 @@
+---
+title: "Getting started with agecraft"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with agecraft}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(agecraft)
+```
+
+Calculating ages and putting them into useful groups are everyday tasks in
+many disciplines, from public health and education to population research.
+A birth date and an event date look simple enough, but birthdays, leap years,
+time units, and group boundaries can make the details surprisingly fiddly.
+
+**agecraft** brings those steps together in a flexible, vector-based framework:
+calculate ages, keep track of their units, and classify them into groups you
+can use in tables and analyses. This introduction walks through that workflow
+using ordinary R vectors and data frames.
+
+## Load the package
+
+Once agecraft is installed, load it with:
+
+```{r load-package}
+library(agecraft)
+```
+
+The main functions we will use are `calculate_age()` and `categorize_age()`.
+
+## Meet the age class
+
+An R class tells R what a value represents and how it should behave. The
+package's S3 class, `age`, represents an age with a time unit. You do not need
+to understand class programming to use it.
+
+An `age` vector can:
+
+- Store fractional ages without discarding their precision.
+- Display completed whole units, as people usually report their age.
+- Keep one unit, such as year, month, week, or day, for the entire vector.
+- Retain its unit when you select, sort, or combine observations.
+- Supply its stored fractional values when you classify ages into groups.
+
+For a small example, construct an age directly:
+
+```{r meet-age}
+example_age <- age(2.75, unit = "year")
+example_age
+as.numeric(example_age)
+as.integer(example_age)
+```
+
+The printed age is `2 year`, but the stored value is **2.75 years**.
+`as.numeric()` extracts the fractional value; `as.integer()` extracts the
+completed whole units. Printing the age does not round or change its value.
+To display the fractions explicitly, use:
+
+```{r show-fractions}
+format(example_age, fractional = TRUE)
+```
+
+## Calculate ages from dates
+
+Most workflows start with dates rather than numeric ages. `calculate_age()`
+needs a `start`, usually a birth date. Its `end` is the date or time at which
+you want to know the age. R needs these as dates or date-times, rather than
+ordinary text, so use `as.Date()` for calendar dates.
+
+### Age on a reference date
+
+Here are three birth dates and a single reference date:
+
+```{r reference-date}
+birth_dates <- as.Date(c("2024-01-01", "2022-01-01", "2020-01-01"))
+reference_date <- as.Date("2024-07-02")
+
+ages <- calculate_age(start = birth_dates, end = reference_date)
+ages
+```
+
+The default unit is **year**, and the default result is an `age` vector.
+One reference date is reused for every birth date. There is no need to write
+a loop. This example uses a fixed reference date so its results are reproducible.
+
+### Age today
+
+To calculate ages as of today, supply today's date:
+
+```{r today}
+calculate_age(start = birth_dates, end = Sys.Date())
+```
+
+You can also omit `end` entirely: `calculate_age(start = birth_dates)` uses
+the current date-time. Results based on today naturally change over time.
+
+### Age at an event
+
+For age at a visit, enrollment, or another event, give each observation its
+own event date. The birth dates and event dates should have the same length,
+or one of the two vectors must have length one.
+
+```{r event-dates}
+event_dates <- as.Date(c("2024-02-01", "2024-08-01", "2024-09-01"))
+ages_at_event <- calculate_age(start = birth_dates, end = event_dates)
+
+data.frame(birth_date = birth_dates, event_date = event_dates,
+           age_at_event = ages_at_event)
+```
+
+An event must not precede the corresponding birth date. Missing dates produce
+missing ages rather than removing observations.
+
+### Choose a unit
+
+Use `unit` to ask for years, months, weeks, days, hours, minutes, or seconds.
+The argument uses singular names:
+
+```{r choose-unit}
+calculate_age(birth_dates, reference_date, unit = "month")
+calculate_age(birth_dates, reference_date, unit = "day")
+```
+
+Years and months use calendar anniversaries. A fractional year is the number
+of completed birthdays plus the fraction of days between the previous and
+next birthdays. Months use the analogous month anniversaries. Leap birthdays
+fall on March 1 in non-leap years; month anniversaries fall on the last day of
+a shorter month when necessary.
+
+For date-times, calendar years and months use civil dates in the starting
+time zone and ignore time of day. Smaller units measure elapsed time: a day
+means 24 hours, so crossing a daylight-saving transition may give a fraction
+of a day.
+
+## Choose what calculate_age returns
+
+`calculate_age()` offers three output formats:
+
+| `output` | Returned object | Values stored |
+|:--|:--|:--|
+| `"age"` (default) | An `age` vector with a unit | Fractional ages; completed units displayed |
+| `"units"` | A vector from the units package | Completed whole units, with a unit |
+| `"numeric"` | A plain numeric vector | Completed whole units, without a unit |
+
+```{r output-options}
+calculate_age(birth_dates, reference_date, output = "age")
+calculate_age(birth_dates, reference_date, output = "units")
+calculate_age(birth_dates, reference_date, output = "numeric")
+```
+
+There is an important distinction between requesting plain numeric output
+and extracting numbers from an `age` object:
+
+```{r extraction}
+as.numeric(ages) # fractional values, with the class and unit removed
+as.integer(ages) # completed whole units
+```
+
+Use the default `age` output when you want to retain fractions for later
+classification. `output = "units"` preserves the completed-age format returned
+by earlier development versions of agecraft.
+
+## Group ages using the supplied definitions
+
+The package includes ready-to-use cut points in `age_group_presets`. Start by
+looking at their names, then select a definition:
+
+```{r supplied-groups}
+names(age_group_presets)
+reporting_groups <- as.age_group(age_group_presets$Yr.5, unit = "year")
+head(reporting_groups)
+
+categories <- categorize_age(ages, by = reporting_groups)
+categories
+table(categories)
+```
+
+`as.age_group()` turns the cut points into an `age_group` vector. Here we
+explicitly say that the supplied cut points represent years. Choose a
+definition that fits your analysis; the presets are inherited reporting
+conventions, and their names and provenance are documented in the package.
+
+`categorize_age()` returns an **ordered factor**: a vector of category labels
+whose levels follow interval order. You can put it straight into `table()`
+or add it to a data frame.
+
+## Make and name your own groups
+
+Suppose you want categories called Infant, Toddler, and Young child.
+Construct the interval boundaries, then give each interval a name:
+
+```{r named-groups}
+child_groups <- age_group(start = c(0, 1, 3), end = c(1, 3, 6), unit = "year")
+child_groups
+names(child_groups) <- c("Infant", "Toddler", "Young child")
+
+child_category <- categorize_age(ages, by = child_groups)
+child_category
+```
+
+Each interval **includes its start and excludes its end**. The toddler group,
+`[1, 3)`, starts on the first birthday and ends just before the third birthday.
+The ordinary interval display is `1-2`, meaning completed ages 1 and 2.
+If you want completed ages 1 through 3, use `[1, 4)` instead.
+These labels and boundaries are examples; choose definitions for your use case.
+
+The group names become the labels in the classified result, and they carry
+through to a frequency table:
+
+```{r named-table}
+table(child_category)
+
+data.frame(birth_date = birth_dates, age = ages, category = child_category)
+```
+
+Without names, the categories display interval labels such as `1-2`.
+Missing or blank names fall back to those interval labels. Give distinct
+intervals unique labels so that separate categories stay distinguishable.
+
+### Fractional boundaries for finer categories
+
+Groups can also have fractional boundaries. For example, you could split the
+first year into an approximate neonatal period and later infancy:
+
+```{r fractional-groups}
+fine_groups <- age_group(start = c(0, 0.077, 1, 3),
+                         end = c(0.077, 1, 3, 6), unit = "year")
+names(fine_groups) <- c("Neonate", "Infant", "Toddler", "Young child")
+
+fine_ages <- calculate_age(as.Date("2024-01-01"),
+                          as.Date(c("2024-01-10", "2024-07-02", "2025-01-01")))
+fine_category <- categorize_age(fine_ages, by = fine_groups)
+fine_category
+table(fine_category)
+```
+
+Classification uses the stored fractions, even when both a neonatal age and
+an infant age print as `0 year`. The cutoff `0.077` years approximates 28 days;
+it is not an exact calendar-day boundary. If an exact 28-day cutoff matters,
+calculate the ages in days and define groups in days.
+
+Keep groups non-overlapping when each person should belong to one category.
+An age outside all intervals, or a missing age, returns `NA`. Overlapping
+matches raise an error by default, helping you spot ambiguous definitions.
+
+## Convert units explicitly
+
+For an existing age vector, use `as_age()` to change units:
+
+```{r convert-units}
+weeks <- age(c(1.5, 2), unit = "week")
+as_age(weeks, unit = "day")
+```
+
+Weeks convert to days exactly. Converting years or months to days is
+approximate because calendar years and months vary in length. You must opt
+in to that approximation:
+
+```{r approximate-conversion}
+approximate_days <- as_age(example_age, unit = "day", allow_approx = TRUE)
+approximate_days
+as.numeric(approximate_days)
+```
+
+After conversion, the fractional part is a fraction of the **new** unit.
+For exact elapsed days from dates, calculate directly in days instead of
+converting a fractional age in years.
+
+## A workflow to take away
+
+Keep the dates, calculate ages in the unit your analysis needs, and pass the
+result directly to `categorize_age()`. Supply an existing group definition
+or create your own intervals and names. The resulting ordered factor is
+ready for a table, a plot, or the next step in your analysis.
