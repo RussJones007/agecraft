@@ -1,3 +1,48 @@
+# agecraft 0.1.0.9013
+
+## Date calculation returns age vectors
+
+- Change `calculate_age()` to return the fractional `age` class by default.
+  Add `output = c("age", "units", "numeric")`: `units` preserves the previous
+  completed-age units output and `numeric` returns completed ages as doubles.
+  `as.numeric()` on the default result now extracts fractions; `as.integer()`
+  extracts completed units. This is an intentional development API change.
+- Calculate fractional years using completed birthdays plus elapsed civil days
+  between consecutive birthdays, and fractional months using calendar month
+  anniversaries. Anchor both anniversaries to the original birth date. Preserve
+  March 1 for leap birthdays in non-leap years and end-of-month rollback for
+  shorter months. Calendar calculations use the start time zone and ignore time
+  of day; finer units retain fractional elapsed time, including daylight saving.
+- Preserve the completed-unit output formats of `calc_age()` and `age_auto_unit()`.
+  Document migration choices and end-to-end fractional named-group classification.
+
+## Fractional age vectors
+
+- Add the numeric S3 `age` class using vctrs, with fractional precision and one
+  explicit time unit per vector. Export `age()`, `as_age()`, and `is_age()`.
+  Normalize common time-unit aliases; reject negative, infinite, nonnumeric,
+  multidimensional, and unsupported-unit inputs while retaining missing ages.
+- Display completed whole units by default without truncating stored values.
+  Use `format(x, fractional = TRUE)` for fractional display, `as.numeric()` for
+  full-precision extraction, and `as.integer()` for completed units.
+- Preserve units, names and precision through vector slicing, sorting, repetition,
+  concatenation, casts, and data-frame binding. Combining and comparing age
+  vectors requires matching units; bare numbers are not implicitly combined.
+- Convert numeric ages and time-units vectors with `as_age()`. Require explicit
+  unit conversion and guard approximate month/year-to-finer-unit conversions
+  with `allow_approx`. Means, extrema and rounding retain the class; unsupported
+  arithmetic and mathematical transformations require explicit numeric extraction.
+- Integrate `age` vectors with `categorize_age()` and `age_cat_iv()`, including
+  fractional named groups, unit alignment, missing and unmatched observations,
+  and interval output. Classification always uses the stored fractional values.
+- Document numeric construction, date-based calculation, display, extraction,
+  and the distinction between calendar fractions and approximate unit conversions.
+- Add regression coverage for class validation, precision, display, metadata,
+  conversions, calendar fractions, elapsed time, output options, compatibility,
+  missing and empty inputs, and named-group classification. All 416 assertions
+  pass. The 0.1.0.9013 built-package check, examples and vignettes pass with zero
+  errors and warnings; remote clock verification produces one environment note.
+
 # agecraft 0.1.0.9012
 
 ## Fractional age groups
