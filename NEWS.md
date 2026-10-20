@@ -1,3 +1,45 @@
+# agecraft 0.1.0.9012
+
+## Fractional age groups
+
+- Allow fractional nonnegative endpoints in `age_group()`, internal construction,
+  numeric `as.age_group()` cut points, interval conversion, and casts. Preserve
+  bounds without rounding; retain validation of negative, reversed, infinite,
+  and incompletely missing bounds.
+- Display intervals with fractional endpoints using explicit right-open notation,
+  such as `[0, 0.077)`, while preserving existing whole-number age labels.
+  Fractional numeric widths and cut points also work in `categorize_age()`.
+  Legacy character input continues to describe whole completed ages.
+
+## Named categories
+
+- Support reading, assigning, and clearing category names with `names()`.
+  Preserve names through slicing, sorting, repetition, concatenation, data-frame
+  binding, casts, and conversion of existing age groups. Names do not affect
+  interval equality or ordering; interval set operations discard names because
+  they may create different intervals.
+- Use nonblank category names as ordered-factor labels in `categorize_age()`
+  and `age_cat_iv()`, and as labels in `generics::as.factor()` and
+  `generics::as.ordered()`. Missing or blank names fall back to interval labels.
+  Reject label collisions between distinct intervals to prevent silent merging
+  of factor levels. Preserve chronological level ordering and existing handling
+  of missing, unmatched, and multiply matched observations.
+- Preserve matched category names in `categorize_age(output = "interval")`.
+  Character conversion continues to describe interval boundaries.
+- Add examples for approximate neonatal, infant, toddler, and young-child groups.
+  Explain that sub-year classification requires fractional input ages;
+  `calculate_age()` and `age_auto_unit()` still return completed units. No new
+  calendar-year convention or mixed-unit representation is introduced.
+
+## Validation
+
+- Add regression coverage for exact fractional boundaries, half-open matching,
+  missing and unmatched ages, interval operations, named factor labels, label
+  collisions, metadata preservation, and unchanged whole-number behavior.
+- Full suite: 307 passing assertions. Built-package check, examples, and vignettes
+  pass with zero errors and zero warnings; remote clock verification is unavailable
+  in the restricted environment and produces one check note.
+
 # agecraft 0.1.0.9011
 
 ## Public interface
