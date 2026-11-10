@@ -26,16 +26,17 @@ age <- calculate_age(birth, reference, "year")
 age
 ```
 
-Leap birthdays reach their next year on March 1 in non-leap years.
-The default result is an `age` vector that retains fractions while displaying
-completed whole years. Use `as.numeric(age)` to extract the fractions or
-`as.integer(age)` for completed years. Request `output = "numeric"` for plain
-completed ages or `output = "units"` for the previous completed-age units output.
-Fractional years measure the fraction of civil days between consecutive birthdays.
-Reversed dates raise an error. Missing observations remain missing.
-Months use calendar anniversaries, including the last day of short
-months; elapsed-day conversion with the units package is an
-approximation of calendar months or years.
+Leap birthdays reach their next year on March 1 in non-leap years. The
+default result is an `age` vector that retains fractions while
+displaying completed whole years. Use `as.numeric(age)` to extract the
+fractions or `as.integer(age)` for completed years. Request
+`output = "numeric"` for plain completed ages or `output = "units"` for
+the previous completed-age units output. Fractional years measure the
+fraction of civil days between consecutive birthdays. Reversed dates
+raise an error. Missing observations remain missing. Months use calendar
+anniversaries, including the last day of short months; elapsed-day
+conversion with the units package is an approximation of calendar months
+or years.
 
 ## Assign reporting groups
 
@@ -70,12 +71,13 @@ day_groups <- as.age_group(c(0, 7, 14, 30, 60, Inf), unit = "day")
 categorize_age(days, by = day_groups)
 ```
 
-Groups with unspecified units inherit the age vector's unit for matching.
-Unitless numeric ages with explicitly unit-bearing groups are rejected. When
-both sides have specified but different units, `convert_units` selects which
-side to convert; `convert_units = "none"` rejects conversion. Conversions between month/year and
-smaller units require `allow_approx = TRUE`; calculate ages directly in
-the reporting unit when possible.
+Groups with unspecified units inherit the age vector's unit for
+matching. Unitless numeric ages with explicitly unit-bearing groups are
+rejected. When both sides have specified but different units,
+`convert_units` selects which side to convert; `convert_units = "none"`
+rejects conversion. Conversions between month/year and smaller units
+require `allow_approx = TRUE`; calculate ages directly in the reporting
+unit when possible.
 
 ## Combine observations safely
 
