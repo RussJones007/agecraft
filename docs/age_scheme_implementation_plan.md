@@ -200,3 +200,7 @@ with one coherent commit per milestone where practical.
 4. Explicit all-membership classification implemented with shared interval matching.
    Focused scheme/classification suite: 108 passing assertions, no failures,
    warnings, or skips. Corrected an all-missing test fixture to use numeric NAs.
+
+5. Eight-scheme legacy registry implemented, reusing packaged data/provenance.
+   Registry/migration tests: 111 passing assertions, zero failures/warnings/skips.
+   Boundary assignments and interval bounds match the unchanged numeric presets.
