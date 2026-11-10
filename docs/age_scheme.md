@@ -1,8 +1,8 @@
 # Age schemes in `agecraft`
 
-**Status:** Proposed design specification — November 2026\
+**Status:** Initial API implemented — 2026-11-10\
 **Scope:** A reusable, source-aware system for defining and applying age classifications.\
-**Implementation status:** Design only; APIs below are proposals unless explicitly identified as existing.
+**Implementation status:** The initial implementation contract in section 15 is implemented. Sections 1–14 retain the original design rationale and candidate APIs; unresolved alternatives there are superseded by section 15. New authoritative external definitions and downstream integration remain deferred.
 
 ## 1. Purpose
 
@@ -239,7 +239,7 @@ The following should be settled before implementation rather than assumed:
 
 **Build `age_scheme` as a small, source-aware S3 wrapper around the existing `ivs`-based `age_group` class.** Make user-defined schemes easy; distinguish partitions from overlapping classifications; migrate the eight historical presets without breaking callers; and add a curated, carefully verified library of epidemiologic and demographic definitions. Reuse existing `agecraft` interval and classification machinery rather than creating a parallel system.
 
-## 15. Initial implementation contract — adopted 2026-11-10
+## 15. Initial implementation contract — implemented 2026-11-10
 
 The implementation follows `age_scheme_implementation_plan.md`. Use one S3
 `age_scheme` class with a validated `type` field, without partition/classification

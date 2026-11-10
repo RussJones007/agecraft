@@ -15,7 +15,8 @@ calculate_age() function, the return value will also be in that unit of time.}
 \item{upper}{is the max age (default is 70), above which the ages are aggregated}
 
 \item{by}{may be a single number for the span of ages in each age group (e.g. '5' creates five year age groups) or a
-vector of cut points that defines each age group. When a single number is given, the upper age group will always
+vector of cut points that defines each age group. It also accepts an age_group
+vector or a validated age_scheme; scheme units require unit-bearing ages. When a single number is given, the upper age group will always
 be inclusive of all ages above.  When giving a vector or cut points like 'c(5, 15, 35, 65)' the upper age group will
 not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf)'.}
 

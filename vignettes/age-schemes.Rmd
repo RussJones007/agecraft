@@ -1,0 +1,114 @@
+---
+title: "Reusable age schemes: partitions and overlapping classifications"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Reusable age schemes: partitions and overlapping classifications}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(agecraft)
+```
+
+An `age_group` vector defines intervals. An `age_scheme` packages that vector
+with an identifier, purpose, provenance, and validation rules. Store the scheme
+once and reuse it across observations. It is an S3 metadata object containing
+an interval vector, rather than another vector class attached to every age.
+
+## A user-defined five-year partition
+
+Intervals include their lower bound and exclude their upper bound: `[0,5)`
+contains ages below 5, including fractions such as 4.9. A partition disallows
+overlapping groups. Completeness is a separate claim against a declared domain.
+
+```{r partition}
+cuts <- c(seq(0, 85, by = 5), Inf)
+g <- age_group(head(cuts, -1), tail(cuts, -1), unit = "year")
+names(g) <- as.character(g)
+five_year <- age_scheme(
+  g, id = "example_five_year", name = "Illustrative five-year bands",
+  domain = c(0, Inf), complete = TRUE,
+  purpose = "Example population tabulation"
+)
+five_year
+summary(five_year)
+head(as.data.frame(five_year))
+```
+
+A domain uses the same unit as the intervals. Use `complete = NA` when making
+no completeness claim. An incomplete partition can be useful: disjoint groups
+covering ages 0–17 need not cover the rest of a declared all-age domain. With
+`complete = FALSE`, construction verifies that coverage really is incomplete.
+Without a domain, coverage and domain gaps are unspecified.
+
+```{r classification}
+a <- age(c(0, 4.9, 5, 84.9, 85, NA), unit = "year")
+categorize_age(a, by = five_year)
+categorize_age(a, by = five_year, output = "interval")
+```
+
+Classification uses stored fractions, regardless of the completed units shown
+when printing an `age` vector. Plain numbers have no declared unit: wrap known
+year values with `age(x, unit = "year")`. Schemes do not silently treat them as
+years. Existing explicit conversion and approximate-conversion guards apply.
+
+## An overlapping classification
+
+The following bands are invented to illustrate overlapping memberships. They
+are not an official WHO, CDC, or clinical definition.
+
+```{r overlap}
+g <- age_group(c(10, 15, 10), c(20, 25, 25), unit = "year")
+names(g) <- c("Example A", "Example B", "Example C")
+overlapping <- age_scheme(
+  g, id = "example_overlap", name = "Illustrative overlapping bands",
+  type = "classification", domain = c(10, 25), complete = TRUE,
+  notes = "Invented example; not an authoritative life-stage definition"
+)
+classify_age_scheme(age(c(12, 17, 24, 30, NA), unit = "year"), overlapping)
+```
+
+The long table has one row per membership. `observation` refers to the original
+input position, and `group_index` to the original group order. Missing ages and
+present-but-unmatched ages have separate statuses and one placeholder row each.
+The `group` column contains matched intervals in the scheme's original units.
+Interval-valued observations match only if fully contained in a category.
+
+`categorize_age()` continues to error on multiple matches by default. An explicit
+`multiple = "first"` or `"last"` selects one match in sorted interval order.
+Overlapping categories cannot be summed as if they were mutually exclusive
+population bands. A crosswalk also cannot determine how counts in a broad band
+should be split into finer bands without additional data or assumptions.
+
+## A legacy surveillance scheme
+
+```{r registry}
+list_age_schemes()[, c("id", "preset", "unit", "verified")]
+ili <- get_age_scheme("legacy_ili")
+ili
+categorize_age(age(c(2, 15, 40, 70), unit = "year"), by = ili)
+ili$source
+ili$notes
+```
+
+All eight historical numeric presets have equivalent year-based schemes. The
+numeric `age_group_presets` list and its `age.groups` alias remain unchanged.
+The registry preserves their original boundaries and records source uncertainty;
+these legacy bands are not verified current clinical or surveillance standards.
+A package-snapshot version identifies the preserved definition, not an official
+external edition. New authoritative definitions require source verification.
+
+## Inspecting and changing a definition
+
+Use `scheme_groups()` for the underlying intervals, `summary()` for coverage,
+gaps, overlaps and provenance, and `as.data.frame()` for an inspection table.
+The table has a `scheme_metadata` attribute; ordinary data-frame transformations
+may discard it. Reconstruct with `age_scheme()` to validate a modified definition.
+Do not retain claims of official source identity after changing cut points.
+
+The constructor checks metadata and any declared coverage claim. A user-supplied
+`verified = TRUE` requires source, reference, and version; it records the user's
+claim, rather than performing external verification. Classification and inspection
+revalidate objects so direct list mutation cannot silently bypass these checks.

@@ -6,7 +6,7 @@
 \alias{agecraft-package}
 \title{agecraft: Age Calculation and Grouping}
 \description{
-Calculate ages from dates and date-times, represent age ranges as interval vectors, and assign ages to ordered groups with explicit time units. Includes reusable age-group definitions for public-health reporting.
+Calculate calendar and elapsed ages from dates and date-times, retaining fractional precision with explicit time units. Represent age ranges as intervals with fractional boundaries and optional names, classify ages into ordered categories, and compare age groups. Includes reusable age-group definitions and explicit unit conversion.
 }
 \author{
 \strong{Maintainer}: Russ Jones \email{RussJones007@gmail.com}

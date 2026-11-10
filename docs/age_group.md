@@ -8,7 +8,7 @@
 
 `age_group` is Agecraft's existing **S3 vector class for age intervals**. It builds on `ivs` interval vectors and participates in `vctrs` operations. It represents one or more age ranges with numeric boundaries, an optional common age unit, display symbols, and optional names for individual groups.
 
-It is **not** an age-classification scheme: it does not, by itself, assert a source, reporting purpose, publication date, partition status, or completeness of coverage. The proposed `age_scheme` should **contain** an `age_group` vector and supply that higher-level information, rather than subclass or replace `age_group`.
+It is **not** an age-classification scheme: it does not, by itself, assert a source, reporting purpose, publication date, partition status, or completeness of coverage. The implemented `age_scheme` **contains** an `age_group` vector and supplies that higher-level information, without subclassing or replacing `age_group`.
 
 ``` text
 age_scheme  [proposed: scheme identity, provenance, constraints]
@@ -118,7 +118,7 @@ Current behavior:
 
 `age_cat_iv()` is an existing exported S3 generic/matching interface; the package's primary workflow, per `API_POLICY.md`, favors `categorize_age()`. Do not create a competing classification implementation for `age_scheme`: adapt or delegate to the existing matching behavior.
 
-**Overlapping classifications:** A proposed `age_scheme` may legitimately contain overlapping age groups (for example, overlapping life-stage categories). Existing single-assignment factor output cannot represent every membership simultaneously. Preserve the current default error behavior until a separate multiple-membership output is explicitly designed and tested.
+**Overlapping classifications:** An `age_scheme` may contain overlapping groups. The default single-assignment factor output still errors on multiple matches; use `classify_age_scheme()` for explicit all-membership output.
 
 ## 8. Comparing age groups
 
@@ -135,22 +135,20 @@ Pairwise comparisons can produce `length(x) * length(y)` rows before filtering. 
 
 For `tarr.pop` or other aggregate population systems, do not reallocate counts between incompatible age partitions without sufficiently fine source data or an explicitly documented modeling assumption.
 
-## 9. Legacy presets and the proposed `age_scheme`
+## 9. Legacy presets and the implemented `age_scheme`
 
-The package currently exposes `age_group_presets`, a named list of numeric cut points, and retains `age.groups` as a compatibility alias. Documented entries include `ILI`, `IMM`, `Yr.5`, `Yr.10`, `Spec`, `Annual`, `School`, and `Covid`.
+`age_group_presets` remains a named list of numeric cut points and `age.groups`
+remains its compatibility alias. The eight presets are unchanged. Equivalent
+unit-bearing schemes are now available through `get_age_scheme()` and
+`list_age_schemes()`, recording uncertainty from
+`inst/extdata/age-group-provenance.csv`. They are not verified current standards.
 
-These presets are **not currently `age_group` or `age_scheme` objects**. Their source provenance is documented in `inst/extdata/age-group-provenance.csv`, with unknown editions for several historical reporting conventions. Do not silently relabel them as current official CDC/WHO recommendations.
-
-Recommended future design (not implemented):
-
-1.  `age_scheme` contains a validated `age_group` vector plus scheme identity, source, version, purpose, and coverage/overlap policy.
-2.  A **partition** scheme disallows overlap; completeness of coverage is a separate property.
-3.  A **classification** scheme may allow overlap, with explicit multi-membership semantics.
-4.  Registry access (e.g., `get_age_scheme()` and `list_age_schemes()`) should be designed separately from the S3 class constructor.
-5.  Convert legacy presets without changing their cut points; preserve `age_group_presets` and `age.groups` according to `API_POLICY.md`.
-6.  `categorize_age()` should eventually accept a scheme by extracting its `age_group` member, without silently changing existing behavior.
-
-See `docs/age_scheme.md` for the detailed **proposed** design and `API_POLICY.md` for binding compatibility commitments.
+The S3 `age_scheme` contains the existing interval vector plus identity, purpose,
+provenance, and validation policy. It distinguishes partitions from potentially
+overlapping classifications. Completeness is separately checked against a domain.
+`categorize_age()` now accepts a scheme through its `by` argument without changing
+existing defaults. `classify_age_scheme()` returns all memberships explicitly.
+See `docs/age_scheme.md` section 15 for the implemented contract.
 
 ## 10. Tests and change-management requirements
 
@@ -163,7 +161,7 @@ When changing the class or its methods, add or update `testthat` tests covering:
 - Matching age values exactly at boundaries, missing/unmatched ages, interval-valued ages, and multiple-match policy.
 - Explicit unit conversion and rejection of incompatible or approximate conversions without permission.
 - Pairwise crosswalk semantics, coverage set operations, and protection against inferred aggregate count allocation.
-- Future `age_scheme` validation, legacy preset parity, and classification with overlapping groups.
+- Scheme validation, legacy preset parity, and classification with overlapping groups.
 
 Relevant existing test files include `tests/testthat/test-agegroup.R`, `test-agegroup-contract.R`, `test-agegroup-compare.R`, `test-fractional-groups.R`, `test-named-groups.R`, `test-vector-metadata.R`, `test-categorize-output.R`, and `test-presets-migration.R`.
 

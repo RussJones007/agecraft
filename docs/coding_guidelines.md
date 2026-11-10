@@ -35,7 +35,7 @@ If documents disagree, **do not silently choose a new behavior**. Preserve the c
 - Use established S3 generics and register methods correctly. Do not add methods to bare `ivs_iv` beyond existing compatibility registrations without an explicit design decision.
 - Use validated constructors rather than setting class or internal record fields ad hoc. Keep internal helpers private unless a public use case justifies export.
 - Handle length-zero vectors, missing values, and incompatible types deliberately.
-- **Proposed, not yet implemented:** `age_scheme` should be a metadata-bearing S3 object **containing** an `age_group` vector, not inheriting from `age_group` and not attached to every observation. Do not assume a proposed constructor, registry, or accessor exists until implemented and tested.
+- `age_scheme` is a metadata-bearing S3 object **containing** an `age_group` vector, not inheriting from `age_group` and not attached to every observation. Consult `docs/age_scheme.md` section 15 for implemented constructors, registry accessors, and validation contracts.
 
 ## 4. Age values and interval semantics
 
@@ -61,13 +61,13 @@ These are correctness requirements, not display preferences:
 
 - Keep `categorize_age()`'s existing default of **one assignment per observation**, ordered-factor output, and an error on multiple matches. Preserve `multiple = "first"` / `"last"` and `output = "interval"` behavior unless an approved API change says otherwise.
 - Missing or unmatched ages must not be assigned an invented category. Test exact boundary values, fractional ages, and interval inputs.
-- **Proposed scheme distinction:** partitions require disjoint groups; overlapping classifications may intentionally assign multiple memberships. An explicit future multi-membership interface is preferable to silently changing the existing default.
+- **Scheme distinction:** partitions require disjoint groups; overlapping classifications may intentionally assign multiple memberships. Use `classify_age_scheme()` for explicit multi-membership output while preserving the existing default.
 - Never sum overlapping classification categories as if they were additive. Validate disjointness and required coverage before using a scheme for population denominators or rates.
 - A crosswalk between grouped intervals does **not** determine how many people belong to finer target groups. Do not allocate aggregated counts without finer data or a documented assumption.
 
-## 7. Age-scheme implementation rules (proposed)
+## 7. Age-scheme implementation rules
 
-When implementing `docs/age_scheme.md`:
+When extending the initial implementation in `docs/age_scheme.md` section 15:
 
 - Reuse `age_group` for boundaries, units, labels, and matching. Scheme metadata should describe identity, purpose, provenance, and validation policy without duplicating interval coordinates.
 - Distinguish an individually valid interval from a valid **partition** and from a potentially overlapping **classification**. Treat coverage completeness as a separate, explicit property.

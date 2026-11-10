@@ -67,3 +67,29 @@ requires a later announced breaking release; no removal date is set.
 The existing `as.character.ivs_iv()` and `summary.ivs_iv()` registrations are
 retained for compatibility. New features operate on `age_group` explicitly and
 will not add methods to the bare ivs class.
+
+## Age schemes
+
+`age_scheme()`, `is_age_scheme()`, `validate_age_scheme()`, `scheme_groups()`,
+`classify_age_scheme()`, `get_age_scheme()`, and `list_age_schemes()` are additive
+public interfaces. A scheme contains the existing interval vector; it does not
+change `age_group` equality or vector semantics. It requires nonempty named
+intervals with an explicit supported time unit. Partitions prohibit overlaps;
+coverage is independently checked against an optional right-open domain.
+`complete = TRUE` or FALSE asserts actual completeness/incompleteness and requires
+a domain; NA makes no claim.
+
+`categorize_age(..., by = scheme)` retains its existing default outputs and
+multiple-match policy. `classify_age_scheme()` explicitly returns every match in
+a long data frame, with original observation/category indices and separate
+missing/unmatched statuses. Present negative or nonfinite numeric ages are
+rejected by the new all-membership interface. Intervals require full containment.
+Unit-bearing schemes do not silently assign units to plain numeric observations.
+Existing explicit conversion and approximation controls apply.
+
+The initial registry contains eight legacy schemes with year units and stable
+`legacy_` identifiers. It preserves preset boundaries and provenance uncertainty;
+legacy numeric lists and aliases retain their existing behavior. Verification
+metadata records a caller's claim, not external validation by the constructor.
+Scheme transformations have no automatic provenance-retention contract; construct
+and validate a new scheme after changing its definition.

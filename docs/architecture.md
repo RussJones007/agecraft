@@ -22,7 +22,7 @@ The package is an **experimental**, S3/vctrs-oriented R package (R >= 4.1.0). It
 | Age interval | S3 `age_group` vector built on `ivs` | Right-open interval boundaries, names, units, matching, comparisons, set operations |
 | Classification | `categorize_age()`, `age_cat_iv()` | Match ages or interval observations to group intervals, return factors or intervals |
 | Reusable definitions | `age_group_presets` (legacy alias `age.groups`) | Numeric cut points for eight conventional reporting groupings |
-| **Scheme** | **Proposed** S3 `age_scheme` object | Compose an `age_group` vector with purpose, validation policy, provenance, and registry identity |
+| Scheme | S3 `age_scheme` object | Compose an `age_group` vector with purpose, validation policy, provenance, and registry identity |
 
 **Design principle:** An `age_scheme` **contains** an `age_group` vector. It does not inherit from `age_group` or replace the `ivs` interval engine. Schemes are small definitions shared across many observations, not an additional per-observation vector class.
 
@@ -78,54 +78,37 @@ The package is an **experimental**, S3/vctrs-oriented R package (R >= 4.1.0). It
 
 These are **historical cut-point conventions**, not necessarily current authoritative CDC/clinical standards. Their original source editions/dates are partly unknown. Preserve cut points unchanged during migration; provenance is recorded in `inst/extdata/age-group-provenance.csv`. Do not infer source authority from the name alone.
 
-## 7. Proposed `age_scheme` layer — Not implemented
+## 7. Implemented `age_scheme` layer
 
-### 7.1 Class and invariants
+`age_scheme()` constructs one S3 metadata object containing a named, nonempty,
+unit-bearing `age_group` vector. `is_age_scheme()`, `validate_age_scheme()`, and
+`scheme_groups()` identify, validate, and access it. Printing, summary, and
+data-frame inspection expose its identity, bounds, unit, provenance, coverage,
+gaps, and overlaps. Metadata is stored once per definition, not per observation.
 
-Introduce an S3 `age_scheme` class whose primary payload is a **single named `age_group` vector** and whose scheme-level fields include:
+A validated `type` distinguishes nonoverlapping partitions from classifications
+that may overlap. A domain is optional; any `complete = TRUE` or FALSE claim
+requires an explicit domain and must agree with actual coverage. Category names
+must be nonblank and unique. Unit and coordinate metadata live in `groups`.
+There are no automatic provenance-preserving scheme transformations.
 
-| Field | Meaning |
-| --- | --- |
-| `groups` | Existing `age_group` interval vector; sole source of interval bounds and unit |
-| `id` / `name` | Stable machine identifier and human-readable title |
-| `type` | `partition` (mutually exclusive) or `classification` (overlaps permitted) |
-| `domain` / `complete` | Explicit intended age domain and whether its coverage is complete within that domain |
-| `purpose` / `description` | Analytical use and cautions |
-| `source`, `reference`, `version`, `verified` | Organization, publication/URL, edition or effective date, verification status |
+`categorize_age(..., by = scheme)` extracts groups and retains current factor,
+interval, overlap-resolution, and unit-conversion behavior. The function remains
+a regular function, not a new S3 generic. `classify_age_scheme()` explicitly
+returns all memberships, preserving original observation/category indices and
+distinguishing missing from unmatched observations. Both use the same private
+interval matching helper. Unitless observations are not silently assigned years.
 
-Avoid duplicating `start`, `end`, `unit`, and labels outside `groups`. Validate uniqueness of effective labels, bounds, units, missing intervals, and scheme identity at construction. A `partition` must not overlap; completeness is **independent** of partition status (e.g., disjoint ages 0–17 can be a valid partial-domain partition). For a `classification`, overlaps are allowed and should be discoverable.
+`get_age_scheme()` and `list_age_schemes()` expose eight legacy definitions via
+private factories using existing packaged cut points and provenance. The numeric
+presets and alias remain unchanged. These schemes use explicit year units and
+record uncertain source editions rather than claim current official authority.
+Published definitions beyond this registry require separate verification.
 
-Prefer immutable-in-practice objects: update via a constructor or validating replacement, not unvalidated edits to nested bounds. Scheme provenance must remain attached to the definition and must not be assumed to survive transformations that create new intervals.
-
-### 7.2 Proposed API (illustrative, not exports)
-
-```r
-# Existing API
-bands <- age_group(c(0, 1, 5, 15, 25, 40, 65),
-                   c(1, 5, 15, 25, 40, 65, Inf), unit = "year")
-names(bands) <- c("<1", "1-4", "5-14", "15-24", "25-39", "40-64", "65+")
-
-# Proposed API — not yet available
-s <- age_scheme(groups = bands, id = "example-surveillance",
-                type = "partition", purpose = "Surveillance reporting")
-get_age_scheme("ILI")
-list_age_schemes()
-scheme_groups(s)
-```
-
-`age_scheme()` should primarily construct **user-defined** objects. A separate `get_age_scheme()` should retrieve registered built-ins; avoid overloading the constructor with ambiguous lookup-by-string behavior. Candidate methods: `print.age_scheme()`, `summary.age_scheme()`, `as.data.frame.age_scheme()` and `validate_age_scheme()`. Final names and signatures require API review before implementation.
-
-### 7.3 Applying schemes
-
-Initially, allow `categorize_age(..., by = scheme)` by extracting its `age_group` and using the current matching path. Do not change the current default `multiple = "error"` implicitly. For overlapping classifications, either require explicit overlap resolution for a single factor, or provide a **separate multi-membership output** (e.g. long-form membership table or logical membership matrix). A single ordered factor cannot represent simultaneous membership in several life stages without loss.
-
-Explicitly document unit conversion behavior and do not silently promote source-specific classification boundaries across incompatible units. For interval-valued input, preserve the current distinction between full containment and partial overlap.
-
-### 7.4 Built-in registry
-
-Start **user-defined-first** with a small, curated, source-aware built-in registry. Migrate all eight existing presets to scheme equivalents, preserving their numerical definitions and marking uncertain provenance. Keep `age_group_presets` and `age.groups` for the compatibility window committed in `API_POLICY.md`.
-
-Candidate *additional* definitions to verify individually before shipping: WHO adolescent/youth/young-people life stages; CDC *Emerging Infectious Diseases* editorial terminology; NNDSS surveillance bands; NCHS mortality groups; SEER cancer age groups; and standard demographic five-/ten-year bands. Distinguish overlapping descriptive life stages from mutually exclusive statistical partitions. Store exact source, edition, retrieval/verification date, and intended use. Do **not** describe a single universal “CDC scheme.”
+The source modules are `R/age-scheme-class.R`, `age-scheme-validation.R`,
+`age-scheme-methods.R`, `age-scheme-classify.R`, and `age-scheme-registry.R`.
+See `age_scheme.md` section 15 for the adopted contract and
+`age_scheme_implementation_plan.md` for milestone results.
 
 ## 8. `tarr.pop` integration — Proposed downstream behavior
 
@@ -147,29 +130,27 @@ Scheme implementation should be additive and must not silently change `calculate
 
 **Baseline evidence, not a fresh test run:** `CURRENT_STATE.md` reports 416 passing assertions and `devtools::check()` with 0 errors, 0 warnings, and 0 notes on 2026-11-09. Its recorded GitHub Actions run predates later documentation updates. Re-run checks on the actual release commit.
 
-## 11. Inconsistencies, tensions, and unresolved decisions
+## 11. Remaining design and validation concerns
 
-1. **Scheme design versus implemented API — expected, not a defect.** Neither `age_scheme` nor a scheme registry exists in the reviewed `R/` directory. The design must remain labeled proposed until implemented. Existing numeric presets are not already scheme objects.
-2. **Overlapping life stages versus current single-category output — real design tension.** `age_group` permits overlaps, but `categorize_age()` defaults to erroring on multiple matches and returns one factor/interval per observation. Do not solve this by silently choosing the first match. Specify multi-membership semantics separately.
-3. **Unit-free presets versus unit-bearing schemes — migration decision.** Current numeric presets are conventionally year-based according to their documentation, but numeric cut points themselves have no unit metadata. Scheme versions should explicitly use `unit = "year"` when justified, while the legacy list retains its existing behavior. This can change how unitless inputs are accepted; test carefully.
-4. **Historical preset authority — provenance gap, already acknowledged.** `API_POLICY.md` and `CURRENT_STATE.md` agree that several external editions are unknown. New curated definitions require verification; do not relabel legacy `ILI`, `IMM`, or `Covid` as current official standards.
-5. **Partition versus coverage — potential confusion.** Nonoverlap alone does not guarantee full coverage. Require an explicit domain/completeness policy, particularly for denominators.
-6. **Scheme metadata through interval transformations — unresolved.** Current `age_group` set operations intentionally discard labels. A scheme created from transformed groups must be revalidated and should not automatically inherit an authoritative source/version claim.
-7. **Historical notes.** The former root `MIGRATION.md` and `REVIEW.md` have been retired; their dated migration and review results remain available in Git history. Consult `CURRENT_STATE.md` for the documented implementation baseline.
-8. **Validation status — avoid overclaiming.** `CURRENT_STATE.md` records local checks and an older CI run, not a fresh check of the exact currently reviewed commit. No tests were executed as part of this document review.
-9. **Future API surface — open.** Decide exact constructor/registry names, how missing interval definitions are treated, whether scheme identity is stable across edits, and whether overlapping classification returns long data, a matrix, or a list-column. Keep the first release narrow.
+1. **Published definitions:** External editions for historical presets remain
+   unknown; do not relabel them as current official standards. New authoritative
+   schemes require verified boundaries, editions, references and dates.
+2. **Transformations:** Scheme subsetting, replacement and coverage operations
+   have no implicit validity/provenance-retention promise. Reconstruct and
+   validate a new definition after editing intervals.
+3. **Unit migration:** Legacy numeric presets retain caller-unit behavior.
+   Equivalent registry schemes have explicit year units and require explicit
+   observation units. This difference is intentional and documented.
+4. **Aggregation:** Membership overlap cannot justify splitting aggregate counts
+   or summing overlapping categories as an additive denominator.
+5. **Validation:** Historical validation statements above remain dated baseline
+   evidence. Consult `CURRENT_STATE.md` for the current feature validation.
 
-No direct contradiction was found between the **existing** `API_POLICY.md` compatibility rules and the **existing** `CURRENT_STATE.md` implementation summary. The most consequential issues arise when layering the proposed scheme abstraction on top of current classification and unit contracts.
+## 12. Further work
 
-## 12. Implementation sequence — Proposed
-
-1. Define and test the `age_scheme` S3 constructor and validation rules around existing `age_group` objects.
-2. Add introspection/printing/accessor methods and documented metadata/provenance representation.
-3. Implement an opt-in adapter from scheme to `categorize_age()` without changing current defaults.
-4. Specify and implement an explicit multi-membership representation for overlapping classifications.
-5. Migrate the eight presets to a curated registry while preserving the numeric legacy interface and source uncertainty.
-6. Add independently source-verified schemes and versioned provenance, followed by a vignette for epidemiologic uses.
-7. Add tests for bounds, names, units, overlaps, gaps, completeness, missing values, conversions, metadata persistence, compatibility, and reproducible preset definitions. Run full package checks and update `CURRENT_STATE.md` when implemented.
+- Curate source-verified published schemes independently of legacy migration.
+- Add validated scheme transformations only when use cases require them.
+- Coordinate downstream lazy population-array integration separately.
 
 ## 13. Source-of-truth references
 

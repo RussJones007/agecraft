@@ -18,10 +18,12 @@ The package provides:
   and optional category names.
 - Classification into ordered factors for tables and analysis, or matched intervals
   when you need to retain the boundaries.
+- Reusable `age_scheme` definitions with provenance, partition validation, and
+  explicit all-membership output for overlapping classifications.
 - Reusable group definitions, automatic reporting-unit selection, and interval
   comparisons such as crosswalks, membership, and coverage operations.
 
-Both classes use the [vctrs](https://vctrs.r-lib.org/) framework. Group intervals
+The `age` and `age_group` vector classes use the [vctrs](https://vctrs.r-lib.org/) framework. Group intervals
 build on [ivs](https://davisvaughan.github.io/ivs/), and explicit unit conversions
 use [units](https://r-quantities.github.io/units/). Requires R 4.1.0 or later.
 The package is under active development; see [NEWS](NEWS.md) for API changes.
@@ -318,3 +320,22 @@ macOS, and Windows.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Reusable age schemes
+
+Wrap named, unit-bearing groups in `age_scheme()` to declare a partition or
+overlapping classification with purpose and provenance. Use the same scheme
+across datasets; completeness is validated against an explicit age domain.
+
+```r
+legacy_ili <- get_age_scheme("legacy_ili")
+ages <- age(c(2, 15, 40, 70, NA), unit = "year")
+categorize_age(ages, by = legacy_ili)
+classify_age_scheme(ages, legacy_ili)
+```
+
+`list_age_schemes()` lists eight legacy definitions with unchanged cut points
+and unverified external editions. Unit-bearing schemes require unit-bearing
+ages. Existing numeric presets and classification defaults remain available.
+For user-defined partitions and overlapping classifications, see the
+[age-schemes guide](vignettes/age-schemes.Rmd).

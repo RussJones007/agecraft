@@ -1,3 +1,52 @@
+# agecraft current state — 2026-11-10
+
+Version: **0.1.0.9014** (development; feature implementation before the next
+development-version increment). Branch: `age_scheme`. Requires R >= 4.1.0.
+
+## Newly implemented age schemes
+
+- `age_scheme()` constructs a metadata object containing the existing interval
+  vector. Validation requires nonempty named groups with explicit time units,
+  checks nonoverlapping partitions independently of domain coverage, and checks
+  declared complete/incomplete coverage. Source verification is recorded as a
+  caller's claim and requires source, reference and version.
+- `is_age_scheme()`, `validate_age_scheme()`, and `scheme_groups()` provide
+  identification, validation, and group access. Print, summary and data-frame
+  methods expose intervals, units, metadata, gaps, overlaps, and coverage.
+- `categorize_age(..., by = scheme)` uses the existing classification path.
+  Factor/interval defaults, overlap resolution and unit conversion are preserved.
+- `classify_age_scheme()` returns every matching category in a long data frame,
+  retaining original observation/category indices and explicit missing/unmatched
+  statuses. Interval inputs require full containment.
+- `get_age_scheme()` and `list_age_schemes()` expose all eight legacy presets as
+  year-based definitions with unchanged cut points and uncertain external source
+  editions. Numeric presets and the compatibility alias are unchanged.
+- Roxygen-generated help, a new age-schemes vignette, README examples, and focused
+  regression tests cover the new API. No new dependency was introduced.
+
+## Feature validation — 2026-11-10
+
+- Baseline `devtools::test()`: 416 passing assertions, zero failures/warnings/skips.
+- Final feature `devtools::test()`: 609 passing assertions, zero failures/warnings/skips.
+- `devtools::document()` completed and `devtools::check(document = FALSE)`
+  finished with **0 errors, 0 warnings, 0 notes**. Examples, installed tests and
+  all five vignettes passed, including vignette rebuilding.
+- Local logs: `/tmp/agecraft-scheme-baseline.log`,
+  `/tmp/agecraft-scheme-full-tests.log`, and `/tmp/agecraft-scheme-check.log`.
+  These are temporary validation logs, not portable release artifacts.
+
+## Remaining work
+
+Independently verify authoritative published scheme editions before adding them.
+Scheme transformation APIs and downstream `tarr.pop` integration remain deferred.
+Scheme definitions must not force lazy arrays into memory or authorize splitting
+aggregate counts. Release stabilization, final release version, external name
+availability and release checks remain separate from this development increment.
+
+The earlier implementation and validation baseline is retained below as history.
+
+---
+
 # agecraft current state — 2026-11-09
 
 Version: **0.1.0.9014** (development). Requires R >= 4.1.0.

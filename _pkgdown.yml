@@ -18,6 +18,12 @@ reference:
       - as.ordered.age_group
       - valid_age_group_symbol
       - new_age_group
+  - title: Reusable age schemes
+    contents:
+      - age_scheme
+      - age_scheme_methods
+      - classify_age_scheme
+      - age_scheme_registry
   - title: Compatibility wrappers
     contents:
       - calc_age

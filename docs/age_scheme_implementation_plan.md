@@ -1,6 +1,6 @@
 # Age-scheme implementation plan
 
-Status: Implementation in progress; milestone 1 complete.
+Status: All six initial implementation milestones complete.
 Prepared: 2026-11-10. Branch: `age_scheme`.
 
 Read alongside `AGENTS.md`, `docs/age_scheme.md`, `docs/architecture.md`,
@@ -178,11 +178,10 @@ with one coherent commit per milestone where practical.
 
 ## Current execution status
 
-- Created branch `age_scheme` from `main`.
-- Read project instructions and design documents; inspected the current
-  classification integration point and preset provenance.
-- Created this implementation plan only. No R source, generated help, or package
-  data has been changed; baseline tests and feature implementation are pending.
+All initial feature milestones are implemented and validated on `age_scheme`.
+Published schemes beyond the legacy registry, scheme transformations and direct
+`tarr.pop` integration remain subsequent work. The development-version increment
+and GitHub push follow the milestone commits.
 
 ## Milestone log
 
@@ -204,3 +203,8 @@ with one coherent commit per milestone where practical.
 5. Eight-scheme legacy registry implemented, reusing packaged data/provenance.
    Registry/migration tests: 111 passing assertions, zero failures/warnings/skips.
    Boundary assignments and interval bounds match the unchanged numeric presets.
+
+6. Roxygen help/exports, vignette, README, API policy and design/status documents
+   updated. Full suite: 609 passing assertions, zero failures/warnings/skips.
+   `devtools::check(document = FALSE)`: zero errors, warnings or notes, including
+   examples, installed tests and rebuilding five vignettes. No new dependencies.

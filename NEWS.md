@@ -1,3 +1,23 @@
+# agecraft (development)
+
+## Reusable age schemes
+
+- Add the S3 `age_scheme` metadata object containing existing `age_group`
+  intervals, with validated category names, time units, provenance, partitions,
+  domain coverage and completeness claims. Add identification, validation,
+  group access, printing, summary, and data-frame inspection interfaces.
+- Allow schemes in `categorize_age(..., by = scheme)` while preserving existing
+  factor/interval outputs, overlap policies, conversion rules, and legacy inputs.
+- Add `classify_age_scheme()` for every membership in overlapping classifications,
+  preserving original observation/category indices and distinct missing/unmatched
+  statuses. Unit-bearing schemes require unit-bearing observations.
+- Add `list_age_schemes()` and `get_age_scheme()` for eight historical presets,
+  preserving original cut points and recording uncertain source editions. The
+  numeric presets and compatibility alias remain unchanged.
+- Add an age-schemes vignette with user-defined partitions, illustrative overlaps,
+  and legacy reporting definitions. No newly verified WHO/CDC definitions or
+  downstream population-array integration are included in this increment.
+
 # agecraft 0.1.0.9014
 
 ## Documentation and examples
