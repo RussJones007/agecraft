@@ -208,7 +208,8 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' @param lower is the lowest age (default is 0) to include
 #' @param upper is the max age (default is 70), above which the ages are aggregated
 #' @param by may be a single number for the span of ages in each age group (e.g. '5' creates five year age groups) or a
-#'   vector of cut points that defines each age group. When a single number is given, the upper age group will always
+#'   vector of cut points that defines each age group. It also accepts an age_group
+#'   vector or a validated age_scheme; scheme units require unit-bearing ages. When a single number is given, the upper age group will always
 #'   be inclusive of all ages above.  When giving a vector or cut points like 'c(5, 15, 35, 65)' the upper age group will
 #'   not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf)'.
 #' @param sep is the separation character used in the age group label (default is "-") but may be 'through', 'thru', or
@@ -246,6 +247,7 @@ categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
   if (!is.logical(allow_approx) || length(allow_approx) != 1L || is.na(allow_approx)) {
     stop("allow_approx must be TRUE or FALSE", call. = FALSE)
   }
+  if (is_age_scheme(by)) by <- scheme_groups(by)
   if (is.age_group(by)) {
     groups <- sort(by)
   } else {

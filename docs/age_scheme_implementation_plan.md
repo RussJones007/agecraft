@@ -193,3 +193,6 @@ with one coherent commit per milestone where practical.
 2. Constructor, coverage validation, and inspection methods implemented. Focused
    class/method tests: 52 passing assertions, no failures, warnings, or skips.
    Roxygen comments added; generated help/exports will be finalized in milestone 6.
+
+3. Scheme adapter added to `categorize_age()`. Focused adapter and related
+   classification regressions: 72 passing assertions, no failures/warnings/skips.
