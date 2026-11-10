@@ -7,7 +7,8 @@
 .quarto
 scripts/dev.r
 build/
-docs/
+docs/*
+!docs/*.md
 *.Rcheck/
 *.tar.gz
 inst/doc/
