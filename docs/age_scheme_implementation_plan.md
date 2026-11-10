@@ -208,3 +208,7 @@ and GitHub push follow the milestone commits.
    updated. Full suite: 609 passing assertions, zero failures/warnings/skips.
    `devtools::check(document = FALSE)`: zero errors, warnings or notes, including
    examples, installed tests and rebuilding five vignettes. No new dependencies.
+
+Development version incremented separately to `0.1.0.9015`. The versioned package
+passed `devtools::check(document = FALSE)` with zero errors, warnings or notes,
+including examples, installed tests and rebuilding all five vignettes.

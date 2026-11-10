@@ -1,7 +1,6 @@
 # agecraft current state — 2026-11-10
 
-Version: **0.1.0.9014** (development; feature implementation before the next
-development-version increment). Branch: `age_scheme`. Requires R >= 4.1.0.
+Version: **0.1.0.9015** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
 
 ## Newly implemented age schemes
 
@@ -31,6 +30,9 @@ development-version increment). Branch: `age_scheme`. Requires R >= 4.1.0.
 - `devtools::document()` completed and `devtools::check(document = FALSE)`
   finished with **0 errors, 0 warnings, 0 notes**. Examples, installed tests and
   all five vignettes passed, including vignette rebuilding.
+- Version `0.1.0.9015` was checked again after the version increment:
+  **0 errors, 0 warnings, 0 notes**, including installed tests, examples and
+  rebuilding all five vignettes. Log: `/tmp/agecraft-scheme-version-check.log`.
 - Local logs: `/tmp/agecraft-scheme-baseline.log`,
   `/tmp/agecraft-scheme-full-tests.log`, and `/tmp/agecraft-scheme-check.log`.
   These are temporary validation logs, not portable release artifacts.
