@@ -196,3 +196,7 @@ with one coherent commit per milestone where practical.
 
 3. Scheme adapter added to `categorize_age()`. Focused adapter and related
    classification regressions: 72 passing assertions, no failures/warnings/skips.
+
+4. Explicit all-membership classification implemented with shared interval matching.
+   Focused scheme/classification suite: 108 passing assertions, no failures,
+   warnings, or skips. Corrected an all-missing test fixture to use numeric NAs.

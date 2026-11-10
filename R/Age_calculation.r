@@ -270,13 +270,7 @@ categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
   }
   aligned <- age_cat_iv_align_units(ages, groups, convert_units, allow_approx)
   haystack <- aligned$haystack %||% groups
-  locations <- if (inherits(aligned$age, "ivs_iv")) {
-    ivs::iv_locate_overlaps(
-      ivs::iv(ivs::iv_start(aligned$age), ivs::iv_end(aligned$age)),
-      ivs::iv(ivs::iv_start(haystack), ivs::iv_end(haystack)), type = "within")
-  } else {
-    ivs::iv_locate_between(as.numeric(aligned$age), haystack)
-  }
+  locations <- age_group_locations(aligned$age, haystack)
   idx <- age_match_indices(locations, length(ages), multiple)
   if (output == "interval") return(groups[idx])
   ret <- factor(idx, levels = seq_along(groups), labels = age_group_labels(groups), ordered = TRUE)

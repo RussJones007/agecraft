@@ -288,3 +288,14 @@ age_group_labels <- function(x) {
   }
   labels
 }
+
+# Shared matching path for single assignment and all-membership output.
+age_group_locations <- function(ages, groups) {
+  if (inherits(ages, "ivs_iv")) {
+    ivs::iv_locate_overlaps(
+      ivs::iv(ivs::iv_start(ages), ivs::iv_end(ages)),
+      ivs::iv(ivs::iv_start(groups), ivs::iv_end(groups)), type = "within")
+  } else {
+    ivs::iv_locate_between(as.numeric(ages), groups)
+  }
+}
