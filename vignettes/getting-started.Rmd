@@ -12,12 +12,12 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-Calculating ages and putting them into useful groups are everyday tasks in
-many disciplines, from public health and education to population research.
-A birth date and an event date look simple enough, but birthdays, leap years,
-time units, and group boundaries can make the details surprisingly fiddly.
+Calculating ages and putting them into useful groups are everyday tasks in many disciplines, like public health,
+education, economics and population research to name just a few. An age is an interval time between a beginning and
+ending.  For example using a birth date and a later event date. A birth date and an event date look simple enough, but
+birthdays, leap years, time units, and group boundaries can make the details surprisingly fiddly.
 
-**agecraft** brings those steps together in a flexible, vector-based framework:
+**agecraft** brings those steps and fiddly nuances together in a flexible, vector-based framework:
 calculate ages, keep track of their units, and classify them into groups you
 can use in tables and analyses. This introduction walks through that workflow
 using ordinary R vectors and data frames.
@@ -34,9 +34,10 @@ The main functions we will use are `calculate_age()` and `categorize_age()`.
 
 ## Meet the age class
 
-An R class tells R what a value represents and how it should behave. The
-package's S3 class, `age`, represents an age with a time unit. You do not need
-to understand class programming to use it.
+An R class tells R what a value represents and how functions should handle it. The
+package's S3 class, `age`, represents an age with a time unit. When objects of that class 
+are constructed, it stores a number plus the unit of time like day, week, year. 
+Its class lets R display **2.75 year** as **2 year** while keeping the full value.
 
 An `age` vector can:
 
@@ -56,9 +57,9 @@ as.integer(example_age)
 ```
 
 The printed age is `2 year`, but the stored value is **2.75 years**.
-`as.numeric()` extracts the fractional value; `as.integer()` extracts the
+`as.numeric()` extracts the whole and fractional value; `as.integer()` extracts the
 completed whole units. Printing the age does not round or change its value.
-To display the fractions explicitly, use:
+To display the fractions explicitly, use the format() function:
 
 ```{r show-fractions}
 format(example_age, fractional = TRUE)
@@ -69,14 +70,14 @@ format(example_age, fractional = TRUE)
 Most workflows start with dates rather than numeric ages. `calculate_age()`
 needs a `start`, usually a birth date. Its `end` is the date or time at which
 you want to know the age. R needs these as dates or date-times, rather than
-ordinary text, so use `as.Date()` for calendar dates.
+ordinary text.
 
 ### Age on a reference date
 
-Here are three birth dates and a single reference date:
+Here are several birth dates from different years and a single reference date:
 
 ```{r reference-date}
-birth_dates <- as.Date(c("2024-01-01", "2022-01-01", "2020-01-01"))
+birth_dates <- as.Date(c("2024-01-01", "2022-01-01", "2020-01-01", "2010-01-01", "1985-01-01"))
 reference_date <- as.Date("2024-07-02")
 
 ages <- calculate_age(start = birth_dates, end = reference_date)
@@ -84,8 +85,10 @@ ages
 ```
 
 The default unit is **year**, and the default result is an `age` vector.
-One reference date is reused for every birth date. There is no need to write
-a loop. This example uses a fixed reference date so its results are reproducible.
+One reference date is reused for every birth date.  In this case the `end` argument has a length of one and is recycled
+to the same length as the start dates. The R tidyverse recycling rule convention is used, that is, if either argument
+has a length of one and the other has a length greater than one, then the single argument will be recycled to the same
+size as the larger length argument. Otherwise the length of both arguments must be the same.
 
 ### Age today
 
@@ -96,16 +99,17 @@ calculate_age(start = birth_dates, end = Sys.Date())
 ```
 
 You can also omit `end` entirely: `calculate_age(start = birth_dates)` uses
-the current date-time. Results based on today naturally change over time.
+the current date-time. Results based on today naturally change with every day.  This example
+was created on `r format(Sys.Date(), "%m/%d/%Y")` so each calculated age is based on using that date.
 
 ### Age at an event
 
 For age at a visit, enrollment, or another event, give each observation its
 own event date. The birth dates and event dates should have the same length,
-or one of the two vectors must have length one.
+or one of the two vectors must have length one as stated in te previous section. 
 
 ```{r event-dates}
-event_dates <- as.Date(c("2024-02-01", "2024-08-01", "2024-09-01"))
+event_dates <- as.Date(c("2024-02-01", "2024-08-01", "2024-09-01", "2024-10-01", "2024-11-01"))
 ages_at_event <- calculate_age(start = birth_dates, end = event_dates)
 
 data.frame(birth_date = birth_dates, event_date = event_dates,
@@ -113,12 +117,12 @@ data.frame(birth_date = birth_dates, event_date = event_dates,
 ```
 
 An event must not precede the corresponding birth date. Missing dates produce
-missing ages rather than removing observations.
+missing ages, `NA`.
 
 ### Choose a unit
 
-Use `unit` to ask for years, months, weeks, days, hours, minutes, or seconds.
-The argument uses singular names:
+Use the `unit` argument in the `calculate_age()` function to ask for year, month, week, day, hour, minute, or
+second. The default is "year".  Note that the The argument uses singular names:
 
 ```{r choose-unit}
 calculate_age(birth_dates, reference_date, unit = "month")
@@ -138,7 +142,7 @@ of a day.
 
 ## Choose what calculate_age returns
 
-`calculate_age()` offers three output formats:
+`calculate_age()` has an optional `output` argument offers three output formats:
 
 | `output` | Returned object | Values stored |
 |:--|:--|:--|
@@ -166,7 +170,7 @@ by earlier development versions of agecraft.
 
 ## Group ages using the supplied definitions
 
-The package includes ready-to-use cut points in `age_group_presets`. Start by
+The package includes ready-to-use cut points in `age_group_presets` list. Start by
 looking at their names, then select a definition:
 
 ```{r supplied-groups}
@@ -194,7 +198,7 @@ Suppose you want categories called Infant, Toddler, and Young child.
 Construct the interval boundaries, then give each interval a name:
 
 ```{r named-groups}
-child_groups <- age_group(start = c(0, 1, 3), end = c(1, 3, 6), unit = "year")
+child_groups <- age_group(start = c(0, 1, 3, 7, 19), end = c(1, 3, 6, 18, 50), unit = "year")
 child_groups
 names(child_groups) <- c("Infant", "Toddler", "Young child")
 

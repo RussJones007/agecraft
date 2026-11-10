@@ -70,8 +70,10 @@ day_groups <- as.age_group(c(0, 7, 14, 30, 60, Inf), unit = "day")
 categorize_age(days, by = day_groups)
 ```
 
-Both sides must have units or both must be unitless. `convert_units`
-selects which side to convert. Conversions between month/year and
+Groups with unspecified units inherit the age vector's unit for matching.
+Unitless numeric ages with explicitly unit-bearing groups are rejected. When
+both sides have specified but different units, `convert_units` selects which
+side to convert; `convert_units = "none"` rejects conversion. Conversions between month/year and
 smaller units require `allow_approx = TRUE`; calculate ages directly in
 the reporting unit when possible.
 

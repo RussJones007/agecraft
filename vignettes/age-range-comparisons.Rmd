@@ -12,9 +12,11 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-All bounds are nonnegative whole numbers. An interval `[1,5)` includes 1 and
-excludes 5, and prints `1-4`. Units describe the age coordinates. Missing ranges
-have both bounds missing. Fractional bounds are rejected without rounding.
+Bounds may be nonnegative whole numbers or fractions; fractional bounds are
+preserved without rounding. Only upper bounds may be infinite. An interval
+`[1,5)` includes 1 and excludes 5, and prints `1-4`; fractional bounds use
+explicit right-open notation such as `[0, 0.5)`. Units describe the age
+coordinates. Missing ranges have both bounds missing.
 
 ## Genealogy: reconcile records at the same reference date
 
