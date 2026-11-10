@@ -1,0 +1,28 @@
+test_that("scheme inspection preserves provenance and interval coordinates", {
+  g <- age_group(c(0, 5.25), c(5, Inf), unit = "year")
+  names(g) <- c("Young", "Older")
+  s <- age_scheme(g, "test", "Example", domain = c(0, Inf), complete = FALSE,
+                  source = "Example source", reference = "Example citation",
+                  version = "2026", verified = TRUE)
+  expect_output(print(s), "age_scheme: test")
+  expect_identical(print(s), s)
+  info <- summary(s)
+  expect_false(info$covered)
+  expect_false(info$overlaps)
+  expect_identical(info$source, s$source)
+  expect_identical(info$unit, "year")
+  expect_identical(info$n_groups, 2L)
+  out <- as.data.frame(s)
+  expect_identical(out$label, names(g))
+  expect_identical(out$start, ivs::iv_start(g))
+  expect_identical(out$end, ivs::iv_end(g))
+  expect_true(attr(out, "scheme_metadata")$verified)
+  unknown <- summary(age_scheme(g, "unknown", "Unknown"))
+  expect_null(unknown$gaps)
+  expect_true(is.na(unknown$covered))
+  altered <- s
+  altered$groups <- age_group(0, 10, unit = "year")
+  expect_error(print(altered), "names")
+  expect_error(summary(altered), "names")
+  expect_error(as.data.frame(altered), "names")
+})

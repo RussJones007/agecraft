@@ -189,3 +189,7 @@ with one coherent commit per milestone where practical.
 1. API decisions adopted above. Baseline `devtools::test()`: 416 passing
    assertions, zero failures, warnings, or skips (2026-11-10). Subsequent milestone
    implementation is authorized; each milestone will be summarized and committed.
+
+2. Constructor, coverage validation, and inspection methods implemented. Focused
+   class/method tests: 52 passing assertions, no failures, warnings, or skips.
+   Roxygen comments added; generated help/exports will be finalized in milestone 6.
