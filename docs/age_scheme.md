@@ -238,3 +238,38 @@ The following should be settled before implementation rather than assumed:
 ## 14. Working decision
 
 **Build `age_scheme` as a small, source-aware S3 wrapper around the existing `ivs`-based `age_group` class.** Make user-defined schemes easy; distinguish partitions from overlapping classifications; migrate the eight historical presets without breaking callers; and add a curated, carefully verified library of epidemiologic and demographic definitions. Reuse existing `agecraft` interval and classification machinery rather than creating a parallel system.
+
+## 15. Initial implementation contract — adopted 2026-11-10
+
+The implementation follows `age_scheme_implementation_plan.md`. Use one S3
+`age_scheme` class with a validated `type` field, without partition/classification
+subclasses. The constructor requires named, nonempty `age_group` intervals with
+an explicit supported time unit. Category names must be nonblank and unique.
+`scheme_groups()` accesses intervals; `is_age_scheme()` identifies the class;
+`validate_age_scheme()` checks the full object, including after direct mutation.
+
+`domain` is NULL or a numeric pair describing a right-open interval in the group
+unit. Groups must lie inside a declared domain. `complete = NA` makes no coverage
+claim; TRUE/FALSE assert complete/incomplete coverage and require a domain.
+Overlap is independent of completeness; partitions reject overlap. There are
+no scheme subsetting/replacement/set-operation methods in the initial release.
+Reconstruct a scheme to change its definition and reconsider its provenance.
+
+`categorize_age(..., by = scheme)` delegates to existing single-assignment
+behavior. `classify_age_scheme(ages, scheme)` returns a base data frame with
+`observation`, `scheme_id`, `group_index`, `label`, `status`, and an `age_group`
+column named `group`. Matches retain original category indices and are ordered
+by observation then category. Missing and unmatched observations each produce
+one placeholder row (`status` is `missing` or `unmatched`); matches have status
+`matched`. Empty input returns the same columns with zero rows. Interval-valued
+ages require full containment. Present negative or nonfinite numeric ages are
+rejected by this new interface; existing classification contracts stay intact.
+Unit-bearing schemes require unit-bearing observations under existing conversion
+rules. Neither interface silently assumes that plain numbers are years.
+
+`get_age_scheme()` retrieves a definition and `list_age_schemes()` lists metadata.
+Private factories reuse existing preset data and provenance; legacy identifiers
+are `legacy_ili`, `legacy_imm`, `legacy_yr_5`, `legacy_yr_10`, `legacy_spec`,
+`legacy_annual`, `legacy_school`, and `legacy_covid`. The original numeric lists
+remain unchanged. Published schemes beyond these legacy definitions are deferred
+until independently verified.
