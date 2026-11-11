@@ -6,8 +6,14 @@
 #' @param scheme A validated `age_scheme`.
 #' @param convert_units Conversion direction: `"age_to_group"` (default),
 #'   `"group_to_age"`, or `"none"`.
-#' @param allow_approx Allow approximate conversions between calendar and finer
-#'   units. Defaults to FALSE, as in [categorize_age()].
+#' @param allow_approx Allow potentially approximate numerical conversion between
+#'   month and year, or between either calendar unit and finer units. Defaults to
+#'   FALSE, as in [categorize_age()]. Calendar month and year coordinates cannot
+#'   generally be converted exactly without the original dates. TRUE permits
+#'   unit-factor conversion in either direction; near category boundaries this
+#'   may differ from calculating age directly in the target unit. For exact
+#'   calendar classification, calculate age from the original dates in the
+#'   scheme's unit.
 #' @return A base data frame with `observation` (one-based input index),
 #'   `scheme_id`, `group_index` (original position in the scheme), `label`,
 #'   `status` (`"matched"`, `"missing"`, or `"unmatched"`), and `group` (the matched

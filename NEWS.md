@@ -1,5 +1,15 @@
 # agecraft 0.1.0.9015
 
+## Calendar conversion safeguard
+
+- Month/year conversion in either direction now requires `allow_approx = TRUE`
+  in `as_age()`, `categorize_age()`, `age_cat_iv()`, and `classify_age_scheme()`.
+  This intentional compatibility change prevents silent boundary changes between
+  calendar age coordinates. Opting in preserves numerical conversion behavior;
+  exact calendar classification requires age calculation from the original dates
+  directly in the scheme's unit. Matching units and elapsed-time conversion
+  behavior are preserved.
+
 ## Reusable age schemes
 
 - Add the S3 `age_scheme` metadata object containing existing `age_group`

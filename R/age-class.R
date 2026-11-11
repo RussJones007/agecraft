@@ -9,8 +9,9 @@
 #' @param unit A single time unit: second, minute, hour, day, week, month, or year.
 #'   Common aliases are normalized. Defaults to year for numeric input and the
 #'   existing unit for age or units input.
-#' @param allow_approx Allow approximate conversion between month/year and finer
-#'   units. Defaults to FALSE. Conversion uses the units package, not birthdays.
+#' @param allow_approx Allow potentially approximate conversion between month and
+#'   year, or between either calendar unit and finer units. Defaults to FALSE.
+#'   TRUE permits numerical conversion using the units package, not birthdays.
 #' @param ... Reserved for future extensions.
 #' @details
 #' `as.numeric()` extracts full precision and `as.integer()` extracts completed units. `format(x, fractional = TRUE)` shows
@@ -27,6 +28,14 @@
 #' calculate_age(output = "units") still return completed units; wrapping those
 #' values cannot recover fractional precision. Converting fractional years to
 #' days is approximate and differs from calculating elapsed days from dates.
+#' Calendar month and year coordinates cannot generally be converted exactly
+#' without the original dates: fractional years use birthday-to-birthday days,
+#' whereas fractional months use month-anniversary days. Even multiplying years
+#' by twelve can differ from calculating calendar months. Near category boundaries
+#' this can change classification. For exact calendar classification, calculate
+#' age from the original dates directly in the scheme's unit.
+#' Month/year conversions now require `allow_approx = TRUE`; this also applies to
+#' time-units input, since its calculation basis is not known.
 #' @return `age()` and `as_age()` return an age vector. `is_age()` returns a scalar
 #'   logical indicating whether x inherits from age.
 #' @export
@@ -94,7 +103,9 @@ as_age.age <- function(x, unit = NULL, allow_approx = FALSE, ...) {
     stop("allow_approx must be TRUE or FALSE", call. = FALSE)
   }
   if (age_cat_iv_is_approx_conversion(source, target) && !allow_approx) {
-    stop("Age unit conversion is approximate; set allow_approx = TRUE", call. = FALSE)
+    stop(paste("Age unit conversion is approximate. Calendar month and year coordinates",
+               "cannot generally be converted exactly without the original dates.",
+               "Set allow_approx = TRUE to use numerical unit conversion."), call. = FALSE)
   }
   values <- age_cat_iv_convert_values(as.numeric(x), source, target)
   names(values) <- names(x)

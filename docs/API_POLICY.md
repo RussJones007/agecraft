@@ -22,7 +22,8 @@ Converting those completed values to `age` cannot recover discarded fractions.
 
 Age values must be nonnegative and finite, or missing. Combining and comparing
 age vectors requires matching units; use `as_age()` to convert explicitly.
-Conversions between months/years and finer units require `allow_approx = TRUE`
+Conversions between month and year, or between either calendar unit and finer
+units, require `allow_approx = TRUE`
 and do not reconstruct exact elapsed time from the original dates.
 
 ## Age-group bounds and names
@@ -93,3 +94,17 @@ legacy numeric lists and aliases retain their existing behavior. Verification
 metadata records a caller's claim, not external validation by the constructor.
 Scheme transformations have no automatic provenance-retention contract; construct
 and validate a new scheme after changing its definition.
+
+## Calendar conversion safeguard — 2026-11-11
+
+Month-to-year and year-to-month conversion now require explicit approximation
+consent in `as_age()`, `categorize_age()`, `age_cat_iv()`, and
+`classify_age_scheme()`, including conversion of observations or boundaries.
+This intentionally tightens the public default: previous calls must supply
+`allow_approx = TRUE` to retain numerical unit-factor conversion. Calendar month
+and year coordinates cannot generally be converted exactly without the original
+dates. Near boundaries, conversion can classify differently from calculating age
+directly in the target unit. For exact calendar classification, calculate age
+from original dates in the scheme's unit. Matching units and supported
+elapsed-time conversions retain existing behavior. No date or calculation-basis
+metadata is added to `age`.

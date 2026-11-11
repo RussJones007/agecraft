@@ -68,7 +68,13 @@ in sorted interval order.}
 \item{convert_units}{Which side to convert: "age_to_group", "group_to_age",
 or "none". Numeric cuts inherit the input age unit.}
 
-\item{allow_approx}{Allow approximate conversion between month/year and smaller units.}
+\item{allow_approx}{Allow potentially approximate numerical conversion between
+month and year, or between either calendar unit and smaller units. Defaults
+to FALSE. Calendar month and year coordinates cannot generally be converted
+exactly without the original dates. TRUE permits unit-factor conversion in
+either conversion direction; near category boundaries this may differ from
+calculating age directly in the target unit. For exact calendar classification,
+calculate age from the original dates in the grouping definition's unit.}
 }
 \value{
 For calculate_age(), an age vector by default. With output = "units",

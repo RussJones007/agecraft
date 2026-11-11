@@ -196,7 +196,13 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #'   in sorted interval order.
 #' @param convert_units Which side to convert: "age_to_group", "group_to_age",
 #'   or "none". Numeric cuts inherit the input age unit.
-#' @param allow_approx Allow approximate conversion between month/year and smaller units.
+#' @param allow_approx Allow potentially approximate numerical conversion between
+#'   month and year, or between either calendar unit and smaller units. Defaults
+#'   to FALSE. Calendar month and year coordinates cannot generally be converted
+#'   exactly without the original dates. TRUE permits unit-factor conversion in
+#'   either conversion direction; near category boundaries this may differ from
+#'   calculating age directly in the target unit. For exact calendar classification,
+#'   calculate age from the original dates in the grouping definition's unit.
 #' @param output For calculate_age(): "age" (default) retains fractions in an age
 #'   vector; "numeric" returns completed ages as plain doubles; "units" returns
 #'   completed ages with units, preserving the previous format.

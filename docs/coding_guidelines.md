@@ -53,7 +53,7 @@ These are correctness requirements, not display preferences:
 - One `age` or `age_group` vector has one explicit or documented unspecified unit; do not silently introduce mixed per-element units.
 - Preserve `calculate_age()`'s current default: a fractional `age` vector whose ordinary display shows completed units. `as.numeric()` returns the retained fractional values; `as.integer()` returns completed units. The `output = "numeric"` and `output = "units"` options return completed values as documented.
 - Preserve established calendar-anniversary rules for years and months, including March 1 handling of leap-day birthdays in non-leap years and month-end rollback. Finer units use elapsed time as documented.
-- Do not treat calendar months or years as universally fixed numbers of days. Require `allow_approx = TRUE` for existing approximate fine/coarse unit conversions.
+- Do not treat calendar months or years as universally fixed numbers of days. Require `allow_approx = TRUE` for month/year conversions and approximate fine/coarse unit conversions.
 - Honor existing classification unit rules: unspecified group units may inherit age units; unitless ages with explicitly unit-bearing groups are rejected; conversion direction is controlled by `convert_units`.
 - `compare_age_groups()` requires matching units and must not introduce implicit conversion.
 

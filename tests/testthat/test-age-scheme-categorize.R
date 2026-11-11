@@ -30,8 +30,8 @@ test_that("scheme classification retains overlap and conversion policies", {
   }
   months <- age(c(12, 96), unit = "month")
   for (direction in c("age_to_group", "group_to_age")) {
-    expect_identical(categorize_age(months, by = s, convert_units = direction),
-                     categorize_age(months, by = g, convert_units = direction))
+    expect_identical(categorize_age(months, by = s, convert_units = direction, allow_approx = TRUE),
+                     categorize_age(months, by = g, convert_units = direction, allow_approx = TRUE))
   }
   expect_error(categorize_age(months, by = s, convert_units = "none"), "compatible")
   days <- age(365, unit = "day")

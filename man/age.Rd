@@ -20,8 +20,9 @@ for \code{as_age()}. Missing values are allowed; negative and infinite ages are 
 Common aliases are normalized. Defaults to year for numeric input and the
 existing unit for age or units input.}
 
-\item{allow_approx}{Allow approximate conversion between month/year and finer
-units. Defaults to FALSE. Conversion uses the units package, not birthdays.}
+\item{allow_approx}{Allow potentially approximate conversion between month and
+year, or between either calendar unit and finer units. Defaults to FALSE.
+TRUE permits numerical conversion using the units package, not birthdays.}
 
 \item{...}{Reserved for future extensions.}
 }
@@ -49,6 +50,14 @@ years and months and elapsed time for smaller units. \code{\link[=age_auto_unit]
 calculate_age(output = "units") still return completed units; wrapping those
 values cannot recover fractional precision. Converting fractional years to
 days is approximate and differs from calculating elapsed days from dates.
+Calendar month and year coordinates cannot generally be converted exactly
+without the original dates: fractional years use birthday-to-birthday days,
+whereas fractional months use month-anniversary days. Even multiplying years
+by twelve can differ from calculating calendar months. Near category boundaries
+this can change classification. For exact calendar classification, calculate
+age from the original dates directly in the scheme's unit.
+Month/year conversions now require \code{allow_approx = TRUE}; this also applies to
+time-units input, since its calculation basis is not known.
 }
 \examples{
 x <- age(c(0.02, 0.5, 2.75, NA), unit = "year")

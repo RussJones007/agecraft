@@ -32,7 +32,7 @@ The package is an **experimental**, S3/vctrs-oriented R package (R >= 4.1.0). It
 - `output = "units"` returns the older completed-age `units` representation; `output = "numeric"` returns plain completed ages. The older `calc_age()` wrapper and `age_auto_unit()` continue to return completed values. Lost fractions cannot be recovered by coercion.
 - Age values are nonnegative, finite, or missing. Each `age` vector has one explicit unit. Combining/comparing incompatible units requires explicit conversion.
 - Years/months use calendar anniversaries; finer units use elapsed time. Calendar calculation uses civil dates in the start time zone and ignores time of day. Leap-day birthdays advance on March 1 in non-leap years; month-end anniversaries roll back to the last day of shorter months.
-- Month/year versus finer-unit conversions are approximate and require `allow_approx = TRUE`. A converted value does not reconstruct the original dates.
+- Month/year conversions in either direction, and calendar-versus-finer-unit conversions, are potentially approximate and require `allow_approx = TRUE`. A converted value does not reconstruct the original dates.
 - `age_auto_unit()` defaults to day/month/year reporting and optionally supports weeks. Automatic hours and calendar shifting remain deferred.
 
 **Implication for schemes:** Classify the *stored fractional value*, not the rounded display. Do not assume a universal exact mapping between age in months and age in days. A mixed-unit surveillance input column requires deliberate normalization or a separate classification workflow; a single `age` vector does not have per-element units.
@@ -55,7 +55,7 @@ The package is an **experimental**, S3/vctrs-oriented R package (R >= 4.1.0). It
 `categorize_age()` accepts numeric cut points, widths, or `age_group` definitions. It classifies using fractional age values and supports ordered-factor output (default) or matched `age_group` intervals (`output = "interval"`). Missing or unmatched observations remain missing.
 
 - Overlapping matches **error by default**; `multiple = "first"` or `"last"` selects in sorted interval order.
-- Unspecified group units inherit the input ages' unit; unitless ages cannot be matched to explicitly unit-bearing groups without resolution. `convert_units` governs direction/denial of conversion; approximate month/year-to-finer conversions require explicit permission.
+- Unspecified group units inherit the input ages' unit; unitless ages cannot be matched to explicitly unit-bearing groups without resolution. `convert_units` governs direction/denial of conversion; month/year conversions and approximate calendar-to-finer conversions require explicit permission.
 - `compare_age_groups()` provides crosswalk, definite/possible membership, ordering, age-gap bounds, coverage intersection/union/difference, and widths. It requires matching units and performs **no implicit conversion**.
 - Pairwise comparisons can produce `length(x) * length(y)` rows. Crosswalks express possible/definite interval relationships, **not allocation of aggregate counts**. Splitting an aggregated band into finer bands is not justified without additional data or assumptions.
 

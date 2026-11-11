@@ -21,8 +21,14 @@ bounds; membership requires full containment, not partial overlap.}
 \item{convert_units}{Conversion direction: \code{"age_to_group"} (default),
 \code{"group_to_age"}, or \code{"none"}.}
 
-\item{allow_approx}{Allow approximate conversions between calendar and finer
-units. Defaults to FALSE, as in \code{\link[=categorize_age]{categorize_age()}}.}
+\item{allow_approx}{Allow potentially approximate numerical conversion between
+month and year, or between either calendar unit and finer units. Defaults to
+FALSE, as in \code{\link[=categorize_age]{categorize_age()}}. Calendar month and year coordinates cannot
+generally be converted exactly without the original dates. TRUE permits
+unit-factor conversion in either direction; near category boundaries this
+may differ from calculating age directly in the target unit. For exact
+calendar classification, calculate age from the original dates in the
+scheme's unit.}
 }
 \value{
 A base data frame with \code{observation} (one-based input index),

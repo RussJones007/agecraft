@@ -32,8 +32,8 @@ test_that("membership matching respects fractional containment and units", {
   a <- age(c(0, 1.5, 2, 3), unit = "year")
   expected <- classify_age_scheme(a, s)
   for (direction in c("age_to_group", "group_to_age")) {
-    expect_identical(classify_age_scheme(as_age(a, unit = "month"), s,
-                                         convert_units = direction), expected)
+    expect_identical(classify_age_scheme(as_age(a, unit = "month", allow_approx = TRUE), s,
+                                         convert_units = direction, allow_approx = TRUE), expected)
   }
   expect_error(classify_age_scheme(c(1, 2), s), "units")
   expect_error(classify_age_scheme(age(12, unit = "month"), s,

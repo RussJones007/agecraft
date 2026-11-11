@@ -18,7 +18,12 @@
 #'   without changing their interval boundaries. Unitless ages with explicitly
 #'   unit-bearing groups remain an error.
 #' @param allow_approx logical; if FALSE (default), block conversions between fine units
-#'   (second/minute/hour/day/week) and coarse units (month/year) because they are approximate.
+#'   (second/minute/hour/day/week) and coarse units (month/year), or between month
+#'   and year, because they are potentially approximate. Calendar month and year
+#'   coordinates cannot generally be converted exactly without the original dates.
+#'   TRUE permits numerical unit conversion; near category boundaries this can
+#'   differ from calculating age directly in the target unit. For exact calendar
+#'   classification, calculate age from the original dates in the groups' unit.
 #'
 #' @return An ordered factor identifying each age group, ordered by interval.
 #'   Nonblank group names supply labels; missing or blank names fall back to
@@ -80,7 +85,8 @@ age_cat_iv_is_approx_conversion <- function(from_unit, to_unit) {
   fine <- c("second", "minute", "hour", "day", "week")
   coarse <- c("month", "year")
   (from_unit %in% fine && to_unit %in% coarse) ||
-    (from_unit %in% coarse && to_unit %in% fine)
+    (from_unit %in% coarse && to_unit %in% fine) ||
+    (from_unit %in% coarse && to_unit %in% coarse && from_unit != to_unit)
 }
 
 age_cat_iv_align_units <- function(age, age_group,
@@ -107,7 +113,9 @@ age_cat_iv_align_units <- function(age, age_group,
   from_unit <- if(convert_units == "age_to_group") age_unit else group_unit
   to_unit <- if(convert_units == "age_to_group") group_unit else age_unit
   if(age_cat_iv_is_approx_conversion(from_unit, to_unit) && !isTRUE(allow_approx)) {
-    stop('Age and age_group unit conversion is approximate (month/year involved). Set allow_approx = TRUE to proceed')
+    stop(paste("Age unit conversion is approximate. Calendar month and year coordinates",
+               "cannot generally be converted exactly without the original dates.",
+               "Set allow_approx = TRUE to use numerical unit conversion."), call. = FALSE)
   }
 
   if(convert_units == "age_to_group") {

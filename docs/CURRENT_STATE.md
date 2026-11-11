@@ -2,6 +2,28 @@
 
 Version: **0.1.0.9015** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
 
+## Calendar conversion safeguard — 2026-11-11
+
+- Month/year conversion in either direction now requires `allow_approx = TRUE`
+  in `as_age()`, `categorize_age()`, `age_cat_iv()`, and
+  `classify_age_scheme()`, including conversion of ages or group boundaries.
+  The error explains why calendar coordinates need original dates for exact
+  conversion. Explicit opt-in preserves numerical unit conversion behavior.
+- This is an intentional public-default compatibility change. Matching units
+  and supported elapsed-time conversions retain existing behavior; the `age`
+  representation remains unchanged.
+- Regression tests cover February 1–March 1, 2021, both calendar conversion
+  directions, age/units/interval inputs, both classification directions, and
+  opt-in results. Roxygen help, the age-schemes vignette, NEWS, and policy
+  summaries describe the safeguard and direct target-unit age calculation.
+- `devtools::document()` completed. `devtools::test()` passed 789 assertions
+  with zero failures, warnings, or skips.
+- `devtools::check(document = FALSE,
+  check_dir = "/tmp/agecraft-calendar-check")` completed with 0 errors,
+  0 warnings, and 0 notes, including examples, installed tests, and rebuilding
+  all five vignettes. Logs: `/tmp/agecraft-calendar-tests.log` and
+  `/tmp/agecraft-calendar-check.log` (temporary local validation artifacts).
+
 ## Newly implemented age schemes
 
 - `age_scheme()` constructs a metadata object containing the existing interval

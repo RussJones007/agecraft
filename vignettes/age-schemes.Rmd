@@ -54,6 +54,45 @@ when printing an `age` vector. Plain numbers have no declared unit: wrap known
 year values with `age(x, unit = "year")`. Schemes do not silently treat them as
 years. Existing explicit conversion and approximate-conversion guards apply.
 
+## Calendar conversion and exact classification
+
+Calendar months and years use different anniversary intervals. A fractional
+calendar year is measured between birthdays; a fractional calendar month is
+measured between month anniversaries. Multiplying a year coordinate by twelve
+does not generally reconstruct the month coordinate from the original dates.
+
+Conversions between month and year now require `allow_approx = TRUE` in
+`as_age()`, `categorize_age()`, `age_cat_iv()`, and `classify_age_scheme()`.
+The same opt-in remains required between either calendar unit and elapsed-time
+units. Matching units and conversions among elapsed-time units keep their
+existing behavior. The guard applies whether observations or group boundaries
+are converted (`convert_units = "age_to_group"` or `"group_to_age"`).
+
+```{r calendar-conversion}
+birth <- as.Date("2021-02-01")
+reference <- as.Date("2021-03-01")
+months <- calculate_age(birth, reference, unit = "month")
+years <- calculate_age(birth, reference, unit = "year")
+g <- age_group(c(0, 1), c(1, Inf), unit = "month")
+names(g) <- c("Under one month", "One month or older")
+monthly <- age_scheme(g, "example_monthly", "Illustrative monthly bands")
+as.numeric(months) # 1 calendar month
+as.numeric(as_age(years, "month", allow_approx = TRUE)) # about 0.921
+classify_age_scheme(months, monthly)$label # One month or older
+# classify_age_scheme(years, monthly) errors: conversion needs original dates
+classify_age_scheme(years, monthly, allow_approx = TRUE)$label # Under one month
+```
+
+`allow_approx = TRUE` permits the existing numerical unit-factor conversion;
+it does not recalculate calendar age or make the result calendar-exact. Near
+category boundaries, classifications can therefore differ from calculations
+performed directly in the target unit. For exact calendar classification,
+calculate age from the original birth and reference dates in the scheme's unit.
+The lightweight `age` vector stores values and a unit, so it cannot recover those
+dates. This safeguard also applies to `units` inputs whose calculation basis is
+unknown. Existing month/year conversion calls must explicitly opt in if numerical
+conversion is intended.
+
 ## An overlapping classification
 
 The following bands are invented to illustrate overlapping memberships. They

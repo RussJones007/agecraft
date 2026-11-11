@@ -355,7 +355,7 @@ argument can choose the first or last match in sorted interval order when
 that is the intended rule.
 
 When ages and groups have different specified units, `convert_units` controls
-which side is converted. Conversions between fine units and months/years require `allow_approx = TRUE`.
+which side is converted. Conversions between month and year, or between fine units and either calendar unit, require `allow_approx = TRUE`.
 For the sample workflow we avoid that approximation by calculating ages in
 years for year-based groups, or in days for day-based groups. Groups without
 a specified unit are interpreted in the age vector's unit; unitless numeric

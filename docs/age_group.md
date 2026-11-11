@@ -67,7 +67,7 @@ Supported normalized unit names in the implementation include `second`, `minute`
 - When classifying an age vector, **unitless groups inherit the input ages' unit** for that operation.
 - Unitless ages cannot be classified against explicitly unit-bearing groups.
 - `categorize_age()` and the lower-level matching infrastructure offer `convert_units = "age_to_group"`, `"group_to_age"`, or `"none"`.
-- Conversions between calendar units (month/year) and fine elapsed-time units (week/day/hour/minute/second) are approximate and require `allow_approx = TRUE`.
+- Conversions between month and year, or between either calendar unit and fine elapsed-time units (week/day/hour/minute/second), are potentially approximate and require `allow_approx = TRUE`.
 - `compare_age_groups()` requires identical units and performs **no implicit conversion**.
 
 Calendar ages and elapsed durations are not interchangeable. A scheme that needs year, month, or day boundaries should state the intended age measurement and unit explicitly.

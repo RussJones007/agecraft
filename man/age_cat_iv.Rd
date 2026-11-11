@@ -28,7 +28,12 @@ without changing their interval boundaries. Unitless ages with explicitly
 unit-bearing groups remain an error.}
 
 \item{allow_approx}{logical; if FALSE (default), block conversions between fine units
-(second/minute/hour/day/week) and coarse units (month/year) because they are approximate.}
+(second/minute/hour/day/week) and coarse units (month/year), or between month
+and year, because they are potentially approximate. Calendar month and year
+coordinates cannot generally be converted exactly without the original dates.
+TRUE permits numerical unit conversion; near category boundaries this can
+differ from calculating age directly in the target unit. For exact calendar
+classification, calculate age from the original dates in the groups' unit.}
 }
 \value{
 An ordered factor identifying each age group, ordered by interval.
