@@ -64,3 +64,17 @@ Do not silently resolve these open design questions by changing public behavior.
   Exact elapsed-unit arithmetic can convert the right age to the left unit.
 - The age-to-age subtraction decision has been surfaced to the user before
   implementation, as required above.
+
+### Steps 2–3 — validation and arithmetic
+
+- Existing central validation is retained and covered by regression tests.
+- User decision: support age + age; leave age - age unsupported. Numeric
+  subtraction is an offset operation returning a nonnegative age, not a signed
+  difference. Numeric minus age is unsupported.
+- Added vctrs arithmetic double dispatch for numeric offsets and age addition.
+  Right ages convert to left units through `as_age()` with its default safeguards.
+  Bare offsets must be finite or missing; vctrs controls recycling and sizes.
+- Unit-bearing `units` objects must be explicitly converted to ages before use;
+  the arithmetic dispatch rejects them. R can resolve conflicting S3 operator
+  methods outside vctrs, so mixing independent vector classes is not supported.
+- Focused age-class/arithmetic tests passed after documentation generation.

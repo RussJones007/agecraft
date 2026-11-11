@@ -53,9 +53,28 @@ unit once in the class header, including in tibble column headers.
 Names, units and precision survive slicing, sorting, repetition and binding.
 Combining or comparing ages requires matching units; convert explicitly with
 \code{as_age(x, unit = ...)} first. Bare numbers are not implicitly combined with
-ages. Means, extrema and rounding retain the class. Arithmetic and other
-mathematical transformations are unsupported: use explicit numeric extraction
-or units vectors for calculations and construct an age from the result.
+ages when concatenating. Means, extrema and rounding retain the class.
+}
+\section{Arithmetic}{
+
+Add or subtract plain numeric offsets in the age vector's unit, retaining
+fractional precision, names, class and unit. Numeric plus age is also supported;
+numeric minus age and age minus age are unsupported. Negative results error
+rather than being clamped to zero. Offsets must be finite or missing.
+
+Adding two ages treats the right age as an elapsed offset, converts it to the
+left age's unit and returns that unit. This asymmetric unit policy applies only
+to arithmetic, not vctrs common types, concatenation or comparisons. Exact
+elapsed-unit conversions are automatic. Calendar conversions still require
+explicit opt-in: convert the right operand with
+\code{as_age(y, unit = ..., allow_approx = TRUE)} before addition. Operators do not
+silently opt into approximation. For example, two years plus six months can be
+written \code{age(2, "year") + as_age(age(6, "month"), "year", allow_approx = TRUE)}.
+
+Operands use vctrs size rules: equal sizes or scalar recycling, including empty
+results when a scalar is combined with an empty vector. Missing values propagate.
+Multiplication, division, sums, logarithms and exponentials remain unsupported;
+extract numeric values explicitly for calculations outside this contract.
 
 \code{\link[=calculate_age]{calculate_age()}} constructs ages from dates, using calendar fractions for
 years and months and elapsed time for smaller units. \code{\link[=age_auto_unit]{age_auto_unit()}} and
@@ -71,6 +90,7 @@ age from the original dates directly in the scheme's unit.
 Month/year conversions now require \code{allow_approx = TRUE}; this also applies to
 time-units input, since its calculation basis is not known.
 }
+
 \section{Floating-point precision}{
 
 Age values are stored as double-precision numbers. Converting between time

@@ -45,7 +45,7 @@ test_that("vctrs operations retain units, precision and names", {
   expect_error(vctrs::vec_cast(x, age(unit = "day")), "incompatible units")
   expect_error(x < age(1, "day"), "incompatible units")
   expect_error(vctrs::vec_c(x, 1), class = "vctrs_error_incompatible_type")
-  expect_error(x + 1, class = "vctrs_error_incompatible_op")
+  expect_identical(x + 1, age(c(older = 3.75, younger = 1.5)))
   expect_error(log(x), "not defined for ages")
   expect_error(sum(x), "not defined for ages")
 })
