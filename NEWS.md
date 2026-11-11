@@ -1,5 +1,16 @@
 # agecraft 0.1.0.9015
 
+## Complete scheme interval validation
+
+- Validate the actual stored `age_group` record inside schemes, including its
+  display symbols, field layout, endpoints, units and category metadata. Missing
+  or malformed display metadata now errors during construction or revalidation,
+  rather than failing later during classification or slicing.
+- Reuse constructor checks with actual metadata instead of defaults. Valid custom
+  display strings, fractional intervals, legacy schemes, coverage policies and
+  the existing S3/ivs representation are unchanged. Structural validation does
+  not independently verify source provenance.
+
 ## Dimensional validation
 
 - Validate the full unit expression before converting or classifying ages in

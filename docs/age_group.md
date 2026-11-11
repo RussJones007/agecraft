@@ -33,6 +33,24 @@ The validated constructor enforces:
 
 These invariants are implemented by internal `new_age_group()`, which delegates interval construction to `ivs::new_iv(..., class = "age_group", ...)`.
 
+### Stored-object structural validation
+
+The private `validate_age_group()` checks the actual stored interval record:
+the core S3 class hierarchy, start/end field layout, equal-length double endpoint
+vectors, and optional character `group_names` of the correct length. It then
+reuses `new_age_group()` with the object's actual `symbols` and `unit` attributes
+for boundary, missing-pair, scalar-unit and display-symbol validation. Validation
+does not coerce fields, recycle endpoints, supply defaults or repair metadata.
+
+Display metadata must contain three scalar nonmissing strings named `below`,
+`sep` and `above`. Custom strings, including empty strings, and any ordering of
+these named entries remain valid. General intervals may be empty, unitless,
+missing, or have optional blank/missing names. Schemes apply their additional
+nonempty, supported-unit, unique nonblank category and coverage policies after
+this structural check. Unrelated user attributes do not become required metadata.
+Restoration continues to use the same constructor checks. Structural validation
+does not independently verify provenance or source authority.
+
 ## 3. Construction and conversion
 
 ### Direct construction

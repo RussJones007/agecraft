@@ -78,6 +78,39 @@ new_age_group <- function(start = double(),
               unit = normalize_age_unit(unit))
 }
 
+# Validate stored objects without coercing fields, recycling endpoints, repairing
+# attributes, or substituting constructor defaults. Construction/restoration own
+# the value checks; this wrapper first checks the record representation they need.
+validate_age_group <- function(x) {
+  required_classes <- c("age_group", "ivs_iv", "vctrs_rcrd", "vctrs_vctr")
+  if (!identical(class(x)[class(x) %in% required_classes], required_classes) ||
+      !is.list(x) || !is.null(dim(x))) {
+    stop("Invalid age_group structure: expected an ivs/vctrs interval record", call. = FALSE)
+  }
+  fields <- unclass(x)
+  if (!identical(names(fields), c("start", "end"))) {
+    stop("Invalid age_group fields: expected start and end", call. = FALSE)
+  }
+  plain_double <- function(value) {
+    is.double(value) && !is.object(value) && is.null(dim(value))
+  }
+  if (!plain_double(fields$start) || !plain_double(fields$end) ||
+      length(fields$start) != length(fields$end)) {
+    stop("Invalid age_group endpoints: start and end must be equal-length double vectors",
+         call. = FALSE)
+  }
+  new_age_group(fields$start, fields$end,
+                symbols = attr(x, "symbols", exact = TRUE),
+                unit = attr(x, "unit", exact = TRUE))
+  labels <- attr(x, "group_names", exact = TRUE)
+  if (!is.null(labels) && (!is.character(labels) || !is.null(dim(labels)) ||
+                           length(labels) != length(fields$start))) {
+    stop("Invalid age_group group_names: expected one character name per interval",
+         call. = FALSE)
+  }
+  invisible(x)
+}
+
 #' @returns is.age_group returns either TRUE or FALSE
 #' @rdname as.age_group
 #'

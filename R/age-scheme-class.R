@@ -24,6 +24,11 @@
 #'   a logical scalar. `validate_age_scheme()` invisibly returns the valid object
 #'   or errors. `scheme_groups()` returns its `age_group` vector.
 #' @details Scheme units must be second, minute, hour, day, week, month or year.
+#'   Validation checks the complete stored `age_group` representation, including
+#'   interval fields, bounds, units, category names and the actual `below`, `sep`
+#'   and `above` display symbols. Malformed metadata is rejected without repair
+#'   or substitution of defaults. Custom scalar-string display symbols remain
+#'   valid. Structural validation does not independently verify external sources.
 #'   Reconstruct and revalidate a scheme after changing its groups. Transformed
 #'   intervals do not automatically retain an official source identity. A
 #'   partition need not cover the entire domain; disjointness and coverage are
@@ -99,7 +104,11 @@ validate_age_scheme <- function(x) {
     stop("verified schemes require source, reference and version", call. = FALSE)
   }
   g <- x$groups
-  if (!is.age_group(g) || !length(g)) {
+  if (!is.age_group(g)) {
+    stop("groups must be a nonempty age_group vector", call. = FALSE)
+  }
+  validate_age_group(g)
+  if (!length(g)) {
     stop("groups must be a nonempty age_group vector", call. = FALSE)
   }
   unit <- get_unit(g)
@@ -107,12 +116,10 @@ validate_age_scheme <- function(x) {
       !unit %in% c("second", "minute", "hour", "day", "week", "month", "year")) {
     stop("groups require an explicit supported time unit", call. = FALSE)
   }
-  # Recheck endpoints even for objects altered after construction.
-  new_age_group(ivs::iv_start(g), ivs::iv_end(g), unit = unit)
   if (anyNA(ivs::iv_start(g)) || anyNA(ivs::iv_end(g))) {
     stop("groups cannot contain missing intervals", call. = FALSE)
   }
-  labels <- names(g)
+  labels <- attr(g, "group_names", exact = TRUE)
   if (is.null(labels) || length(labels) != length(g) || anyNA(labels) ||
       any(!nzchar(trimws(labels))) || anyDuplicated(labels)) {
     stop("groups require unique nonblank names", call. = FALSE)

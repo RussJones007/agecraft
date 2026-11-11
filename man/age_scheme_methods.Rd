@@ -14,7 +14,9 @@
 \method{as.data.frame}{age_scheme}(x, row.names = NULL, optional = FALSE, ...)
 }
 \arguments{
-\item{x, object}{An \code{age_scheme}.}
+\item{x, object}{An \code{age_scheme}. Inspection first validates the complete stored
+interval representation, including display metadata; malformed objects error
+without repair. This does not independently verify external provenance.}
 
 \item{...}{Additional arguments, currently unused.}
 

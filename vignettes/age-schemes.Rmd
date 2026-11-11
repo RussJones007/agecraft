@@ -176,4 +176,10 @@ Do not retain claims of official source identity after changing cut points.
 The constructor checks metadata and any declared coverage claim. A user-supplied
 `verified = TRUE` requires source, reference, and version; it records the user's
 claim, rather than performing external verification. Classification and inspection
-revalidate objects so direct list mutation cannot silently bypass these checks.
+revalidate the complete stored interval representation, including actual display
+symbols, units, category names and endpoint fields, so direct list mutation
+cannot silently bypass structural or declared-coverage checks. Missing or
+malformed metadata is rejected without replacement by defaults. Custom scalar
+strings for `below`, `sep` and `above` remain supported. These structural checks
+do not independently verify external sources or establish that retained
+provenance still describes modified cut points.

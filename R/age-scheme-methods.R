@@ -1,6 +1,8 @@
 #' Inspect an age scheme
 #'
-#' @param x,object An `age_scheme`.
+#' @param x,object An `age_scheme`. Inspection first validates the complete stored
+#'   interval representation, including display metadata; malformed objects error
+#'   without repair. This does not independently verify external provenance.
 #' @param ... Additional arguments, currently unused.
 #' @return `print()` invisibly returns its input. `summary()` returns a list
 #'   containing identity, unit, group count, declared completeness, observed

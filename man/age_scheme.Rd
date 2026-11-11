@@ -68,6 +68,11 @@ It does not inherit from \code{age_group}. All intervals are right-open \verb{[s
 }
 \details{
 Scheme units must be second, minute, hour, day, week, month or year.
+Validation checks the complete stored \code{age_group} representation, including
+interval fields, bounds, units, category names and the actual \code{below}, \code{sep}
+and \code{above} display symbols. Malformed metadata is rejected without repair
+or substitution of defaults. Custom scalar-string display symbols remain
+valid. Structural validation does not independently verify external sources.
 Reconstruct and revalidate a scheme after changing its groups. Transformed
 intervals do not automatically retain an official source identity. A
 partition need not cover the entire domain; disjointness and coverage are

@@ -75,7 +75,10 @@ will not add methods to the bare ivs class.
 `classify_age_scheme()`, `get_age_scheme()`, and `list_age_schemes()` are additive
 public interfaces. A scheme contains the existing interval vector; it does not
 change `age_group` equality or vector semantics. It requires nonempty named
-intervals with an explicit supported time unit. Partitions prohibit overlaps;
+intervals with an explicit supported time unit. Validation checks the complete
+stored `age_group` representation, including actual display symbols, interval
+fields and category metadata, without repair or default substitution. Custom
+scalar-string display symbols remain valid. Partitions prohibit overlaps;
 coverage is independently checked against an optional right-open domain.
 `complete = TRUE` or FALSE asserts actual completeness/incompleteness and requires
 a domain; NA makes no claim.

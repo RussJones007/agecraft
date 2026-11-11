@@ -2,6 +2,35 @@
 
 Version: **0.1.0.9015** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
 
+## Complete underlying interval validation — 2026-11-11
+
+- Added private `validate_age_group()` for stored ivs/vctrs record layout,
+  endpoint field types and lengths, actual display/unit attributes and optional
+  category-name structure. It reuses `new_age_group()` with the actual metadata
+  for value checks, without repair, recycling or default substitution.
+- Scheme validation now applies this structural check before scheme-specific
+  nonempty, supported-unit, missing-category, label and coverage policies. All
+  existing classification/accessor/inspection entry points use this validation
+  path. Actual category metadata is read by exact attribute name.
+- Missing/malformed display symbols and corrupted underlying records now fail
+  early. Valid custom/empty scalar display strings, fractional bounds, units,
+  overlaps, legacy schemes and representations retain their behavior. General
+  age_group vectors may still be empty, unitless or missing. Structural validation
+  does not independently verify external provenance.
+- Added 693 regression/invariant assertions exercising every scheme entry point,
+  individual display symbols, unit/name/boundary/record corruption, mutation
+  without repair, valid custom symbols and ordinary operations, and all eight
+  legacy schemes. Updated roxygen-generated help, scheme vignette, internal
+  age_group documentation, API policy, README and NEWS.
+- `devtools::document()` completed. Final targeted structural tests passed 693
+  assertions; the full `devtools::test()` suite passed 2,020 assertions with zero
+  failures, warnings or skips. `devtools::check(document = FALSE,
+  check_dir = "/tmp/agecraft-structure-final-check")` completed with 0 errors,
+  0 warnings and 0 notes, including examples, installed tests and rebuilding all
+  five vignettes. `git diff --check` passed. Temporary local logs:
+  `/tmp/agecraft-structure-final-tests.log` and
+  `/tmp/agecraft-structure-final-check.log`.
+
 ## Dimensional validation — 2026-11-11
 
 - A shared private validator checks the complete unit expression against the

@@ -345,3 +345,9 @@ hour, day, week, month or year, including supported aliases). `as_age()` and
 classification functions reject compound, squared, inverse, dimensionless and
 non-time quantities before conversion or matching. For plain numeric ages with
 a known unit, use `age(x, unit = "year")` (or the appropriate supported unit).
+
+Scheme construction, classification and inspection validate the complete stored
+interval representation, including display symbols, units, category names and
+boundaries. Malformed metadata errors without default substitution; valid custom
+display symbols remain supported. Structural validity does not verify external
+source authority or provenance.
