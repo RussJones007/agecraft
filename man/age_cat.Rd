@@ -7,8 +7,13 @@
 age_cat(ages, lower = 0, upper = 70, by = 10, sep = "-", above.char = " +")
 }
 \arguments{
-\item{ages}{A numeric, units, or interval vector.  If this is a units vector like that returned from the
-calculate_age() function, the return value will also be in that unit of time.}
+\item{ages}{A numeric, \code{age}, \code{units}, or interval vector. \code{units} observations
+must already have a supported simple time unit or alias: second, minute,
+hour, day, week, month or year. Compound, squared, inverse, dimensionless
+and non-time quantities are rejected before conversion or matching, including
+missing and empty inputs. Plain numeric ages can match unitless definitions;
+use \code{age(x, unit = ...)} to give known numeric ages an explicit unit before
+matching unit-bearing groups or schemes.}
 
 \item{lower}{is the lowest age (default is 0) to include}
 

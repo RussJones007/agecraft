@@ -13,7 +13,13 @@ age_cat_iv(
 )
 }
 \arguments{
-\item{age}{a integer or numeric}
+\item{age}{An integer, numeric, \code{age}, \code{units}, or interval vector. A \code{units}
+observation must have a supported simple time unit (second, minute, hour,
+day, week, month or year, including supported aliases). The complete unit
+expression is checked before conversion or matching: compound, squared,
+inverse, dimensionless and non-time quantities are rejected even when empty
+or missing. Plain numeric ages can match unitless groups; explicitly
+unit-bearing groups require unit-bearing observations.}
 
 \item{age_group}{a integer, or numeric vector that can be represented as age groups. Integer and numeric
 vectors are internally converted to intervals as an age_group vector.}

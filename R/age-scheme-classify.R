@@ -2,7 +2,12 @@
 #'
 #' @param ages An `age`, `units`, or unit-bearing interval vector. Present numeric
 #'   ages must be finite and nonnegative. Interval ages must have valid nonnegative
-#'   bounds; membership requires full containment, not partial overlap.
+#'   bounds; membership requires full containment, not partial overlap. `units`
+#'   inputs must already have a supported simple time unit or alias: second,
+#'   minute, hour, day, week, month or year. Compound, squared, inverse,
+#'   dimensionless and non-time quantities are rejected, including empty and
+#'   missing inputs. Use `age(x, unit = ...)` to assign a known unit to plain
+#'   numeric observations; schemes do not infer it.
 #' @param scheme A validated `age_scheme`.
 #' @param convert_units Conversion direction: `"age_to_group"` (default),
 #'   `"group_to_age"`, or `"none"`.
@@ -54,6 +59,8 @@ classify_age_scheme <- function(ages, scheme,
     new_age_group(ivs::iv_start(ages), ivs::iv_end(ages))
     missing <- is.na(ivs::iv_start(ages))
   } else {
+    # Validate dimensions before numeric coercion can hide the unit expression.
+    age_cat_iv_age_unit(ages)
     values <- as.numeric(ages)
     missing <- is.na(values)
     if (any(!missing & (!is.finite(values) | values < 0))) {

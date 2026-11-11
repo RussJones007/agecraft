@@ -339,3 +339,9 @@ and unverified external editions. Unit-bearing schemes require unit-bearing
 ages. Existing numeric presets and classification defaults remain available.
 For user-defined partitions and overlapping classifications, see the
 [age-schemes guide](vignettes/age-schemes.Rmd).
+
+Unit-bearing observations must use a supported simple time unit (second, minute,
+hour, day, week, month or year, including supported aliases). `as_age()` and
+classification functions reject compound, squared, inverse, dimensionless and
+non-time quantities before conversion or matching. For plain numeric ages with
+a known unit, use `age(x, unit = "year")` (or the appropriate supported unit).

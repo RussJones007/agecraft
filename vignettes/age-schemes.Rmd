@@ -54,6 +54,32 @@ when printing an `age` vector. Plain numbers have no declared unit: wrap known
 year values with `age(x, unit = "year")`. Schemes do not silently treat them as
 years. Existing explicit conversion and approximate-conversion guards apply.
 
+## Valid unit-bearing observations
+
+An age must carry one supported simple time unit: second, minute, hour, day,
+week, month or year. Common aliases, including the `units` representations
+`s`, `min`, `h` and `d`, are accepted. Plain numeric observations can be given
+a known meaning explicitly with `age(x, unit = "year")`; `age()` and numeric
+`as_age()` default to years. A `units` object already expresses a quantity and
+must have a valid time unit before it can be converted or classified.
+
+`as_age()`, `categorize_age()`, `age_cat_iv()` and `classify_age_scheme()` reject
+compound expressions such as `year/day`, squared units such as `year^2`, inverse
+units such as `1/day`, dimensionless quantities (including time ratios), and
+non-time quantities such as meters or kilograms. Unsupported time units such as
+milliseconds must first be explicitly converted with `units` to a supported
+simple unit. Validation checks the entire stored expression before numeric
+extraction or a same-unit shortcut. Missing values and empty vectors do not
+exempt their units from validation. Neither an explicit target unit nor
+`allow_approx = TRUE` overrides the dimensional requirement.
+
+```{r simple-time-units}
+x <- units::set_units(c(0.5, 5, NA), "year")
+categorize_age(x, by = five_year)
+# categorize_age(units::set_units(0.5, "year/day"), by = five_year)
+# errors: an age must have a supported simple time unit
+```
+
 ## Calendar conversion and exact classification
 
 Calendar months and years use different anniversary intervals. A fractional

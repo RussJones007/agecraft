@@ -108,3 +108,18 @@ directly in the target unit. For exact calendar classification, calculate age
 from original dates in the scheme's unit. Matching units and supported
 elapsed-time conversions retain existing behavior. No date or calculation-basis
 metadata is added to `age`.
+
+## Unit-bearing observation validation — 2026-11-11
+
+A unit-bearing age must have a supported simple time unit or existing alias:
+second, minute, hour, day, week, month or year. `units` inputs to `as_age()`,
+`categorize_age()`, `age_cat_iv()`, and `classify_age_scheme()` are checked using
+their complete unit expression before numeric extraction or same-unit shortcuts.
+Compound, squared, inverse, dimensionless, non-time and unsupported expressions
+are rejected even when empty or missing, regardless of conversion options.
+Plain numbers may be assigned a known unit with `age(x, unit = ...)`; numeric
+constructors retain their default year unit. Schemes still require explicit
+observation units. This fixes acceptance of invalid dimensions; valid simple
+units and aliases, calendar approximation safeguards and representations remain
+unchanged. Error messages for previously rejected quantities now identify the
+invalid expression and supported simple-time requirement.

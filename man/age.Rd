@@ -14,7 +14,10 @@ as_age(x, unit = NULL, allow_approx = FALSE, ...)
 }
 \arguments{
 \item{x}{A numeric vector for \code{age()}, or an age, numeric, or time-units vector
-for \code{as_age()}. Missing values are allowed; negative and infinite ages are not.}
+for \code{as_age()}. A \code{units} input must already carry a supported simple time
+unit; compound, squared, inverse, dimensionless and non-time quantities are
+rejected, including missing and empty inputs. Missing values are allowed;
+negative and infinite ages are not.}
 
 \item{unit}{A single time unit: second, minute, hour, day, week, month, or year.
 Common aliases are normalized. Defaults to year for numeric input and the
@@ -36,6 +39,13 @@ time unit for the entire vector. Display uses completed units, but comparison,
 sorting and classification use the stored fractional values.
 }
 \details{
+Plain numeric values acquire their unit through \code{age(x, unit = ...)} or
+\code{as_age(x, unit = ...)} (default year). A \code{units} object already has a unit:
+its complete expression must denote one supported simple time unit or alias.
+For example, \code{year/day}, \code{year^2}, \code{1/day}, dimensionless ratios, meters and
+kilograms are invalid ages. An explicit target unit or \code{allow_approx = TRUE}
+does not make an invalid dimensional expression valid.
+
 \code{as.numeric()} extracts full precision and \code{as.integer()} extracts completed units. \code{format(x, fractional = TRUE)} shows
 fractions; \code{format(x)} and printing show completed whole units (floor).
 Names, units and precision survive slicing, sorting, repetition and binding.

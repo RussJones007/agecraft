@@ -64,7 +64,7 @@ test_that("explicit age conversions normalize units and guard approximation", {
   expect_identical(as_age(units::set_units(1.5, "week"), "day"), age(10.5, "day"))
   expect_error(as_age(x, "year"), "approximate")
   expect_identical(attr(as_age(x, "year", allow_approx = TRUE), "unit"), "year")
-  expect_error(as_age(units::set_units(1, "kg")), "cannot convert")
+  expect_error(as_age(units::set_units(1, "kg")), "supported simple time unit")
   expect_error(as_age(as.Date("2024-01-01")), "Cannot convert")
   expect_error(as_age("2.5"), "Cannot convert")
   expect_error(as_age(x, allow_approx = NA), "TRUE or FALSE")

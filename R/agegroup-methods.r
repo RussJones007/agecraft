@@ -9,7 +9,13 @@
 #'
 #' @param age_group a integer, or numeric vector that can be represented as age groups. Integer and numeric
 #' vectors are internally converted to intervals as an age_group vector.
-#' @param age a integer or numeric
+#' @param age An integer, numeric, `age`, `units`, or interval vector. A `units`
+#'   observation must have a supported simple time unit (second, minute, hour,
+#'   day, week, month or year, including supported aliases). The complete unit
+#'   expression is checked before conversion or matching: compound, squared,
+#'   inverse, dimensionless and non-time quantities are rejected even when empty
+#'   or missing. Plain numeric ages can match unitless groups; explicitly
+#'   unit-bearing groups require unit-bearing observations.
 #' @param multiple how to handle a single age matching multiple age groups.
 #'   One of "error" (default), "first", or "last".
 #' @param convert_units which side to convert when `age` and `age_group` units differ.
@@ -65,11 +71,40 @@ normalize_age_unit <- function(x) {
   x
 }
 
+# Validate the entire expression before any unit comparison or numeric coercion.
+# A supported alias denotes one simple time unit; products, powers and ratios
+# must not be reduced to their first numerator or their net dimension.
+validate_age_unit <- function(unit) {
+  if (!is.character(unit) || length(unit) != 1L || is.na(unit)) {
+    stop("unit must be one time-unit string identifying a supported simple time unit",
+         call. = FALSE)
+  }
+  normalized <- normalize_age_unit(unit)
+  if (!normalized %in% c("second", "minute", "hour", "day", "week", "month", "year")) {
+    stop("Unsupported age unit '", unit,
+         "': an age must have a supported simple time unit ",
+         "(second, minute, hour, day, week, month, or year)", call. = FALSE)
+  }
+  normalized
+}
+
+age_units_unit <- function(x) {
+  # deparse_unit() preserves the full symbolic expression, including powers and
+  # denominators. The allowlist also excludes compound expressions whose net
+  # dimension happens to be time (e.g. second^2 / minute).
+  validate_age_unit(units::deparse_unit(x))
+}
+
 age_cat_iv_age_unit <- function(age) {
-  if(is.age_group(age) || is_age(age)) return(get_unit(age))
+  if (inherits(age, "units")) return(age_units_unit(age))
+  if (is.age_group(age) || is_age(age)) {
+    unit <- get_unit(age)
+    return(if (is.null(unit)) NULL else validate_age_unit(unit))
+  }
   units_attr <- attr(age, "units")
-  if(is.null(units_attr)) return(NULL)
-  normalize_age_unit(units_attr[["numerator"]] %||% units_attr)
+  if (is.null(units_attr)) return(NULL)
+  # Retain support for explicit unit attributes, validating the whole expression.
+  validate_age_unit(as.character(units_attr, neg_power = TRUE, prod_sep = " "))
 }
 
 age_cat_iv_convert_values <- function(values, from_unit, to_unit) {
@@ -202,7 +237,7 @@ age_cat_iv.integer <- function(age, age_group,
                                multiple = c("error", "first", "last"),
                                convert_units = c("age_to_group", "group_to_age", "none"),
                                allow_approx = FALSE){
-  age_cat_iv.numeric(age = as.numeric(age), age_group = age_group, multiple = multiple,
+  age_cat_iv.numeric(age = age, age_group = age_group, multiple = multiple,
                      convert_units = convert_units, allow_approx = allow_approx)
 }
 

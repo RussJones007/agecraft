@@ -5,7 +5,10 @@
 #' sorting and classification use the stored fractional values.
 #'
 #' @param x A numeric vector for `age()`, or an age, numeric, or time-units vector
-#'   for `as_age()`. Missing values are allowed; negative and infinite ages are not.
+#'   for `as_age()`. A `units` input must already carry a supported simple time
+#'   unit; compound, squared, inverse, dimensionless and non-time quantities are
+#'   rejected, including missing and empty inputs. Missing values are allowed;
+#'   negative and infinite ages are not.
 #' @param unit A single time unit: second, minute, hour, day, week, month, or year.
 #'   Common aliases are normalized. Defaults to year for numeric input and the
 #'   existing unit for age or units input.
@@ -14,6 +17,13 @@
 #'   TRUE permits numerical conversion using the units package, not birthdays.
 #' @param ... Reserved for future extensions.
 #' @details
+#' Plain numeric values acquire their unit through `age(x, unit = ...)` or
+#' `as_age(x, unit = ...)` (default year). A `units` object already has a unit:
+#' its complete expression must denote one supported simple time unit or alias.
+#' For example, `year/day`, `year^2`, `1/day`, dimensionless ratios, meters and
+#' kilograms are invalid ages. An explicit target unit or `allow_approx = TRUE`
+#' does not make an invalid dimensional expression valid.
+#'
 #' `as.numeric()` extracts full precision and `as.integer()` extracts completed units. `format(x, fractional = TRUE)` shows
 #' fractions; `format(x)` and printing show completed whole units (floor).
 #' Names, units and precision survive slicing, sorting, repetition and binding.
@@ -57,13 +67,7 @@ age <- function(x = double(), unit = "year") {
 # Internal construction also validates results restored by vctrs.
 new_age <- function(x = double(), unit = "year") {
   x <- vctrs::vec_data(x)
-  if (!is.character(unit) || length(unit) != 1L || is.na(unit)) {
-    stop("unit must be one time-unit string", call. = FALSE)
-  }
-  unit <- normalize_age_unit(unit)
-  if (!unit %in% c("second", "minute", "hour", "day", "week", "month", "year")) {
-    stop("Unsupported age unit", call. = FALSE)
-  }
+  unit <- validate_age_unit(unit)
   if (any(!is.na(x) & (!is.finite(x) | x < 0))) {
     stop("Ages must be nonnegative and finite, or missing", call. = FALSE)
   }
@@ -114,11 +118,7 @@ as_age.age <- function(x, unit = NULL, allow_approx = FALSE, ...) {
 
 #' @exportS3Method
 as_age.units <- function(x, unit = NULL, allow_approx = FALSE, ...) {
-  source <- units::deparse_unit(x)
-  # Ask units to reject compound, inverse and non-time quantities.
-  reference <- units::set_units(1, source, mode = "standard")
-  units::set_units(reference, "second", mode = "standard")
-  source <- normalize_age_unit(source)
+  source <- age_units_unit(x)
   out <- new_age(stats::setNames(as.numeric(x), names(x)), source)
   as_age(out, unit = unit, allow_approx = allow_approx)
 }

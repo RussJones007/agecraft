@@ -14,7 +14,12 @@ classify_age_scheme(
 \arguments{
 \item{ages}{An \code{age}, \code{units}, or unit-bearing interval vector. Present numeric
 ages must be finite and nonnegative. Interval ages must have valid nonnegative
-bounds; membership requires full containment, not partial overlap.}
+bounds; membership requires full containment, not partial overlap. \code{units}
+inputs must already have a supported simple time unit or alias: second,
+minute, hour, day, week, month or year. Compound, squared, inverse,
+dimensionless and non-time quantities are rejected, including empty and
+missing inputs. Use \code{age(x, unit = ...)} to assign a known unit to plain
+numeric observations; schemes do not infer it.}
 
 \item{scheme}{A validated \code{age_scheme}.}
 

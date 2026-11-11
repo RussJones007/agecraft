@@ -1,5 +1,16 @@
 # agecraft 0.1.0.9015
 
+## Dimensional validation
+
+- Validate the full unit expression before converting or classifying ages in
+  `as_age()`, `categorize_age()`, `age_cat_iv()`, and `classify_age_scheme()`.
+  Compound, squared, inverse, dimensionless, non-time and unsupported expressions
+  now fail with an informative error, including empty or missing quantities.
+  Matching a numerator to the group unit no longer bypasses validation.
+- Share the supported simple time-unit and alias contract with the `age()`
+  constructor. Valid time quantities, precision, missingness, explicit conversion
+  options and calendar approximation safeguards retain their behavior.
+
 ## Calendar conversion safeguard
 
 - Month/year conversion in either direction now requires `allow_approx = TRUE`

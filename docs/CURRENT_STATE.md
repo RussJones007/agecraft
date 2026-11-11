@@ -2,6 +2,35 @@
 
 Version: **0.1.0.9015** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
 
+## Dimensional validation — 2026-11-11
+
+- A shared private validator checks the complete unit expression against the
+  supported simple time units and existing aliases. `new_age()` and
+  `as_age.units()` use this contract; classification checks dimensions before
+  numerical extraction and same-unit shortcuts. Integer classification retains
+  explicit unit attributes until validation.
+- `as_age()`, `categorize_age()`, `age_cat_iv()`, and `classify_age_scheme()` reject
+  compound, squared, inverse, dimensionless, non-time and unsupported expressions,
+  including missing and empty inputs. Errors identify the stored expression.
+  Valid units, aliases, fractional precision, missingness and the calendar
+  approximation safeguards retain their behavior. No representation or public
+  signature changes were introduced.
+- Added 538 regression assertions in `test-dimensional-validation.R`, covering
+  the audit reproduction, apparent matching numerators, conversion modes,
+  invalid and valid expressions, aliases, constructor metadata, empty/missing
+  inputs and early validation. Updated roxygen help, README, NEWS, the scheme
+  vignette and API policy.
+- `devtools::document()` completed. The focused dimensional/calendar regression
+  run passed 711 assertions before the final integer-attribute coverage was
+  added; the final full `devtools::test()` passed 1,327 assertions with zero
+  failures, warnings, or skips, including all new regression assertions.
+- `devtools::check(document = FALSE,
+  check_dir = "/tmp/agecraft-dimensional-check")` completed with 0 errors,
+  0 warnings and 0 notes, including examples, installed tests and rebuilding
+  all five vignettes. `git diff --check` passed. Logs are temporary local files:
+  `/tmp/agecraft-dimensional-regression.log`, `/tmp/agecraft-dimensional-tests.log`
+  and `/tmp/agecraft-dimensional-check.log`.
+
 ## Calendar conversion safeguard — 2026-11-11
 
 - Month/year conversion in either direction now requires `allow_approx = TRUE`
