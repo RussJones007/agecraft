@@ -54,6 +54,33 @@ when printing an `age` vector. Plain numbers have no declared unit: wrap known
 year values with `age(x, unit = "year")`. Schemes do not silently treat them as
 years. Existing explicit conversion and approximate-conversion guards apply.
 
+## Units on category factors
+
+The `units` attribute of a `categorize_age()` factor records the original
+observation unit (normalized to a supported name), rather than the units defining
+its category boundaries. For example, hour-based ages can match day-based bands:
+
+```{r category-factor-units}
+day_groups <- age_group(c(0, 1), c(1, Inf), unit = "day")
+names(day_groups) <- c("Under one day", "One day or older")
+day_scheme <- age_scheme(day_groups, "example_days", "Illustrative day bands")
+hours <- age(c(12, 36, NA), unit = "hour")
+result <- categorize_age(hours, by = day_scheme)
+result
+attr(result, "units") # "hour"
+scheme_groups(day_scheme) # boundaries remain in days
+categorize_age(hours, by = day_scheme, output = "interval") # matched day intervals
+```
+
+`convert_units = "age_to_group"` compares in days here; `"group_to_age"`
+compares in hours. Both retain `"hour"` on the factor. The scheme's intervals
+define the category boundaries and units regardless of conversion direction.
+Factor integer codes identify categories; they are not numerical ages and must
+not be interpreted as time quantities. The attribute is not a complete or durable
+provenance record: ordinary factor operations may discard it. Retain the scheme
+or request interval output when boundaries and units are needed.
+`classify_age_scheme()` likewise returns its `group` column in scheme units.
+
 ## Valid unit-bearing observations
 
 An age must carry one supported simple time unit: second, minute, hour, day,
@@ -181,6 +208,51 @@ Interval-valued observations match only if fully contained in a category.
 Overlapping categories cannot be summed as if they were mutually exclusive
 population bands. A crosswalk also cannot determine how counts in a broad band
 should be split into finer bands without additional data or assumptions.
+
+### Identical intervals with different labels
+
+An overlapping classification can use identical intervals for distinct semantic
+categories. The following labels are illustrative, not authoritative definitions.
+All schemes require unique, nonblank category labels: duplicate **intervals** are
+permitted here, but duplicate **labels** are not. Bare `age_group` vectors retain
+their more permissive naming rules.
+
+```{r duplicate-intervals}
+g <- age_group(c(0, 0), c(5, 5), unit = "year")
+names(g) <- c("Early childhood", "Preschool age")
+s <- age_scheme(
+  groups = g, id = "example", name = "Illustrative shared age range",
+  type = "classification", domain = c(0, 5), complete = TRUE
+)
+classify_age_scheme(age(c(2, 5), unit = "year"), s)
+```
+
+Age 2 has two memberships, with original labels and category indices 1 and 2.
+Age 5 has neither: both intervals are `[0,5)`. Completeness applies only within
+that declared domain. Repeating an interval does not extend coverage or fill gaps.
+The corresponding partition is rejected because identical intervals overlap:
+
+```{r duplicate-partition, error=TRUE}
+age_scheme(g, "example_partition", "Invalid partition", type = "partition")
+```
+
+A single assignment needs an explicit multiple-match policy:
+
+```{r duplicate-default, error=TRUE}
+categorize_age(age(2, unit = "year"), by = s)
+```
+
+```{r duplicate-selection}
+categorize_age(age(2, unit = "year"), by = s, multiple = "first") # Early childhood
+categorize_age(age(2, unit = "year"), by = s, multiple = "last")  # Preschool age
+```
+
+`classify_age_scheme()` preserves original category order. `categorize_age()`
+resolves matches in interval order; the exact ties in this example retain the
+shown order in the current implementation. This is not a semantic ranking of
+these labels or an additional ordering guarantee. Its factor output can retain
+both labels as levels but assigns one category per observation. Use the long
+table when all memberships are needed.
 
 ## A legacy surveillance scheme
 

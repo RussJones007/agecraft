@@ -34,9 +34,17 @@ not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf
 For calculate_age(), an age vector by default. With output = "units",
 a completed-age units vector; with output = "numeric", completed ages as doubles.
 
-for categorize_age(), a vector of age groups as an ordered factor.  If the ages argument was a units vector,
-the returned factor will have the same units. With output = "interval", an
-age_group vector in the grouping definition's units is returned.
+For \code{categorize_age()}, an ordered factor by default. Its \code{units}
+attribute records the original observation unit, normalized to a supported
+unit name, when present. It does not specify the category boundaries' units
+or necessarily the internal comparison unit. Factor integer codes identify
+categories, not numerical ages. This attribute is not a complete or durable
+provenance record; ordinary factor operations may discard it. Retain the
+grouping definition for category boundaries and units, or request
+\code{output = "interval"} to return matched \code{age_group} intervals in that
+definition's units. Comparisons use group units with \code{"age_to_group"} and
+observation units with \code{"group_to_age"}; the factor attribute always describes
+the original observations. See the age-schemes vignette for a day/hour example.
 }
 \description{
 Functions to calculate age and age groups. The calculate_age() function returns the age from start to

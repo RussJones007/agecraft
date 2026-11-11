@@ -230,9 +230,17 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' 'to'.
 #' @param above.char is the character used for the upper summary group.  It can be '>', '+', 'plus' and 'above'
 #' @rdname calculate_age
-#' @return for categorize_age(), a vector of age groups as an ordered factor.  If the ages argument was a units vector,
-#'   the returned factor will have the same units. With output = "interval", an
-#'   age_group vector in the grouping definition's units is returned.
+#' @return For `categorize_age()`, an ordered factor by default. Its `units`
+#'   attribute records the original observation unit, normalized to a supported
+#'   unit name, when present. It does not specify the category boundaries' units
+#'   or necessarily the internal comparison unit. Factor integer codes identify
+#'   categories, not numerical ages. This attribute is not a complete or durable
+#'   provenance record; ordinary factor operations may discard it. Retain the
+#'   grouping definition for category boundaries and units, or request
+#'   `output = "interval"` to return matched `age_group` intervals in that
+#'   definition's units. Comparisons use group units with `"age_to_group"` and
+#'   observation units with `"group_to_age"`; the factor attribute always describes
+#'   the original observations. See the age-schemes vignette for a day/hour example.
 #' @examples
 #'
 #' #age_vec <- c(25, 23, 20, 1, 0, 7, 10, 50, 50, 52, 54, 56,34)

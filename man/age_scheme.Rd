@@ -94,7 +94,13 @@ valid. Structural validation does not independently verify external sources.
 Ordinary replacement validates the completed candidate; invalid edits error
 without changing the original. A
 partition need not cover the entire domain; disjointness and coverage are
-separate properties. No registry lookup is performed by this constructor.
+separate properties. Identical intervals overlap, so partitions reject them.
+Classifications permit identical intervals with distinct category names:
+each name represents a separate category, and \code{\link[=classify_age_scheme]{classify_age_scheme()}} returns
+every membership with its original label and category index. Duplicate names
+are invalid in either scheme type. These scheme requirements do not tighten
+the naming rules for bare \code{age_group} vectors. No registry lookup is performed
+by this constructor.
 }
 \section{Editing local copies}{
 

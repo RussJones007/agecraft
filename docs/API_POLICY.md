@@ -51,6 +51,15 @@ retains matched intervals and category names per observation. Missing and
 unmatched ages return missing assignments. Multiple matches error by default;
 `multiple = "first"` or `"last"` resolves them in sorted interval order.
 
+The `units` attribute on `categorize_age()` factor output records the original
+observation unit, normalized to a supported name. Category boundaries and their
+units belong to the grouping definition. Comparisons use group units for
+`"age_to_group"` and observation units for `"group_to_age"`; the factor attribute
+does not identify those internal coordinates. Factor integer codes are category
+identifiers, not ages. The attribute is not a complete or durable provenance
+record and ordinary factor operations may discard it. Retain the scheme or use
+`output = "interval"` for matched boundaries and definition units.
+
 Unspecified group units inherit the input ages' unit for classification.
 Unitless ages with explicitly unit-bearing groups are rejected. When specified
 units differ, `convert_units` chooses conversion of ages or groups, or rejects
@@ -82,6 +91,16 @@ scalar-string display symbols remain valid. Partitions prohibit overlaps;
 coverage is independently checked against an optional right-open domain.
 `complete = TRUE` or FALSE asserts actual completeness/incompleteness and requires
 a domain; NA makes no claim.
+
+Identical intervals overlap and are invalid in partitions. Classifications permit
+identical intervals with distinct labels as separate semantic categories. Every
+scheme requires unique, nonblank category labels, independently of interval
+equality; bare `age_group` vectors retain their more permissive naming rules.
+Duplicates do not extend coverage or fill gaps. The all-membership table preserves
+original category order and indices. Single-assignment classification resolves
+matches in interval order; its factor output represents one selected membership,
+not all memberships. Interval ordering does not imply a semantic ranking of labels
+that share identical boundaries.
 
 `categorize_age(..., by = scheme)` retains its existing default outputs and
 multiple-match policy. `classify_age_scheme()` explicitly returns every match in
