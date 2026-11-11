@@ -1,9 +1,30 @@
-# agecraft 0.1.0.9016
+# agecraft 0.1.0.9017
 
-* Added optional `import_mudnester_scheme()` and `mudnester_catalogue()` APIs.
-  Imports preserve catalogue boundaries/labels and remain unverified; companion
-  provenance separates package snapshots from guidance editions and reports
-  known issues. `mudnester` is Suggested; the legacy registry is unchanged.
+## Optional mudnester catalogue interoperability
+
+- Add `import_mudnester_scheme(id)` to convert exact upstream catalogue IDs into
+  validated Agecraft schemes with `mudnester_` identifiers. Preserve numeric
+  boundaries, fractional precision, category order, labels and year/day units.
+  Validate catalogue schema, breaks, labels and band counts; report missing
+  dependencies, unknown IDs and malformed definitions with actionable errors.
+- Add `mudnester_catalogue()` for structured upstream provenance, installed
+  package snapshot versions and known issues. Imports remain unverified;
+  package snapshots are distinct from unknown external guidance editions.
+  Preserve missing source information without inferring organizations or authority.
+- Warn about known label/boundary inconsistencies, approximate neonatal year
+  coordinates, illustrative definitions, missing source URLs and applicability.
+  Import faithfully without corrections: numerical completeness does not
+  establish clinical applicability or eligibility. Ordinary edits retain
+  existing derivative tracking.
+- Keep `mudnester` in Suggests only and load its public dataset in a private
+  environment. The eight legacy registry schemes, numeric presets, S3 classes,
+  interval engine and classification behavior are unchanged.
+- Add attributed offline fixtures, optional installed-catalogue parity tests,
+  generated help, vignette examples and provenance/policy documentation.
+  Feature validation passed the full suite and package check before this
+  version-only update; tests and package checks were not rerun for the bump.
+
+# agecraft 0.1.0.9016
 
 ## Classification documentation and regression coverage
 

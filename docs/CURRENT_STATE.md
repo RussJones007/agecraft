@@ -1,6 +1,16 @@
-# agecraft current state — 2026-11-10
+# agecraft current state — 2026-11-11
 
-Version: **0.1.0.9016** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
+Version: **0.1.0.9017** (development). Branch: `main`. Requires R >= 4.1.0.
+
+## Development version update — 2026-11-11
+
+- Fast-forwarded `age_scheme` into `main`, then incremented the development
+  version to 0.1.0.9017. Expanded the latest NEWS entry for optional mudnester
+  interoperability and kept prior changes under their existing version headings.
+- This metadata/documentation update does not change production code. Per user
+  instruction, no tests, assertions or package checks were rerun; validation was
+  limited to reviewing the diff and `git diff --check`. The feature-validation
+  results below describe the preceding implementation, not this version bump.
 
 ## Optional mudnester catalogue interoperability — 2026-11-11
 
