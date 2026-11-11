@@ -1,9 +1,30 @@
-# agecraft 0.1.0.9017
+# agecraft 0.1.0.9018
 
-- Support numeric age offsets and age addition with right-to-left unit conversion,
-  preserving fractions and nonnegative validation. Calendar conversions require
-  explicit approximation consent before arithmetic. Age minus age remains
-  unsupported. Add unit-preserving medians and arithmetic regression coverage.
+## Age arithmetic
+
+- Support addition and subtraction of plain numeric offsets in an age vector's
+  unit, and numeric plus age. Preserve fractional precision, names, class and
+  unit metadata; reject negative or infinite age results rather than clamping.
+- Support age plus age by converting the right operand to the left operand's
+  unit. Exact elapsed-unit conversions are automatic. Calendar conversions,
+  including month/year, still require explicit `as_age(..., allow_approx = TRUE)`
+  before addition. Result units depend on operand order; existing common-type,
+  concatenation and comparison rules remain unchanged.
+- Leave age minus age, numeric minus age, multiplication, division, sums,
+  logarithms and exponentials unsupported. Age-group and scheme arithmetic
+  remain outside the contract.
+- Add unit-preserving medians and verify existing rounding, absolute values,
+  means and extrema. Preserve missing values and vctrs recycling rules; reject
+  invalid infinite extrema from empty or all-missing inputs with removal.
+- Complete the arithmetic implementation plan with regression tests for central
+  validation, conversion safeguards, vector sizes and half-open classification
+  boundaries after arithmetic. Update help, README, vignette and API policy.
+- Validation before this version increment: 3,091 assertions passed with no
+  failures or warnings and one optional mudnester skip. Package check completed
+  with 0 errors, 0 warnings and 0 notes, including installed tests, examples and
+  vignette rebuilds. Tests and package check were not rerun for this version bump.
+
+# agecraft 0.1.0.9017
 
 - Print `age` units once in the class or tibble column header. `format(age)`
   now returns numeric strings without unit suffixes, including when
