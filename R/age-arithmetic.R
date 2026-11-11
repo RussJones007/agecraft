@@ -34,7 +34,7 @@ vec_arith.numeric.age <- function(op, x, y, ...) {
 
 
 # Median is not routed through vec_math by vctrs.
-#' @exportS3Method
+#' @exportS3Method stats::median
 median.age <- function(x, na.rm = FALSE, ...) {
   new_age(stats::median(vctrs::vec_data(x), na.rm = na.rm, ...), attr(x, "unit"))
 }
