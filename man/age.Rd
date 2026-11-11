@@ -49,7 +49,8 @@ does not make an invalid dimensional expression valid.
 \code{as.numeric()} extracts full precision and \code{as.integer()} extracts completed units. \code{format(x, fractional = TRUE)} shows
 fractions; \code{format(x)} and printing show completed whole units (floor).
 Formatted values contain numbers without unit suffixes. Printing shows the
-unit once in the class header. Tibble column headers use an abbreviated
+unit once in the class header, for example \verb{<age [year][6]>} for six ages.
+Tibble column headers use an abbreviated
 label such as \verb{<age-year>}, \verb{<age-month>} or \verb{<age-day>}.
 Names, units and precision survive slicing, sorting, repetition and binding.
 Combining or comparing ages requires matching units; convert explicitly with

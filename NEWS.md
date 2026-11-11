@@ -1,5 +1,7 @@
 # agecraft 0.1.0.9018
 
+- Show standalone age headers as `<age [year][6]>`, separating the class and unit with a space and square brackets. Tibble headers remain `<age-year>`; stored values and metadata are unchanged.
+
 - Abbreviate age tibble column headers as `<age-year>`, `<age-month>`, etc.
   Standalone printing and stored class/unit metadata are unchanged.
 

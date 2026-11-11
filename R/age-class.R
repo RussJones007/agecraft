@@ -27,7 +27,8 @@
 #' `as.numeric()` extracts full precision and `as.integer()` extracts completed units. `format(x, fractional = TRUE)` shows
 #' fractions; `format(x)` and printing show completed whole units (floor).
 #' Formatted values contain numbers without unit suffixes. Printing shows the
-#' unit once in the class header. Tibble column headers use an abbreviated
+#' unit once in the class header, for example `<age [year][6]>` for six ages.
+#' Tibble column headers use an abbreviated
 #' label such as `<age-year>`, `<age-month>` or `<age-day>`.
 #' Names, units and precision survive slicing, sorting, repetition and binding.
 #' Combining or comparing ages requires matching units; convert explicitly with
@@ -179,7 +180,7 @@ format.age <- function(x, ..., fractional = FALSE) {
 vec_ptype_abbr.age <- function(x, ...) paste0("age-", attr(x, "unit"))
 
 #' @exportS3Method vctrs::vec_ptype_full
-vec_ptype_full.age <- function(x, ...) paste0("age<", attr(x, "unit"), ">")
+vec_ptype_full.age <- function(x, ...) paste0("age [", attr(x, "unit"), "]")
 
 #' @exportS3Method vctrs::vec_restore
 vec_restore.age <- function(x, to, ...) new_age(x, attr(to, "unit"))

@@ -1,3 +1,14 @@
+## Standalone age unit delimiter — 2026-11-11
+
+- Full age type labels now use `age [year]` (and corresponding units), producing
+  standalone headers such as `<age [year][6]>`. Abbreviated tibble labels remain
+  `<age-year>`; values, classes and unit metadata are unchanged.
+- Updated roxygen help, NEWS and regression expectations across all seven units,
+  including empty vectors. `devtools::document()` completed; focused age-class
+  tests passed 162 assertions with no failures, warnings or skips. Manually
+  verified standalone and tibble output; `git diff --check` passed. Full suite
+  and package check were not rerun for this display-only change.
+
 ## Abbreviated age labels — 2026-11-11
 
 - Tibble headers now use `<age-year>`, `<age-month>`, etc. via
