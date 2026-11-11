@@ -1,5 +1,8 @@
 # agecraft 0.1.0.9018
 
+- Abbreviate age tibble column headers as `<age-year>`, `<age-month>`, etc.
+  Standalone printing and stored class/unit metadata are unchanged.
+
 ## Age arithmetic
 
 - Support addition and subtraction of plain numeric offsets in an age vector's

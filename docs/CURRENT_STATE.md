@@ -1,3 +1,14 @@
+## Abbreviated age labels — 2026-11-11
+
+- Tibble headers now use `<age-year>`, `<age-month>`, etc. via
+  `vec_ptype_abbr.age()`. Full type labels, standalone printing, stored classes
+  and unit metadata are unchanged. Updated roxygen help, NEWS and regression
+  tests across all seven units.
+- `devtools::document()` completed; focused age-class tests passed 162 assertions
+  with no failures, warnings or skips. Confirmed rendered tibble output manually;
+  `git diff --check` passed. Full suite and package check were not rerun for this
+  display-only change.
+
 ## Age arithmetic — 2026-11-11
 
 - Added numeric addition/subtraction offsets and age addition through vctrs

@@ -108,9 +108,11 @@ test_that("age display puts units in headers and leaves values numeric", {
     expect_identical(format(age(NA_real_, unit)), NA_character_)
     expect_identical(as.numeric(x), c(10.75, 5.25, NA_real_))
     expect_identical(attr(x, "unit"), unit)
+    expect_identical(vctrs::vec_ptype_abbr(x), paste0("age-", unit))
+    expect_identical(vctrs::vec_ptype_full(x), paste0("age<", unit, ">"))
     if (requireNamespace("tibble", quietly = TRUE)) {
       column <- capture.output(print(tibble::tibble(value = x)))
-      expect_true(any(grepl(paste0("age<", unit, ">"), column, fixed = TRUE)))
+      expect_true(any(grepl(paste0("<age-", unit, ">"), column, fixed = TRUE)))
       expect_false(any(grepl(paste0("[0-9] +", unit), column)))
     }
   }
