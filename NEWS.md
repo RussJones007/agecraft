@@ -1,3 +1,23 @@
+# agecraft 0.1.0.9016
+
+## Classification documentation and regression coverage
+
+- Clarify that identical intervals overlap and are invalid in partitions, while
+  classifications permit them as separate categories with distinct labels.
+  All schemes require unique, nonblank labels; bare age-group naming rules are
+  unchanged. Explain all-membership output, explicit first/last selection,
+  interval ordering, half-open boundaries and coverage with runnable examples.
+- Clarify that the `units` attribute on classification factors records the
+  original observation unit, not the category boundaries or a physical unit for
+  factor codes. Explain comparison units, the limits of factor metadata, and how
+  to retain scheme-unit intervals. Add a day-based scheme/hour-based age example.
+- Regenerate function help and add 124 focused regression assertions covering
+  duplicate memberships, labels, exact ties, coverage gaps, factor-unit metadata,
+  equivalent inputs, missing/empty observations and scheme-unit interval outputs.
+  Targeted tests passed 1,830 assertions with no failures, warnings or skips;
+  the age-schemes vignette rendered successfully. Production behavior and public
+  APIs are unchanged.
+
 # agecraft 0.1.0.9015
 
 ## Validation performance

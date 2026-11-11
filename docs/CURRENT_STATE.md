@@ -1,6 +1,21 @@
 # agecraft current state — 2026-11-10
 
-Version: **0.1.0.9015** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
+Version: **0.1.0.9016** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
+
+## Classification policy documentation — 2026-11-11
+
+- Document duplicate intervals versus duplicate labels, partition rejection,
+  multiple-membership classification, interval ordering and half-open coverage.
+- Document classification factor units as original-observation metadata, distinct
+  from category-definition and comparison units. Explain categorical codes,
+  metadata durability limits and scheme-unit interval output with a day/hour
+  example. Regenerated function help; production behavior and APIs unchanged.
+- Added 124 focused assertions. Before this metadata-only version increment,
+  targeted age-scheme, calendar-conversion and floating-point tests passed 1,830
+  assertions with no failures, warnings or skips. The age-schemes vignette rendered
+  successfully. Logs: `/tmp/agecraft-finding8-tests.log` and
+  `/tmp/agecraft-finding8-vignette.log`. No full suite or R CMD check run.
+- Incremented the development version to 0.1.0.9016 and added the NEWS summary.
 
 ## Minimal validation optimization — 2026-11-11
 
