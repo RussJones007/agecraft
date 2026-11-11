@@ -95,8 +95,18 @@ The initial registry contains eight legacy schemes with year units and stable
 `legacy_` identifiers. It preserves preset boundaries and provenance uncertainty;
 legacy numeric lists and aliases retain their existing behavior. Verification
 metadata records a caller's claim, not external validation by the constructor.
-Scheme transformations have no automatic provenance-retention contract; construct
-and validate a new scheme after changing its definition.
+Ordinary `$<-`, `[[<-` and `[<-` edits now validate the completed candidate and
+track derivatives. Bounds, units, ordered labels, category order, type, domain
+and completeness changes capture first ancestry in protected `derived_from`,
+assign a local `_derived` ID and clear current verification/version. Title,
+purpose, notes and cosmetic symbols preserve status. Identical definition
+assignments preserve status. Source/organization/reference/ID/version edits also
+capture ancestry and clear verification; explicit replacement IDs/versions are
+retained. A later explicit verification assignment remains a caller claim.
+Batch replacement supports jointly valid edits; recursive `[[<-` is rejected.
+Older objects without ancestry remain valid; no historical lineage is inferred.
+Deliberate reconstruction bypasses tracking. No snapshots or full histories are
+stored. Interval coverage/set operations alone do not preserve scheme provenance.
 
 ## Calendar conversion safeguard — 2026-11-11
 

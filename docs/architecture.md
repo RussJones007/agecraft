@@ -90,7 +90,12 @@ A validated `type` distinguishes nonoverlapping partitions from classifications
 that may overlap. A domain is optional; any `complete = TRUE` or FALSE claim
 requires an explicit domain and must agree with actual coverage. Category names
 must be nonblank and unique. Unit and coordinate metadata live in `groups`.
-There are no automatic provenance-preserving scheme transformations.
+Ordinary replacement uses a shared validated update transaction with exact,
+label-aware definition comparison. The first substantive or asserted-source edit
+captures `derived_from`; current identity becomes local and verification is
+cleared. Descriptive titles and cosmetic symbols preserve status. No histories,
+snapshots or reference-based storage are introduced. Deliberate reconstruction
+is outside tracking; interval set operations do not transfer scheme provenance.
 
 `categorize_age(..., by = scheme)` extracts groups and retains current factor,
 interval, overlap-resolution, and unit-conversion behavior. The function remains
@@ -135,9 +140,9 @@ Scheme implementation should be additive and must not silently change `calculate
 1. **Published definitions:** External editions for historical presets remain
    unknown; do not relabel them as current official standards. New authoritative
    schemes require verified boundaries, editions, references and dates.
-2. **Transformations:** Scheme subsetting, replacement and coverage operations
-   have no implicit validity/provenance-retention promise. Reconstruct and
-   validate a new definition after editing intervals.
+2. **Transformations:** Ordinary replacement now tracks derivative ancestry.
+   Coverage/set operations on extracted intervals do not transfer provenance;
+   deliberate reconstruction remains outside automatic tracking.
 3. **Unit migration:** Legacy numeric presets retain caller-unit behavior.
    Equivalent registry schemes have explicit year units and require explicit
    observation units. This difference is intentional and documented.

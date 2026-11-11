@@ -2,6 +2,34 @@
 
 Version: **0.1.0.9015** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
 
+## Lightweight derivative provenance — 2026-11-11
+
+- Added `$<-`, `[[<-` and `[<-` methods sharing one update transaction. Exact
+  substantive comparisons include bounds, units, ordered category labels,
+  category order, type, domain and completeness. No definition snapshot is stored.
+- First substantive or identity/asserted-source changes capture protected
+  `derived_from = list(id, version, source, organization, reference)`, give a local
+  `_derived` ID, clear inherited version and set verified FALSE. Explicit ID or
+  version replacements are honored; current and ancestor IDs must differ.
+  Subsequent changes retain first ancestry. Title, purpose, notes and valid
+  cosmetic formatting preserve status; identical definition assignments do not
+  create derivatives or reset verification. A later explicit verification claim
+  remains subject to existing source/reference/version requirements.
+- Atomic batch replacement validates final state. Recursive `[[<-` is rejected;
+  invalid edits leave the original/catalog unchanged. Optional NULL metadata
+  retains its schema field. Legacy serialized objects without ancestry remain
+  readable; their first tracked edit captures then-current metadata without
+  inventing earlier history. Deliberate S3 reconstruction bypasses tracking.
+- Added 439 provenance regression assertions and adapted existing structural
+  corruption tests to bypass ordinary setters deliberately. Targeted scheme,
+  calendar-conversion and floating-point-boundary tests passed 1,526 assertions
+  with zero failures, warnings or skips. The age-schemes vignette rendered into
+  `/tmp/agecraft-provenance-vignette`. Roxygen help/registrations were regenerated;
+  `git diff --check` passed. Log: `/tmp/agecraft-provenance-targeted.log`.
+- No full suite or R CMD check was run for this targeted task. No dependencies,
+  histories, fingerprints, timestamps, development-version increment or changes
+  to age/interval storage and numerical algorithms were introduced.
+
 ## Floating-point precision policy documentation — 2026-11-11
 
 - Retain existing double-precision conversion and classification algorithms,

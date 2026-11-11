@@ -13,8 +13,9 @@ test_that("scheme classification delegates to existing groups", {
   interval <- age_group(c(0, 17, 20), c(10, 19, 21), unit = "year")
   expect_identical(categorize_age(interval, by = s), categorize_age(interval, by = g))
   expect_true(is.na(categorize_age(interval, by = s)[2]))
-  altered <- s
+  altered <- unclass(s)
   altered$groups <- unname(g)
+  class(altered) <- "age_scheme"
   expect_error(categorize_age(a, by = altered), "names")
 })
 

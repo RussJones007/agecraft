@@ -351,3 +351,9 @@ interval representation, including display symbols, units, category names and
 boundaries. Malformed metadata errors without default substitution; valid custom
 display symbols remain supported. Structural validity does not verify external
 source authority or provenance.
+
+Ordinary edits to local scheme copies now track minimal derivative ancestry.
+For example, `names(modified$groups)[1] <- "Revised category"` creates a local
+`_derived` identity, clears verification, and retains original identity/source
+metadata in `derived_from`. Changing the descriptive title does not create a
+derivative. See the age-schemes guide for batch edits and tracking limits.

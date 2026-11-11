@@ -7,7 +7,9 @@ structure_test_groups <- function() {
 expect_scheme_rejects_groups <- function(g, pattern) {
   expect_error(age_scheme(g, "broken", "Broken"), pattern)
   s <- age_scheme(structure_test_groups(), "example", "Example")
+  s <- unclass(s)
   s$groups <- g
+  class(s) <- "age_scheme"
   original <- serialize(s, NULL)
   expect_error(validate_age_scheme(s), pattern)
   expect_error(scheme_groups(s), pattern)

@@ -1,5 +1,18 @@
 # agecraft 0.1.0.9015
 
+## Lightweight derivative provenance
+
+- Track ordinary scheme edits through `$<-`, `[[<-` and atomic `[<-` replacement.
+  Exact substantive comparisons include ordered labels; title, notes and cosmetic
+  formatting preserve status. First changes record protected `derived_from`
+  identity/source metadata and a local `_derived` ID; verification and inherited
+  version are cleared. Later edits retain ancestry. Source/identity edits also
+  clear verification. Recursive replacement is explicitly rejected.
+- Keep catalog/original copies independent and accept older serialized schemes
+  without invented ancestry. No snapshots, full histories, dependencies or
+  development-version increment are introduced. Invalid edits now fail on
+  assignment; use batch edits when policies and groups must change together.
+
 ## Floating-point precision documentation
 
 - Document retained double-precision conversion and classification behavior:

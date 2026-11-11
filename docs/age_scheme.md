@@ -251,9 +251,16 @@ an explicit supported time unit. Category names must be nonblank and unique.
 `domain` is NULL or a numeric pair describing a right-open interval in the group
 unit. Groups must lie inside a declared domain. `complete = NA` makes no coverage
 claim; TRUE/FALSE assert complete/incomplete coverage and require a domain.
-Overlap is independent of completeness; partitions reject overlap. There are
-no scheme subsetting/replacement/set-operation methods in the initial release.
-Reconstruct a scheme to change its definition and reconsider its provenance.
+Overlap is independent of completeness; partitions reject overlap. Ordinary scheme replacement now uses `$<-`, `[[<-` and `[<-` methods to validate
+completed candidates and track minimal `derived_from` ancestry. Ordered labels
+are substantive, while descriptive title/notes and cosmetic symbols are not.
+The first substantive or asserted-source change creates a local derivative ID,
+clears current verification/version, and records original identity/source metadata.
+Subsequent edits preserve ancestry. No snapshots or histories are stored; class
+removal and arbitrary reconstruction are outside tracking. Recursive `[[<-` is
+rejected; batch replacement supports jointly valid changes. Older serialized
+objects without ancestry remain readable without invented historical lineage.
+There are no provenance-preserving scheme set-operation methods.
 
 `categorize_age(..., by = scheme)` delegates to existing single-assignment
 behavior. `classify_age_scheme(ages, scheme)` returns a base data frame with

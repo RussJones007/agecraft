@@ -58,9 +58,13 @@ test_that("scheme construction rejects malformed definitions and metadata", {
     expect_error(age_scheme(g, "test", "Test", domain = domain), "domain")
   }
   s <- age_scheme(g, "test", "Test")
+  s <- unclass(s)
   s$type <- "other"
+  class(s) <- "age_scheme"
   expect_error(validate_age_scheme(s), "type")
+  s <- unclass(s)
   s$groups <- unitless
+  class(s) <- "age_scheme"
   expect_error(scheme_groups(s))
   expect_error(validate_age_scheme(structure(list(), class = "age_scheme")), "fields")
 })

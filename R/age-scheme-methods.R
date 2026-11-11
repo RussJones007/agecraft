@@ -12,6 +12,8 @@
 #'   remaining scheme fields. This is an inspection format, not an automatic
 #'   round-trip constructor; data-frame operations may discard the attribute.
 #'   Without a domain, gaps and coverage are unspecified (NULL and NA).
+#'   Derivatives print their ancestor ID/version; summaries and data-frame metadata
+#'   include `derived_from`. See [age_scheme()] for editing and ancestry rules.
 #' @param row.names Optional row names for the data frame.
 #' @param optional Logical, passed to [data.frame()].
 #' @name age_scheme_methods
@@ -31,6 +33,10 @@ print.age_scheme <- function(x, ...) {
   cat("<age_scheme:", x$id, ">", x$name, "\n")
   cat("Type:", x$type, "| Unit:", get_unit(x$groups), "| Groups:",
       length(x$groups), "| Verified:", x$verified, "\n")
+  if (!is.null(x$derived_from)) {
+    cat("Derived from:", x$derived_from$id, "| Source version:",
+        x$derived_from$version %||% "unknown", "\n")
+  }
   print(x$groups)
   invisible(x)
 }

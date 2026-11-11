@@ -7,7 +7,8 @@
 #'   unique, nonblank names for every category. Missing intervals are not allowed.
 #' @param id Stable machine identifier, using letters, digits, underscores or
 #'   hyphens and starting with a letter.
-#' @param name Nonblank human-readable title.
+#' @param name Nonblank human-readable title. For `$<-`, the exact field name
+#'   to replace; changing the title field `name` is descriptive, not substantive.
 #' @param type `"partition"` rejects overlap; `"classification"` permits it.
 #' @param domain NULL or two numeric bounds specifying the intended right-open
 #'   age domain, in the groups' unit. All groups must lie within this domain.
@@ -22,17 +23,51 @@
 #'   an external source. Legacy built-ins are unverified.
 #' @return `age_scheme()` returns a validated S3 scheme. `is_age_scheme()` returns
 #'   a logical scalar. `validate_age_scheme()` invisibly returns the valid object
-#'   or errors. `scheme_groups()` returns its `age_group` vector.
+#'   or errors. `scheme_groups()` returns its `age_group` vector. Replacement
+#'   methods return the validated updated scheme.
 #' @details Scheme units must be second, minute, hour, day, week, month or year.
 #'   Validation checks the complete stored `age_group` representation, including
 #'   interval fields, bounds, units, category names and the actual `below`, `sep`
 #'   and `above` display symbols. Malformed metadata is rejected without repair
 #'   or substitution of defaults. Custom scalar-string display symbols remain
 #'   valid. Structural validation does not independently verify external sources.
-#'   Reconstruct and revalidate a scheme after changing its groups. Transformed
-#'   intervals do not automatically retain an official source identity. A
+#'   Ordinary replacement validates the completed candidate; invalid edits error
+#'   without changing the original. A
 #'   partition need not cover the entire domain; disjointness and coverage are
 #'   separate properties. No registry lookup is performed by this constructor.
+#' @section Editing local copies:
+#' Schemes are independent R value objects. Copy with `modified <- original`,
+#' then edit using `$<-`, `[[<-` or batch `[<-` replacement. Substantive changes
+#' to bounds, units, ordered category labels, category order, type, domain or
+#' completeness create a derivative. Display symbols, title, purpose and notes
+#' are descriptive/cosmetic; valid changes to these preserve status. Identical
+#' definition assignments do not create derivatives or reset verification.
+#'
+#' New objects have `derived_from = NULL`. The first substantive edit records
+#' the parent's `id`, `version`, `source`, `organization` and `reference` there,
+#' assigns an `_derived` ID, clears the current version and sets `verified = FALSE`.
+#' Subsequent edits retain that first ancestry and do not restore verification,
+#' even when reverting the definition. Generated IDs are predictable local names,
+#' not globally unique. An explicitly supplied distinct ID or version in a batch
+#' is retained. Source, organization, reference, ID or version changes also create
+#' ancestry on first change and clear verification. Inherited source/citation
+#' fields remain attribution, not verification of the derivative. A later explicit
+#' `verified = TRUE` remains a caller's claim requiring source, reference and version;
+#' substantive or asserted-source changes always clear it, even in a batch that
+#' also assigns TRUE.
+#'
+#' `derived_from` is protected from ordinary replacement. Use one exact field name
+#' or position for `[[<-`; recursive indices are rejected. Use a list of values
+#' for atomic batch edits, for example `x[c("groups", "complete")] <- list(g, FALSE)`.
+#' Each completed assignment must be valid; batch related policy/interval changes
+#' rather than relying on an invalid intermediate object. Optional fields can be
+#' cleared with NULL without deleting schema fields.
+#'
+#' Older serialized schemes without `derived_from` remain readable and valid.
+#' Their first tracked edit records their then-current metadata, not an invented
+#' historical lineage. Deliberate class removal, `unclass()` or reconstruction
+#' bypasses tracking. No definition snapshots or change histories are stored;
+#' validation checks structure and ancestry shape, not historical authenticity.
 #' @seealso [categorize_age()], [classify_age_scheme()], [get_age_scheme()]
 #' @examples
 #' g <- age_group(c(0, 18, 65), c(18, 65, Inf), unit = "year")
@@ -52,7 +87,7 @@ age_scheme <- function(groups, id, name, type = c("partition", "classification")
                       domain = domain, complete = complete, purpose = purpose,
                       organization = organization, source = source,
                       reference = reference, version = version,
-                      verified = verified, notes = notes), class = "age_scheme")
+                      verified = verified, notes = notes, derived_from = NULL), class = "age_scheme")
   validate_age_scheme(x)
   x
 }
@@ -74,8 +109,28 @@ scheme_groups <- function(x) {
 validate_age_scheme <- function(x) {
   required <- c("groups", "id", "name", "type", "domain", "complete", "purpose",
                 "organization", "source", "reference", "version", "verified", "notes")
-  if (!is_age_scheme(x) || !is.list(x) || !identical(names(x), required)) {
+  if (!is_age_scheme(x) || !is.list(x) || !(identical(names(x), required) ||
+        identical(names(x), c(required, "derived_from")))) {
     stop("x must be an age_scheme with all required fields", call. = FALSE)
+  }
+  ancestry <- x$derived_from
+  if (!is.null(ancestry)) {
+    if (!is.list(ancestry) || is.object(ancestry) ||
+        !identical(names(ancestry), c("id", "version", "source", "organization", "reference"))) {
+      stop("derived_from must contain id, version, source, organization and reference", call. = FALSE)
+    }
+    for (field in names(ancestry)) {
+      value <- ancestry[[field]]
+      if (field != "id" && is.null(value)) next
+      if (!is.character(value) || length(value) != 1L || is.na(value) ||
+          !nzchar(trimws(value))) {
+        stop("derived_from ", field, " must be a nonblank character scalar or optional NULL",
+             call. = FALSE)
+      }
+    }
+    if (!grepl("^[A-Za-z][A-Za-z0-9_-]*$", ancestry$id) || identical(x$id, ancestry$id)) {
+      stop("a derivative requires a valid ancestor id distinct from its current id", call. = FALSE)
+    }
   }
   for (field in c("id", "name", "type", "purpose", "organization", "source",
                   "reference", "version", "notes")) {

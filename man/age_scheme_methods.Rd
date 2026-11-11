@@ -33,6 +33,8 @@ unit, and scheme identifier. Its \code{scheme_metadata} attribute contains the
 remaining scheme fields. This is an inspection format, not an automatic
 round-trip constructor; data-frame operations may discard the attribute.
 Without a domain, gaps and coverage are unspecified (NULL and NA).
+Derivatives print their ancestor ID/version; summaries and data-frame metadata
+include \code{derived_from}. See \code{\link[=age_scheme]{age_scheme()}} for editing and ancestry rules.
 }
 \description{
 Inspect an age scheme

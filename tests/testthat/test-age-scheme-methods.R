@@ -20,8 +20,9 @@ test_that("scheme inspection preserves provenance and interval coordinates", {
   unknown <- summary(age_scheme(g, "unknown", "Unknown"))
   expect_null(unknown$gaps)
   expect_true(is.na(unknown$covered))
-  altered <- s
+  altered <- unclass(s)
   altered$groups <- age_group(0, 10, unit = "year")
+  class(altered) <- "age_scheme"
   expect_error(print(altered), "names")
   expect_error(summary(altered), "names")
   expect_error(as.data.frame(altered), "names")

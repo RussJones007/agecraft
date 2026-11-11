@@ -202,19 +202,61 @@ external edition. New authoritative definitions require source verification.
 
 ## Inspecting and changing a definition
 
-Use `scheme_groups()` for the underlying intervals, `summary()` for coverage,
-gaps, overlaps and provenance, and `as.data.frame()` for an inspection table.
-The table has a `scheme_metadata` attribute; ordinary data-frame transformations
-may discard it. Reconstruct with `age_scheme()` to validate a modified definition.
-Do not retain claims of official source identity after changing cut points.
+Use `scheme_groups()` for intervals, `summary()` for coverage and provenance,
+and `as.data.frame()` for an inspection table. Its `scheme_metadata` attribute
+can be discarded by ordinary data-frame operations.
 
-The constructor checks metadata and any declared coverage claim. A user-supplied
-`verified = TRUE` requires source, reference, and version; it records the user's
-claim, rather than performing external verification. Classification and inspection
-revalidate the complete stored interval representation, including actual display
-symbols, units, category names and endpoint fields, so direct list mutation
-cannot silently bypass structural or declared-coverage checks. Missing or
-malformed metadata is rejected without replacement by defaults. Custom scalar
-strings for `below`, `sep` and `above` remain supported. These structural checks
-do not independently verify external sources or establish that retained
-provenance still describes modified cut points.
+Schemes use ordinary R copy-on-modify semantics. Modifying a retrieved copy
+changes neither the local original nor the package catalog:
+
+```{r derivative-label}
+original <- get_age_scheme("legacy_ili")
+modified <- original
+names(modified$groups)[1] <- "Revised youngest category"
+modified$id                         # legacy_ili_derived
+modified$verified                   # FALSE
+modified$derived_from               # original ID, version and source information
+names(original$groups)[1]            # original category label
+modified$name <- "My reporting title" # descriptive: no new derivative
+```
+
+Bounds, units, category labels and their order, partition/classification policy,
+domain and completeness are substantive. Labels convey meaning even when
+bounds are identical. The first edit captures `derived_from`; later edits keep
+that ancestry unchanged. Reverting a definition does not restore verification.
+Valid title, purpose, notes and cosmetic display-symbol changes preserve status.
+Assigning an identical substantive definition is a no-op for provenance.
+
+The current ID receives an `_derived` suffix on the first substantive edit and
+the current version is cleared, while the original version remains in
+`derived_from`. IDs are local, predictable names, not globally unique; assign a
+distinct local ID if needed. Identity or asserted-source edits (ID, version,
+source, organization or reference) also capture first ancestry and clear current
+verification. Explicitly supplied IDs/versions are retained; the current ID must
+remain distinct from the ancestor's ID. Source and citation fields retained on
+a derivative are attribution, not a claim that the changed definition was
+published or verified. A separate later `verified = TRUE` is an explicit caller
+claim, requiring source, reference and version; the package does not verify it.
+
+Use `$<-`, `[[<-` or `[<-` normally. For changes requiring several fields, use an
+atomic list replacement so the final candidate can be validated together:
+
+```{r derivative-batch}
+partial <- original
+partial[c("groups", "complete")] <- list(original$groups[1:2], FALSE)
+summary(partial)$covered # FALSE
+```
+
+Each completed assignment must be valid. A single edit contradicting the current
+coverage or partition policy errors; use a batch rather than an invalid editing
+state. `[[<-` accepts one exact field name or position and rejects recursive
+indices. `derived_from` cannot be replaced through the ordinary setters.
+Optional metadata can be cleared with NULL without deleting its schema field.
+
+Older RDS schemes without `derived_from` remain usable. The first tracked edit
+records their current metadata; it cannot reconstruct earlier changes. Deliberate
+class removal, `unclass()` or arbitrary reconstruction bypasses automatic tracking.
+The implementation stores no definition snapshots, timestamps or full history.
+Structural validation checks actual interval metadata and ancestry shape; it
+cannot prove source authenticity or detect valid changes made through such
+bypasses. Catalog presets remain unverified historical definitions.
