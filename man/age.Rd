@@ -53,7 +53,10 @@ unit once in the class header, including in tibble column headers.
 Names, units and precision survive slicing, sorting, repetition and binding.
 Combining or comparing ages requires matching units; convert explicitly with
 \code{as_age(x, unit = ...)} first. Bare numbers are not implicitly combined with
-ages when concatenating. Means, extrema and rounding retain the class.
+ages when concatenating. Means, medians, extrema, absolute values and rounding
+retain the class and unit. Empty or all-missing extrema with \code{na.rm = TRUE}
+error because their infinite numeric results are not valid ages. Empty means
+and medians retain missing results.
 }
 \section{Arithmetic}{
 

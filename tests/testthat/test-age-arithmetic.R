@@ -54,3 +54,28 @@ test_that("age addition converts only exact right-hand units automatically", {
   expect_error(age(1, "day") < age(1, "week"), "incompatible units")
   expect_error(vctrs::vec_c(age(1, "day"), age(1, "week")), "incompatible units")
 })
+
+
+test_that("supported transformations and summaries preserve class and units", {
+  x <- age(c(1.25, 2.75, NA), "day")
+  for (fn in c("round", "floor", "ceiling", "trunc", "abs")) {
+    expected <- do.call(fn, list(c(1.25, 2.75, NA)))
+    expect_identical(do.call(fn, list(x)), age(expected, "day"))
+    expect_identical(do.call(fn, list(age(unit = "day"))), age(unit = "day"))
+  }
+  for (fn in c("mean", "median", "min", "max", "range")) {
+    expected <- do.call(fn, list(c(1.25, 2.75, NA), na.rm = TRUE))
+    expect_identical(do.call(fn, list(x, na.rm = TRUE)), age(expected, "day"))
+    expect_identical(do.call(fn, list(x)),
+                     age(do.call(fn, list(c(1.25, 2.75, NA))), "day"))
+  }
+  expect_identical(median(age(unit = "day")), age(NA_real_, "day"))
+  expect_true(is.nan(as.numeric(mean(age()))))
+  for (fn in c("min", "max", "range")) {
+    expect_error(suppressWarnings(do.call(fn, list(age()))), "nonnegative and finite")
+    expect_error(suppressWarnings(do.call(fn, list(age(NA_real_), na.rm = TRUE))), "nonnegative and finite")
+  }
+  for (fn in c("sum", "prod", "log", "exp", "sqrt")) {
+    expect_error(do.call(fn, list(x)), "not defined for ages")
+  }
+})

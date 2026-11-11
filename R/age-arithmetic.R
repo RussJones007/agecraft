@@ -31,3 +31,10 @@ vec_arith.numeric.age <- function(op, x, y, ...) {
   if (op != "+") vctrs::stop_incompatible_op(op, x, y)
   vec_arith.age.numeric(op, y, x, ...)
 }
+
+
+# Median is not routed through vec_math by vctrs.
+#' @exportS3Method
+median.age <- function(x, na.rm = FALSE, ...) {
+  new_age(stats::median(vctrs::vec_data(x), na.rm = na.rm, ...), attr(x, "unit"))
+}

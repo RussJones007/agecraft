@@ -78,3 +78,13 @@ Do not silently resolve these open design questions by changing public behavior.
   the arithmetic dispatch rejects them. R can resolve conflicting S3 operator
   methods outside vctrs, so mixing independent vector classes is not supported.
 - Focused age-class/arithmetic tests passed after documentation generation.
+
+### Step 4 — transformations and summaries
+
+- Retained the existing rounding, floor, ceiling, truncation, absolute-value,
+  mean and extrema methods. Added `median.age()` because vctrs does not route
+  median through `vec_math`. All age results use central validation.
+- Missing results remain missing; empty extrema or all-missing extrema with
+  removal still reject infinite results. No clamping or invented empty values.
+- Added regression coverage for supported methods and rejection of sums,
+  products, logs, exponentials and square roots.
