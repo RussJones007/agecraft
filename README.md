@@ -357,3 +357,11 @@ For example, `names(modified$groups)[1] <- "Revised category"` creates a local
 `_derived` identity, clears verification, and retains original identity/source
 metadata in `derived_from`. Changing the descriptive title does not create a
 derivative. See the age-schemes guide for batch edits and tracking limits.
+
+### Optional external catalogue
+
+With `mudnester` installed, `import_mudnester_scheme("abs_5yr")` imports a
+validated, unverified scheme; `mudnester_catalogue()` exposes upstream provenance,
+package snapshot version and known issues. Imports warn about applicability and
+preserve numeric boundaries and labels faithfully. The eight legacy schemes
+and numeric presets are unchanged. See the age-schemes vignette for caveats.

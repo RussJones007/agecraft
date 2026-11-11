@@ -168,3 +168,23 @@ Scheme implementation should be additive and must not silently change `calculate
 - [`age_scheme.md`](age_scheme.md) — detailed scheme proposal, if placed alongside this file.
 
 This document summarizes repository state and our design discussions. It does not certify external CDC/WHO scheme editions or claim that proposed functions already exist.
+
+## Optional mudnester interoperability — 2026-11-11
+
+Additive public APIs `import_mudnester_scheme(id)` and `mudnester_catalogue()`
+read the optional package's public dataset using `utils::data()` in a private
+environment. Exact upstream IDs are required; returned IDs use `mudnester_`.
+The legacy registry and numeric presets are unchanged. Adjacent numeric breaks
+construct validated right-open groups; years/days map to year/day without
+coordinate conversion. Schema, breaks, labels and band counts are validated.
+Imported definitions are unverified; organization and external edition remain
+unknown. Source/source URL populate source/reference when present. Package
+snapshot versions live in companion metadata and notes, separately from the
+scheme's guidance-edition field. Companion rows preserve upstream provenance
+and expose conservative issue diagnostics. Save the table with the scheme; it
+reflects the installed catalogue, not historical imports or derivatives.
+Imports warn about applicability and identified issues without correcting them.
+Numerical completeness cannot establish clinical applicability or eligibility.
+Ordinary edits retain existing derivative tracking; no extra scheme fields or
+undocumented attributes are introduced. This is optional interoperability,
+not an independently authoritative built-in catalogue.

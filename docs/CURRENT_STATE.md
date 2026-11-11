@@ -2,6 +2,40 @@
 
 Version: **0.1.0.9016** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
 
+## Optional mudnester catalogue interoperability — 2026-11-11
+
+- Added `import_mudnester_scheme(id)` and `mudnester_catalogue()` as additive
+  public APIs, with mudnester in Suggests only. The importer reads the public
+  dataset into a private environment, validates schema and rows, and constructs
+  ordinary validated schemes using adjacent numeric breaks and unchanged labels.
+  Year/day units map without coordinate conversion; unknown IDs and malformed
+  catalogues fail actionably. The eight legacy registry entries and numeric
+  presets retain their behavior.
+- Imported schemes remain unverified. Package snapshot versions are separate
+  from unknown guidance editions; no organization is inferred from an ID.
+  Companion metadata preserves upstream fields, missing information and issue
+  diagnostics without extending the validated scheme representation. Save it
+  alongside imported definitions for reproducibility across package upgrades.
+- Confirmed the reported COVID-19, UNICEF and approximate neonatal issues in
+  the CRAN 0.7.8 catalogue; imports preserve them and warn. Numerical coverage
+  does not establish clinical applicability or eligibility. Fixtures contain
+  only five attributed rows with the upstream MIT copyright/license notice.
+- Documentation includes generated help, vignette import/classification and
+  provenance inspection, README, NEWS, architecture, scheme and API policy.
+- Validation: `devtools::document()` completed; final focused tests passed
+  338 assertions with mudnester 0.7.8 in a temporary library. Without mudnester,
+  137 assertions passed and only installed-catalogue integration was skipped.
+  The full `devtools::test()` passed 3,122 assertions without failures, warnings
+  or skips. The affected vignette rendered successfully. After qualifying
+  utils calls to resolve an initial namespace note, final
+  `devtools::check(document = FALSE,
+  check_dir = "/tmp/agecraft-mudnester-final-check")` completed with 0 errors,
+  0 warnings and 0 notes, including installed tests and all vignette rebuilds.
+  `git diff --check` passed. Logs: `/tmp/agecraft-mudnester-final-tests.log`,
+  `/tmp/agecraft-mudnester-final-focused.log`,
+  `/tmp/agecraft-mudnester-final-offline.log`, and
+  `/tmp/agecraft-mudnester-final-check.log` (temporary local artifacts).
+
 ## Classification policy documentation — 2026-11-11
 
 - Document duplicate intervals versus duplicate labels, partition rejection,

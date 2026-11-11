@@ -1,5 +1,10 @@
 # agecraft 0.1.0.9016
 
+* Added optional `import_mudnester_scheme()` and `mudnester_catalogue()` APIs.
+  Imports preserve catalogue boundaries/labels and remain unverified; companion
+  provenance separates package snapshots from guidance editions and reports
+  known issues. `mudnester` is Suggested; the legacy registry is unchanged.
+
 ## Classification documentation and regression coverage
 
 - Clarify that identical intervals overlap and are invalid in partitions, while

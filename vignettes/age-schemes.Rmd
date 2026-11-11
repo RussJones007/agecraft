@@ -332,3 +332,42 @@ The implementation stores no definition snapshots, timestamps or full history.
 Structural validation checks actual interval metadata and ancestry shape; it
 cannot prove source authenticity or detect valid changes made through such
 bypasses. Catalog presets remain unverified historical definitions.
+
+## Optional mudnester catalogue imports
+
+Install `mudnester` separately to use its public catalogue. Imports preserve
+numeric coordinates, labels and their order, including known inconsistencies.
+Use namespace-qualified discovery because both packages export `list_age_schemes()`:
+`agecraft::list_age_schemes()` still lists only the eight legacy schemes;
+`mudnester::list_age_schemes()` describes the external catalogue.
+
+```{r mudnester-import, eval=requireNamespace("mudnester", quietly=TRUE)}
+catalogue <- agecraft::mudnester_catalogue()
+scheme <- agecraft::import_mudnester_scheme("abs_5yr")
+agecraft::categorize_age(agecraft::age(c(0, 4.9, 5), unit = "year"), by = scheme)
+catalogue[catalogue$scheme == "abs_5yr", ]
+scheme$verified # FALSE, even for non-illustrative upstream definitions
+```
+
+Save the companion table alongside the imported scheme: it preserves `scheme`,
+`family`, `focus_tags`, `source`, `source_url`, `last_checked`, `is_illustrative`,
+and the installed `package_version`, plus `imported_id` and a list of `issues`.
+It reads the currently installed catalogue, not historical imports or edited
+objects. The package snapshot is not the external guidance edition; the latter
+remains unknown (`scheme$version` is NULL). Missing source information stays
+missing. Neither a check date, a non-illustrative flag, nor an organization-like
+identifier independently verifies guidance. Catalogue definitions are copyright
+2026 Nicolas Smoll, Sunshine Coast Hospital and Health Service, under MIT;
+see [mudnester](https://github.com/nrsmoll/mudnester) and its LICENSE.
+
+Every import warns about applicability, with additional diagnostics in the
+companion table and scheme notes. Version 0.7.8 includes COVID-19 severity labels
+that disagree with numeric boundaries, UNICEF's `"0-1"` label on `[0,1)`, and an
+approximate `28/365.25`-year neonatal boundary. These remain unchanged; year
+coordinates are not converted to exact elapsed days. Some definitions are
+illustrative or have no source URL. Catch-all categories may extend beyond a
+scheme's substantive scope, and age-only guidance may collapse risk distinctions.
+Numerical completeness over `[0, Inf)` does not establish clinical applicability
+or eligibility. Review the actual guidance before applying it. Any correction
+belongs in a separately identified local derivative, using ordinary scheme edits
+and their existing ancestry tracking.
