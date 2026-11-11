@@ -1,3 +1,28 @@
+## Age arithmetic — 2026-11-11
+
+- Added numeric addition/subtraction offsets and age addition through vctrs
+  double dispatch. Numeric offsets use the age unit; right-hand ages convert
+  to left-hand units through existing conversion safeguards. Calendar conversion
+  still requires explicit approximation consent before arithmetic. Fractional
+  precision, names, unit metadata and nonnegative finite validation are retained.
+- Age minus age and numeric minus age remain unsupported by explicit decision.
+  Common-type, comparison, classification, date-ordering and interval/scheme
+  semantics remain unchanged. No dependencies or public signatures changed.
+- Added unit-preserving median dispatch. Existing rounding, absolute values,
+  means and extrema retain their behavior; invalid infinite extrema error.
+  Sums, products, logs, exponentials and division remain unsupported.
+- Completed all steps in `age_arithmetic_implementation_plan.md` with separate
+  commits for inspection/validation, arithmetic, summaries, a stats median
+  registration correction, and final integration/documentation.
+- `devtools::document()` completed. Full `devtools::test()` passed 3,091 assertions
+  with zero failures/warnings and one skip for optional mudnester. Final
+  `devtools::check(document = FALSE,
+  check_dir = "/tmp/agecraft-arithmetic-final-check")` completed with 0 errors,
+  0 warnings and 0 notes, including installed tests, examples and all vignette
+  rebuilds. `git diff --check` passed. Temporary logs:
+  `/tmp/agecraft-arithmetic-tests.log` and
+  `/tmp/agecraft-arithmetic-final-check.log`.
+
 ## Age display — 2026-11-11
 
 - `age` printing shows the unit once in the class or tibble column header.

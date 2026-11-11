@@ -1,7 +1,8 @@
 # Age arithmetic implementation plan
 
 **Project:** Agecraft\
-**Purpose:** Codex implementation instructions; proposed behavior, not yet implemented.
+**Purpose:** Implementation instructions and completion record.
+**Status:** Implemented on the arithmetic branch; see the implementation record below.
 
 ## Scope and prerequisites
 
@@ -88,3 +89,25 @@ Do not silently resolve these open design questions by changing public behavior.
   removal still reject infinite results. No clamping or invented empty values.
 - Added regression coverage for supported methods and rejection of sums,
   products, logs, exponentials and square roots.
+
+### Step 5 — integration, documentation and validation
+
+- Added exact `[5, 10)` boundary comparisons and classification tests after
+  numeric offsets, plus mixed elapsed-unit classification and open-ended groups.
+  Scheme-backed classification and unsupported group/scheme arithmetic remain
+  unchanged. Updated roxygen help, README, vignette, NEWS and API policy.
+- Full `devtools::test()` passed 3,091 assertions with zero failures or warnings
+  and one skip for the absent optional mudnester package.
+- Initial installed-package check exposed an unqualified stats median S3
+  registration; corrected it to `stats::median` and reran the package check.
+- Steps 1–5 are complete. No new dependencies, date-ordering changes, interval
+  arithmetic, scheme arithmetic, approximate-conversion defaults or public
+  function signature changes were introduced. Operators intentionally extend
+  the previously unsupported arithmetic behavior.
+
+- Final `devtools::check(document = FALSE,
+  check_dir = "/tmp/agecraft-arithmetic-final-check")` completed with 0 errors,
+  0 warnings and 0 notes, including installed tests, examples and rebuilding
+  all vignettes. `git diff --check` passed. Logs:
+  `/tmp/agecraft-arithmetic-tests.log` and
+  `/tmp/agecraft-arithmetic-final-check.log` (temporary local artifacts).

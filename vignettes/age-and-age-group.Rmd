@@ -160,8 +160,9 @@ visits[which(visits$age_years < age(1, unit = "year")), c("id", "age_years")]
 ```
 
 Age vectors must have matching units when you combine or compare them. Means,
-extrema, and rounding retain the class. General arithmetic and transformations
-such as logarithms are deliberately unsupported. If an analysis needs plain
+medians, extrema, and rounding retain the class. Numeric offsets and age
+addition are supported as described below; transformations such as logarithms
+are deliberately unsupported. If an analysis needs plain
 numbers, explicitly extract them with `as.numeric()` and keep their unit clear
 in the surrounding code.
 
@@ -196,6 +197,25 @@ data.frame(id = visits$id,
 The two numeric columns can differ. If exact elapsed days matter, calculate
 in days directly from the dates. Setting `allow_approx = TRUE` acknowledges
 the approximation; it does not make the conversion calendar-exact.
+
+### Arithmetic with ages
+
+Numeric offsets use the age vector's unit, retaining fractions and metadata.
+Negative results error rather than being clamped to zero. Adding two ages
+converts the right age to the left unit, so the result unit depends on order.
+Calendar conversion still requires explicit approximation consent before addition.
+Age minus age and numeric minus age are unsupported; signed differences require
+explicit numeric extraction in a common unit. Multiplication, division and sums
+remain unsupported. Means, medians, extrema and rounding retain age units.
+
+```{r}
+age(25, "year") + 1
+age(25, "year") - 25
+age(2, "week") + age(3.5, "day")
+age(3.5, "day") + age(2, "week")
+age(2, "year") + as_age(age(6, "month"), "year", allow_approx = TRUE)
+median(age(c(1.25, 2.75), "day"))
+```
 
 ### Age function reference
 

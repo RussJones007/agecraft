@@ -1,5 +1,10 @@
 # agecraft 0.1.0.9017
 
+- Support numeric age offsets and age addition with right-to-left unit conversion,
+  preserving fractions and nonnegative validation. Calendar conversions require
+  explicit approximation consent before arithmetic. Age minus age remains
+  unsupported. Add unit-preserving medians and arithmetic regression coverage.
+
 - Print `age` units once in the class or tibble column header. `format(age)`
   now returns numeric strings without unit suffixes, including when
   `fractional = TRUE`; stored precision and units are unchanged.

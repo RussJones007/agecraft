@@ -141,9 +141,23 @@ as_age(elapsed_days, unit = "week")
 
 Names, units, and fractional precision survive slicing, sorting, repetition,
 concatenation, and data-frame binding. Combining or comparing age vectors requires
-matching units. Means, extrema, and rounding retain the class; general arithmetic
-and other mathematical transformations require explicit numeric extraction or
-conversion to units vectors. Negative and infinite ages are rejected.
+matching units. Means, medians, extrema, and rounding retain the class.
+Numeric offsets use the age's unit; addition of two ages converts the right age
+to the left age's unit. Negative or infinite results are rejected. Age minus age,
+numeric minus age, multiplication, division, sums and general transformations
+remain unsupported.
+
+```r
+age(25, "year") + 1                 # 26 years
+age(25, "year") - 25                # zero years
+age(2, "week") + age(3.5, "day")     # 2.5 weeks
+age(3.5, "day") + age(2, "week")     # 17.5 days
+# Calendar conversion still needs explicit approximation consent:
+age(2, "year") + as_age(age(6, "month"), "year", allow_approx = TRUE)
+```
+
+Arithmetic preserves stored fractions and uses vctrs scalar recycling rules.
+Convert time-units objects with `as_age()` before using them in arithmetic.
 
 Conversions between finer units and months/years require `allow_approx = TRUE`:
 

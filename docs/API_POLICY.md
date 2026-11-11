@@ -178,3 +178,18 @@ Numerical completeness cannot establish clinical applicability or eligibility.
 Ordinary edits retain existing derivative tracking; no extra scheme fields or
 undocumented attributes are introduced. This is optional interoperability,
 not an independently authoritative built-in catalogue.
+
+## Age arithmetic
+
+Plain numeric addition/subtraction offsets use the age operand's unit and return
+validated nonnegative ages. Numeric plus age is supported; numeric minus age and
+age minus age are unsupported. Age plus age treats the right age as an elapsed
+offset and converts it to the left unit via existing `as_age()` safeguards.
+This left-unit precedence is specific to arithmetic; common types, casts,
+concatenation and comparisons continue to require matching units. Calendar
+conversion requires explicit `as_age(..., allow_approx = TRUE)` before arithmetic.
+No operator silently opts into approximation. Values retain fractions, names,
+class and units, with vctrs size/recycling rules and missing-value propagation.
+Mean, median, extrema, absolute values and rounding retain the class. Invalid
+infinite extrema error; sums, multiplication, division, logs and exponentials
+remain unsupported. Age-group and scheme arithmetic are outside this contract.
