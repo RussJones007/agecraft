@@ -71,7 +71,10 @@ not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf
 in sorted interval order.}
 
 \item{convert_units}{Which side to convert: "age_to_group", "group_to_age",
-or "none". Numeric cuts inherit the input age unit.}
+or "none". Numeric cuts inherit the input age unit. Near boundaries,
+floating-point rounding can make the two conversion directions classify
+differently. See the Floating-point precision section in \code{\link[=age]{age()}} for
+consistent-unit guidance and the limits of \code{"none"}.}
 
 \item{allow_approx}{Allow potentially approximate numerical conversion between
 month and year, or between either calendar unit and smaller units. Defaults

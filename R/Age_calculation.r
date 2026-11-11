@@ -200,7 +200,10 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' @param multiple How to resolve multiple matches: "error", "first", or "last",
 #'   in sorted interval order.
 #' @param convert_units Which side to convert: "age_to_group", "group_to_age",
-#'   or "none". Numeric cuts inherit the input age unit.
+#'   or "none". Numeric cuts inherit the input age unit. Near boundaries,
+#'   floating-point rounding can make the two conversion directions classify
+#'   differently. See the Floating-point precision section in [age()] for
+#'   consistent-unit guidance and the limits of `"none"`.
 #' @param allow_approx Allow potentially approximate numerical conversion between
 #'   month and year, or between either calendar unit and smaller units. Defaults
 #'   to FALSE. Calendar month and year coordinates cannot generally be converted

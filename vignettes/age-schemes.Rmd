@@ -80,6 +80,41 @@ categorize_age(x, by = five_year)
 # errors: an age must have a supported simple time unit
 ```
 
+## Floating-point boundaries
+
+Age values are stored as double-precision numbers. Unit conversions can round
+these values, including conversions between elapsed-time units with exact scale
+relationships. When an observation is extremely close to a category boundary,
+converting ages to group units can classify differently from converting group
+boundaries to age units. For example, with the conversion backend used here:
+
+```{r floating-point-boundary}
+g <- age_group(c(0, 11), c(11, Inf), unit = "second")
+names(g) <- c("Under eleven", "Eleven or more")
+seconds <- age_scheme(g, "seconds", "Second categories")
+x <- as_age(age(11, unit = "second"), unit = "day")
+sprintf("%.17g", as.numeric(as_age(x, unit = "second")))
+# "10.999999999999998"
+classify_age_scheme(x, seconds, convert_units = "age_to_group")$label
+# "Under eleven"
+classify_age_scheme(x, seconds, convert_units = "group_to_age")$label
+# "Eleven or more"
+```
+
+In the first path the converted observation is below 11 seconds; in the second,
+the converted boundary equals the stored day value. This floating-point effect
+also applies to `categorize_age()` and `age_cat_iv()`. Intervals retain exact
+half-open `[start, end)` semantics in the matching coordinates, with no implicit
+numerical tolerance or snapping of nearby values.
+
+Use consistent units for observations and definitions when precise boundary
+classification matters. `convert_units = "none"` prevents additional
+classification-time conversion by rejecting different units. It cannot recover
+precision already lost: converting `x` back to seconds first still leaves it below
+11 on this backend. Supplying `age(11, unit = "second")` directly and classifying
+with `"none"` includes it in "Eleven or more". See `?age` for the shared precision
+policy; calendar approximation is a separate issue described next.
+
 ## Calendar conversion and exact classification
 
 Calendar months and years use different anniversary intervals. A fractional

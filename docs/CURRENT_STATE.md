@@ -2,6 +2,23 @@
 
 Version: **0.1.0.9015** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
 
+## Floating-point precision policy documentation — 2026-11-11
+
+- Retain existing double-precision conversion and classification algorithms,
+  exact half-open predicates and conversion-direction options; no numerical
+  tolerance, new dependencies, public API change or version increment.
+- Document possible rounding and direction-dependent membership near boundaries,
+  consistent-unit guidance, and why `convert_units = "none"` cannot recover
+  earlier precision loss. Add the 11-second example to the age-scheme vignette
+  and cross-reference the shared precision section in age help.
+- `devtools::document()` completed. Targeted
+  `devtools::test(filter = "^floating-point-boundaries$")` passed 21 assertions
+  with zero failures, warnings or skips. The updated vignette rendered with
+  `rmarkdown::render()` into `/tmp/agecraft-floating-point-vignette`.
+  Parsed executable R expressions are unchanged; `git diff --check` passed.
+  Full tests and R CMD check were not rerun for this documentation/test-only
+  change. Log: `/tmp/agecraft-floating-point-targeted.log`.
+
 ## Complete underlying interval validation — 2026-11-11
 
 - Added private `validate_age_group()` for stored ivs/vctrs record layout,

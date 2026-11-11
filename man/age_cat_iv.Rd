@@ -31,7 +31,9 @@ One of "error" (default), "first", or "last".}
 One of "age_to_group" (default), "group_to_age", or "none".
 Groups without units are interpreted in the units of \code{age}, when present,
 without changing their interval boundaries. Unitless ages with explicitly
-unit-bearing groups remain an error.}
+unit-bearing groups remain an error. Near-boundary results can depend on
+conversion direction through floating-point rounding; see the Floating-point
+precision section in \code{\link[=age]{age()}} for consistent-unit guidance and \code{"none"}.}
 
 \item{allow_approx}{logical; if FALSE (default), block conversions between fine units
 (second/minute/hour/day/week) and coarse units (month/year), or between month

@@ -10,7 +10,9 @@
 #'   numeric observations; schemes do not infer it.
 #' @param scheme A validated `age_scheme`.
 #' @param convert_units Conversion direction: `"age_to_group"` (default),
-#'   `"group_to_age"`, or `"none"`.
+#'   `"group_to_age"`, or `"none"`. Near-boundary results can depend on conversion
+#'   direction through floating-point rounding; see the Floating-point precision
+#'   section in [age()] for consistent-unit guidance and the limits of `"none"`.
 #' @param allow_approx Allow potentially approximate numerical conversion between
 #'   month and year, or between either calendar unit and finer units. Defaults to
 #'   FALSE, as in [categorize_age()]. Calendar month and year coordinates cannot

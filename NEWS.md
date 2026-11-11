@@ -1,5 +1,14 @@
 # agecraft 0.1.0.9015
 
+## Floating-point precision documentation
+
+- Document retained double-precision conversion and classification behavior:
+  near-boundary results can depend on conversion direction. Recommend consistent
+  units and explain that `convert_units = "none"` avoids additional conversion
+  but cannot recover earlier precision loss. Add the 11-second example and
+  focused regression tests; half-open semantics have no implicit tolerance.
+  No numerical algorithms, public APIs, dependencies or version changed.
+
 ## Complete scheme interval validation
 
 - Validate the actual stored `age_group` record inside schemes, including its

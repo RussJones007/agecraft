@@ -24,7 +24,9 @@ numeric observations; schemes do not infer it.}
 \item{scheme}{A validated \code{age_scheme}.}
 
 \item{convert_units}{Conversion direction: \code{"age_to_group"} (default),
-\code{"group_to_age"}, or \code{"none"}.}
+\code{"group_to_age"}, or \code{"none"}. Near-boundary results can depend on conversion
+direction through floating-point rounding; see the Floating-point precision
+section in \code{\link[=age]{age()}} for consistent-unit guidance and the limits of \code{"none"}.}
 
 \item{allow_approx}{Allow potentially approximate numerical conversion between
 month and year, or between either calendar unit and finer units. Defaults to

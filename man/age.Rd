@@ -69,6 +69,25 @@ age from the original dates directly in the scheme's unit.
 Month/year conversions now require \code{allow_approx = TRUE}; this also applies to
 time-units input, since its calculation basis is not known.
 }
+\section{Floating-point precision}{
+
+Age values are stored as double-precision numbers. Converting between time
+units can introduce floating-point rounding, even when the unit relationship
+is exact (for example, days and seconds). Repeated conversions need not recover
+the original stored value.
+
+Classification retains exact half-open \verb{[start, end)} comparisons on the
+coordinates used for matching, with no implicit numerical tolerance. Values
+extremely close to a category boundary may classify differently depending on
+whether \code{convert_units = "age_to_group"} converts observations or
+\code{convert_units = "group_to_age"} converts category boundaries.
+Use consistent units for ages and definitions when precise boundary
+classification matters. \code{convert_units = "none"} rejects differing units and
+avoids additional classification-time conversion; it cannot recover precision
+lost in earlier conversions. See the age-schemes vignette for an 11-second
+boundary example (\code{vignette("age-schemes", package = "agecraft")}).
+}
+
 \examples{
 x <- age(c(0.02, 0.5, 2.75, NA), unit = "year")
 x
