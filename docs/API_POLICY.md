@@ -11,7 +11,10 @@ for compatibility; use `as.character()` and `as.age_group()` in new code.
 ## Age precision and return formats
 
 `calculate_age()` defaults to `output = "age"`, retaining fractional precision
-with one explicit time unit per vector. Printing displays completed whole units;
+with one explicit time unit per vector. Printing shows the unit once in the
+class or tibble column header and displays completed whole units without suffixes.
+`format()` returns numeric strings without unit suffixes (also with
+`fractional = TRUE`), an intentional change from unit-suffixed strings;
 `as.numeric()` extracts the fractions and `as.integer()` extracts completed units.
 Years and months use calendar anniversaries; finer units use elapsed time.
 

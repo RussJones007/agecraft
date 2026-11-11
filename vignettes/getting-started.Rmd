@@ -37,7 +37,7 @@ The main functions we will use are `calculate_age()` and `categorize_age()`.
 An R class tells R what a value represents and how functions should handle it. The
 package's S3 class, `age`, represents an age with a time unit. When objects of that class 
 are constructed, it stores a number plus the unit of time like day, week, year. 
-Its class lets R display **2.75 year** as **2 year** while keeping the full value.
+Its class lets R display **2.75 years** as **2**, with the unit in the class header, while keeping the full value.
 
 An `age` vector can:
 
@@ -56,7 +56,7 @@ as.numeric(example_age)
 as.integer(example_age)
 ```
 
-The printed age is `2 year`, but the stored value is **2.75 years**.
+The printed age is `2` under a year header, but the stored value is **2.75 years**.
 `as.numeric()` extracts the whole and fractional value; `as.integer()` extracts the
 completed whole units. Printing the age does not round or change its value.
 To display the fractions explicitly, use the format() function:
@@ -243,7 +243,7 @@ table(fine_category)
 ```
 
 Classification uses the stored fractions, even when both a neonatal age and
-an infant age print as `0 year`. The cutoff `0.077` years approximates 28 days;
+an infant age print as `0` under a year header. The cutoff `0.077` years approximates 28 days;
 it is not an exact calendar-day boundary. If an exact 28-day cutoff matters,
 calculate the ages in days and define groups in days.
 

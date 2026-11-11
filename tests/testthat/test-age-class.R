@@ -7,9 +7,9 @@ test_that("age stores fractional precision with one validated time unit", {
   expect_identical(attr(x, "unit"), "year")
   expect_identical(as.numeric(x), c(0.02, 0.5, 2.75, NA_real_))
   expect_identical(as.integer(x), c(0L, 0L, 2L, NA_integer_))
-  expect_identical(format(x), c("0 year", "0 year", "2 year", NA_character_))
-  expect_identical(format(x, fractional = TRUE), c("0.02 year", "0.50 year", "2.75 year", NA_character_))
-  expect_output(print(x), "2 year")
+  expect_identical(format(x), c("0", "0", "2", NA_character_))
+  expect_identical(format(x, fractional = TRUE), c("0.02", "0.50", "2.75", NA_character_))
+  expect_output(print(x), "age<year>")
   expect_length(age(), 0)
   expect_identical(as.numeric(age(1:3)), c(1, 2, 3))
   expect_false(is_age(2.5))
@@ -91,4 +91,27 @@ test_that("classification uses fractional age values and explicit units", {
   expect_error(categorize_age(days, by = groups), "approximate")
   expect_identical(as.character(categorize_age(days, by = groups, allow_approx = TRUE)), rep("Neonate", 3))
   expect_length(categorize_age(age(), by = groups), 0)
+})
+
+
+test_that("age display puts units in headers and leaves values numeric", {
+  for (unit in c("second", "minute", "hour", "day", "week", "month", "year")) {
+    x <- age(c(a = 10.75, b = 5.25, c = NA_real_), unit)
+    expect_identical(format(x), c(a = "10", b = "5", c = NA_character_))
+    printed <- capture.output(print(x))
+    expect_match(printed[1], paste0("age<", unit, ">"), fixed = TRUE)
+    expect_false(any(grepl(unit, printed[-1], fixed = TRUE)))
+    invisible(capture.output(result <- withVisible(print(x))))
+    expect_identical(result$visible, FALSE)
+    expect_identical(format(age(numeric(), unit)), character())
+    expect_output(print(age(numeric(), unit)), paste0("age<", unit, ">"), fixed = TRUE)
+    expect_identical(format(age(NA_real_, unit)), NA_character_)
+    expect_identical(as.numeric(x), c(10.75, 5.25, NA_real_))
+    expect_identical(attr(x, "unit"), unit)
+    if (requireNamespace("tibble", quietly = TRUE)) {
+      column <- capture.output(print(tibble::tibble(value = x)))
+      expect_true(any(grepl(paste0("age<", unit, ">"), column, fixed = TRUE)))
+      expect_false(any(grepl(paste0("[0-9] +", unit), column)))
+    }
+  }
 })

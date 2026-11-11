@@ -1,5 +1,9 @@
 # agecraft 0.1.0.9017
 
+- Print `age` units once in the class or tibble column header. `format(age)`
+  now returns numeric strings without unit suffixes, including when
+  `fractional = TRUE`; stored precision and units are unchanged.
+
 ## Optional mudnester catalogue interoperability
 
 - Add `import_mudnester_scheme(id)` to convert exact upstream catalogue IDs into

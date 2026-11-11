@@ -296,7 +296,7 @@ table(visits$category, useNA = "ifany")
 The result is an ordered factor, with levels in interval order. The category
 names become its labels and therefore the labels in `table()`. Classification
 uses full fractional ages: the newborn and older infant both display as
-`0 year`, but enter different categories.
+`0` under a year header, but enter different categories.
 
 Unnamed groups use interval labels. Missing or blank names fall back to
 interval labels, and distinct intervals must have unique resulting labels.

@@ -1,3 +1,16 @@
+## Age display — 2026-11-11
+
+- `age` printing shows the unit once in the class or tibble column header.
+  `format.age()` returns numeric strings without unit suffixes, including with
+  `fractional = TRUE`. Whole-unit flooring, missing values, names, stored
+  precision and unit metadata are preserved. This intentionally changes formatted
+  strings; no public signatures or numerical behavior change.
+- Updated regression tests, roxygen help, README, vignettes, NEWS and API policy.
+  `devtools::document()` completed. Full `devtools::test()` passed 2,998 assertions
+  with zero failures or warnings and one skip because optional mudnester is not
+  installed. `git diff --check` passed. Full R CMD check was not run.
+  Test log: `/tmp/agecraft-age-display-tests.log` (temporary local artifact).
+
 # agecraft current state — 2026-11-11
 
 Version: **0.1.0.9017** (development). Branch: `main`. Requires R >= 4.1.0.

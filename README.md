@@ -97,7 +97,7 @@ Supported units are `"year"` (default), `"month"`, `"week"`, `"day"`, `"hour"`,
 
 ```r
 x <- calculate_age(as.Date("2024-01-01"), as.Date("2024-07-02"))
-x                            # displays 0 year
+x                            # displays 0, with year in the class header
 as.numeric(x)                # 0.5: full fractional precision
 as.integer(x)                # 0: completed whole units
 format(x, fractional = TRUE) # display the fraction
@@ -176,7 +176,7 @@ categorize_age(fine_ages, by = fine_groups)
 
 The `0.077`-year cutoff approximates 28 days. Use day-based ages and groups when
 an exact day boundary matters. Classification uses the stored fractional values,
-even when several ages display as `0 year`.
+even when several ages display as `0` under a year header.
 
 Use `as.age_group()` for supported completed-age labels, factors of those labels,
 numeric cut points, or `ivs::iv()` intervals:

@@ -6,7 +6,7 @@ test_that("calculate_age defaults to fractional age with completed display", {
   expect_identical(attr(x, "unit"), "year")
   expect_equal(as.numeric(x), c(0, 0.5, 1, NA))
   expect_identical(as.integer(x), c(0L, 0L, 1L, NA_integer_))
-  expect_identical(format(x), c("0 year", "0 year", "1 year", NA_character_))
+  expect_identical(format(x), c("0", "0", "1", NA_character_))
   expect_identical(calculate_age(start, end, output = "numeric"), c(0, 0, 1, NA_real_))
   legacy <- calculate_age(start, end, output = "units")
   expect_s3_class(legacy, "units")

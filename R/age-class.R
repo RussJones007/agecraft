@@ -26,6 +26,8 @@
 #'
 #' `as.numeric()` extracts full precision and `as.integer()` extracts completed units. `format(x, fractional = TRUE)` shows
 #' fractions; `format(x)` and printing show completed whole units (floor).
+#' Formatted values contain numbers without unit suffixes. Printing shows the
+#' unit once in the class header, including in tibble column headers.
 #' Names, units and precision survive slicing, sorting, repetition and binding.
 #' Combining or comparing ages requires matching units; convert explicitly with
 #' `as_age(x, unit = ...)` first. Bare numbers are not implicitly combined with
@@ -146,7 +148,7 @@ format.age <- function(x, ..., fractional = FALSE) {
   }
   values <- vctrs::vec_data(x)
   if (!fractional) values <- floor(values)
-  out <- paste(format(values, trim = TRUE, ...), attr(x, "unit"))
+  out <- format(values, trim = TRUE, ...)
   out[is.na(values)] <- NA_character_
   names(out) <- names(x)
   out
