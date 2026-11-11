@@ -44,8 +44,7 @@ print.age_scheme <- function(x, ...) {
 #' @rdname age_scheme_methods
 #' @export
 summary.age_scheme <- function(object, ...) {
-  validate_age_scheme(object)
-  coverage <- age_scheme_coverage(object$groups, object$domain)
+  coverage <- age_scheme_assess(object)
   c(object[setdiff(names(object), "groups")],
     list(unit = get_unit(object$groups), n_groups = length(object$groups),
          overlaps = coverage$overlaps, gaps = coverage$gaps,

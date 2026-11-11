@@ -1,5 +1,15 @@
 # agecraft 0.1.0.9015
 
+## Validation performance
+
+- Detect Boolean scheme overlap by sorting temporary start coordinates and
+  comparing each with the maximum preceding end, avoiding quadratic-size overlap
+  enumeration. Exact half-open comparisons, category order and `ivs` domain-gap
+  detection are unchanged.
+- Reuse the validation assessment in scheme summaries instead of computing
+  coverage twice. Public validation still returns its input invisibly. No public
+  APIs, representations, dependencies or development version changed.
+
 ## Lightweight derivative provenance
 
 - Track ordinary scheme edits through `$<-`, `[[<-` and atomic `[<-` replacement.

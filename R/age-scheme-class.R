@@ -107,6 +107,12 @@ scheme_groups <- function(x) {
 #' @rdname age_scheme
 #' @export
 validate_age_scheme <- function(x) {
+  age_scheme_assess(x)
+  invisible(x)
+}
+
+# Validate before returning the coverage assessment for internal consumers.
+age_scheme_assess <- function(x) {
   required <- c("groups", "id", "name", "type", "domain", "complete", "purpose",
                 "organization", "source", "reference", "version", "verified", "notes")
   if (!is_age_scheme(x) || !is.list(x) || !(identical(names(x), required) ||
@@ -198,5 +204,5 @@ validate_age_scheme <- function(x) {
   if (!is.na(x$complete) && x$complete != coverage$covered) {
     stop("complete does not agree with domain coverage", call. = FALSE)
   }
-  invisible(x)
+  coverage
 }

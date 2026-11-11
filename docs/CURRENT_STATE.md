@@ -2,6 +2,42 @@
 
 Version: **0.1.0.9015** (development). Branch: `age_scheme`. Requires R >= 4.1.0.
 
+## Minimal validation optimization — 2026-11-11
+
+- Boolean overlap detection uses sorted temporary starts and cumulative maximum
+  preceding ends with strict `<` comparisons. It no longer enumerates overlapping
+  pairs. Stored groups/labels remain in their original order; `ivs` set difference
+  still computes gaps and coverage. No tolerance, cache or persistent state added.
+- A private validation worker returns the assessment for summary reuse. Summary
+  validates and assesses once; public `validate_age_scheme()` retains its invisible
+  input return and the existing validation order and errors.
+- Added 180 targeted assertions covering adjacency, overlaps, nesting, duplicates,
+  unsorted/fractional/infinite bounds, tiny gaps, partition policies, completeness,
+  category order, classifications, invisible validation return and a single summary
+  assessment. Includes 100 randomized cases with an independent pairwise oracle.
+  Targeted scheme, calendar-conversion and floating-point-boundary tests passed
+  1,706 assertions with no failures, warnings or skips. Log:
+  `/tmp/agecraft-finding6-tests.log`. No full suite or R CMD check run for this task.
+- Benchmarked full validation on R 4.6.1 / ivs 0.2.0 against isolated committed
+  definitions in the same process, outside the regression suite. Elapsed values
+  are medians of three batches of ten warmed calls; allocation is total Rprofmem
+  allocation per call (not peak memory). Construction is excluded.
+
+  | Scheme | Before ms | After ms | Before MiB | After MiB |
+  | --- | ---: | ---: | ---: | ---: |
+  | 10-category partition | 1.8 | 1.6 | 0.044 | 0.003 |
+  | 10,000-category partition | 10.2 | 7.8 | 3.682 | 3.260 |
+  | 1,000-category dense overlap | 28.0 | 2.3 | 29.414 | 0.339 |
+  | 1,000-category nested | 128.7 | 2.2 | 61.311 | 0.327 |
+
+  The investigation baseline was 2.0 / 10.9 / 28.9 / 124.7 ms respectively,
+  with the same allocation totals to the displayed precision. Temporary
+  reproducibility script and results: `/tmp/agecraft-finding6-benchmark.R`,
+  `/tmp/agecraft-finding6-benchmark.csv`. No timing thresholds were added to CI.
+  Sorting, structural validation and ivs gap calculation remain; this does not
+  optimize the size of all-membership classification output.
+- No public API, representation, provenance behavior, dependency or version change.
+
 ## Lightweight derivative provenance — 2026-11-11
 
 - Added `$<-`, `[[<-` and `[<-` methods sharing one update transaction. Exact
