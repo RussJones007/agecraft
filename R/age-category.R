@@ -1,15 +1,13 @@
 #' Categorized ages with retained interval definitions
 #'
-#' An ordered factor whose levels map one-to-one to chronological age intervals.
-#' Subsetting retains unused categories; use `droplevels()` to remove them.
-#' Combining requires matching bounds, labels and units. Convert explicitly with
-#' `generics::as.factor()` or `generics::as.ordered()` to discard interval metadata.
-#' Base coercers leave existing factor subclasses unchanged. Use
-#' `vctrs::vec_rbind()` for binding: base data-frame binding can discard metadata.
-#' Reordering and implicit category merging are rejected. Original exact ages
-#' and scheme provenance are not stored. The legacy `units` attribute describes
-#' observations; definition units live in `groups`. Differing observation units
-#' are dropped on combination; definition units must match.
+#' Creates an age_category object which is an ordered factor whose levels map one-to-one to chronological age intervals.
+#' Subsetting retains unused categories; use `droplevels()` to remove them. When combining two or more of age_category
+#' vectors, they must match on the age intervals used, labels and units.
+#' Convert explicitly with `generics::as.factor()` or `generics::as.ordered()` to discard interval metadata. Base
+#' coercers leave existing factor subclasses unchanged. Use `vctrs::vec_rbind()` for binding: base data-frame binding
+#' can discard metadata. Reordering and implicit category merging are rejected. Original exact ages and scheme
+#' provenance are not stored. The legacy `units` attribute describes observations; definition units live in `groups`.
+#' Differing observation units are dropped on combination; definition units must match.
 #' @param x Character category labels or a factor; missing values are allowed.
 #' @param groups An `age_group` vector in chronological order, with unique labels.
 #' @return `age_category()` returns an ordered-factor subclass;

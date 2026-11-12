@@ -125,7 +125,7 @@ vec_ptype_abbr.age_group <- function(x, ...){"aGrp"}
 #' @exportS3Method vctrs::vec_ptype_full
 vec_ptype_full.age_group <- function(x, ...) {
   unit <- get_unit(x)
-  if (is.null(unit)) "age_group" else paste0("age_group<", unit, ">")
+  if (is.null(unit)) "age_group" else paste0("age_group [", unit, "]")
 }
 
 # functions for restoring attributes -------------------------------------------------------------------------------
