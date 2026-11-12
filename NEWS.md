@@ -1,9 +1,15 @@
-# agecraft 0.1.0.9019
+# agecraft 0.1.0.9020
 
 - Scheme summaries now print provenance and coverage clearly while retaining
   existing list fields (with a new `summary_age_scheme` class). The standard
   `utils::toBibtex()` generic exports scheme metadata and derivative ancestry
   without inferring authors or publication years.
+- Add package badges and runnable arithmetic/classification examples, with a
+  registered HTML vignette and updated README presentation.
+- Increment the development version after the preceding validation; tests and
+  R CMD check were not rerun for this metadata-only version update.
+
+# agecraft 0.1.0.9019
 
 ## Age-category assignments
 
