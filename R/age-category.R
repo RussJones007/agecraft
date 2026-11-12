@@ -8,6 +8,8 @@
 #' can discard metadata. Reordering and implicit category merging are rejected. Original exact ages and scheme
 #' provenance are not stored. The legacy `units` attribute describes observations; definition units live in `groups`.
 #' Differing observation units are dropped on combination; definition units must match.
+#' Printing shows the class, length and category-definition unit in the header.
+#' vctrs type descriptions also use the category-definition unit.
 #' @param x Character category labels or a factor; missing values are allowed.
 #' @param groups An `age_group` vector in chronological order, with unique labels.
 #' @return `age_category()` returns an ordered-factor subclass;
@@ -235,9 +237,26 @@ vec_ptype2.age_category.character <- function(x, y, ...) vec_ptype2.age_category
 #' @exportS3Method vctrs::vec_ptype2
 vec_ptype2.character.age_category <- function(x, y, ...) vec_ptype2.age_category.factor(y, x, ...)
 
+#' @exportS3Method vctrs::vec_ptype_full
+vec_ptype_full.age_category <- function(x, ...) {
+  unit <- attr(category_groups(x), "unit", exact = TRUE)
+  if (is.null(unit)) unit <- "unspecified"
+  paste0("age_category [", unit, "]")
+}
+
+#' @exportS3Method vctrs::vec_ptype_abbr
+vec_ptype_abbr.age_category <- function(x, ...) {
+  unit <- attr(category_groups(x), "unit", exact = TRUE)
+  if (is.null(unit)) unit <- "unk"
+  paste0("aCat-", unit)
+}
+
 #' @export
 print.age_category <- function(x, ...) {
   validate_age_category(x)
+  unit <- attr(attr(x, "groups", exact = TRUE), "unit", exact = TRUE)
+  if (is.null(unit)) unit <- "unknown"
+  cat(sprintf("<age_category[%d]; unit: %s>\n", length(x), unit))
   print(as.ordered.age_category(x), ...)
   invisible(x)
 }

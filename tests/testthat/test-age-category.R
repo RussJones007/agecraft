@@ -108,6 +108,34 @@ test_that("restoration, comparison and names do not lose interval meaning", {
   expect_error(category_groups(broken), "mapping")
 })
 
+test_that("vctrs type descriptions use category-definition units", {
+  x <- categorize_age(age(c(1, NA), unit = "day"),
+                      by = age_group(0, Inf, unit = "week"))
+  for (value in list(x, x[0], x[2])) {
+    expect_identical(vctrs::vec_ptype_full(value), "age_category [week]")
+    expect_identical(vctrs::vec_ptype_abbr(value), "aCat-week")
+  }
+  unitless <- age_category("0-4", age_group(0, 5))
+  expect_identical(vctrs::vec_ptype_full(unitless), "age_category [unspecified]")
+  expect_identical(vctrs::vec_ptype_abbr(unitless), "aCat-unk")
+})
+
+test_that("printing identifies the class and category-definition unit", {
+  x <- categorize_age(age(c(1, 2), unit = "day"),
+                      by = age_group(0, Inf, unit = "week"))
+  expect_identical(capture.output(print(x))[1], "<age_category[2]; unit: week>")
+  expect_identical(capture.output(print(x[FALSE]))[1], "<age_category[0]; unit: week>")
+  expect_identical(capture.output(print(x[NA_integer_]))[1], "<age_category[1]; unit: week>")
+  unitless <- age_category("0-4", age_group(0, 5))
+  expect_identical(capture.output(print(unitless))[1],
+                   "<age_category[1]; unit: unknown>")
+  result <- withVisible(print(x))
+  expect_identical(result$value, x)
+  expect_false(result$visible)
+  expect_identical(capture.output(print(x))[-1],
+                   capture.output(print(generics::as.ordered(x))))
+})
+
 test_that("structural edits are explicit and observation units are separate", {
   x <- categorize_age(age(c(1, 2), unit = "day"), by = age_group(0, Inf, unit = "week"))
   y <- categorize_age(age(1, unit = "week"), by = age_group(0, Inf, unit = "week"))

@@ -23,16 +23,16 @@ category_groups(x)
 the defining \code{age_group} vector, including unused categories.
 }
 \description{
-An ordered factor whose levels map one-to-one to chronological age intervals.
-Subsetting retains unused categories; use \code{droplevels()} to remove them.
-Combining requires matching bounds, labels and units. Convert explicitly with
-\code{generics::as.factor()} or \code{generics::as.ordered()} to discard interval metadata.
-Base coercers leave existing factor subclasses unchanged. Use
-\code{vctrs::vec_rbind()} for binding: base data-frame binding can discard metadata.
-Reordering and implicit category merging are rejected. Original exact ages
-and scheme provenance are not stored. The legacy \code{units} attribute describes
-observations; definition units live in \code{groups}. Differing observation units
-are dropped on combination; definition units must match.
+Creates an age_category object which is an ordered factor whose levels map one-to-one to chronological age intervals.
+Subsetting retains unused categories; use \code{droplevels()} to remove them. When combining two or more of age_category
+vectors, they must match on the age intervals used, labels and units.
+Convert explicitly with \code{generics::as.factor()} or \code{generics::as.ordered()} to discard interval metadata. Base
+coercers leave existing factor subclasses unchanged. Use \code{vctrs::vec_rbind()} for binding: base data-frame binding
+can discard metadata. Reordering and implicit category merging are rejected. Original exact ages and scheme
+provenance are not stored. The legacy \code{units} attribute describes observations; definition units live in \code{groups}.
+Differing observation units are dropped on combination; definition units must match.
+Printing shows the class, length and category-definition unit in the header.
+vctrs type descriptions also use the category-definition unit.
 }
 \examples{
 groups <- age_group(c(0, 5), c(5, Inf))

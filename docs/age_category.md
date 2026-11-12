@@ -35,6 +35,11 @@ Explicit generics::as.factor/as.ordered conversion drops metadata; base
 as.factor/as.ordered return existing factor subclasses unchanged.
 Arbitrary attr/class mutation bypasses S3 validation and is unsupported.
 
+Printing identifies the class, length and category-definition unit. vctrs full
+type descriptions use `age_category [week]`, for example; abbreviated descriptions
+use `aCat-week`. Unitless definitions display `unspecified` in the full description, `unk` in the
+abbreviation and `unknown` in the print header.
+
 ## Compatibility
 
 categorize_age factor output gains this subclass and groups metadata. Factor

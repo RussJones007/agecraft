@@ -1,3 +1,13 @@
+# Age-category display methods — 2026-11-12
+
+- Standalone printing includes class, length and category-definition unit.
+  Registered vctrs full and abbreviated descriptions use `age_category [week]`
+  and `aCat-week`. Unitless definitions use `unspecified` in full descriptions,
+  `unk` in abbreviations and `unknown` in print headers.
+- Regenerated roxygen documentation and registrations. Full tests: 3,264 passing
+  assertions, one optional mudnester skip and one unrelated age_group type-name
+  expectation failure (`age_group<day>` versus current `age_group [day]`).
+
 # Scheme provenance inspection and BibTeX — 2026-11-11
 
 - `summary(age_scheme)` retains all existing metadata/coverage fields and now

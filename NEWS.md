@@ -4,6 +4,7 @@
 
 ## Age-category assignments
 
+- Show class, length and definition unit when printing age categories; add vctrs full and abbreviated type descriptions using definition units.
 - Return `age_category`, an ordered-factor subclass, from `categorize_age()` factor output. Retain readable labels and a level-aligned `age_group` definition available through `category_groups()`; matching policies and interval output are unchanged.
 - Add `age_category()` and `is_age_category()`. Preserve unused categories on subset; explicit `droplevels()` removes levels and intervals together. Support validated relabeling, replacement, repetition, concatenation, comparison and vctrs slicing/casting/binding.
 - Require matching ordered bounds, labels and definition units when combining. Normalize conflicting cosmetic symbols to package defaults; reject implicit merging and reordering. Original exact ages and scheme provenance are not stored.
