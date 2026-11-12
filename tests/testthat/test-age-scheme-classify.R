@@ -1,5 +1,5 @@
 test_that("all memberships retain observations and original category indices", {
-  g <- age_group(c(15, 10), c(25, 20), unit = "year")
+  g <- age_interval(c(15, 10), c(25, 20), unit = "year")
   names(g) <- c("B", "A")
   s <- age_scheme(g, "test", "Overlap", type = "classification")
   a <- age(c(12, 17, 30, NA, 20, 10, 25), unit = "year")
@@ -16,16 +16,16 @@ test_that("all memberships retain observations and original category indices", {
   expect_type(empty$observation, "integer")
   expect_type(empty$label, "character")
   expect_type(empty$status, "character")
-  expect_s3_class(empty$group, "age_group")
+  expect_s3_class(empty$group, "age_interval")
   all_missing <- classify_age_scheme(age(c(NA_real_, NA_real_), unit = "year"), s)
   expect_identical(all_missing$status, c("missing", "missing"))
 })
 
 test_that("membership matching respects fractional containment and units", {
-  g <- age_group(c(0, 1.5), c(2, 3), unit = "year")
+  g <- age_interval(c(0, 1.5), c(2, 3), unit = "year")
   names(g) <- c("A", "B")
   s <- age_scheme(g, "test", "Test", type = "classification")
-  intervals <- age_group(c(1.5, 1, NA), c(2, 2.5, NA), unit = "year")
+  intervals <- age_interval(c(1.5, 1, NA), c(2, 2.5, NA), unit = "year")
   out <- classify_age_scheme(intervals, s)
   expect_identical(out$group_index, c(1L, 2L, NA_integer_, NA_integer_))
   expect_identical(out$status, c("matched", "matched", "unmatched", "missing"))

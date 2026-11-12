@@ -24,7 +24,7 @@
 #' @return A base data frame with `observation` (one-based input index),
 #'   `scheme_id`, `group_index` (original position in the scheme), `label`,
 #'   `status` (`"matched"`, `"missing"`, or `"unmatched"`), and `group` (the matched
-#'   `age_group` interval in the scheme's original units). One row per match;
+#'   `age_interval` interval in the scheme's original units). One row per match;
 #'   missing/unmatched observations each have one placeholder row with missing
 #'   group fields. Rows are ordered by observation and then original group index.
 #'   Empty input yields zero rows with the same columns and types. Scheme metadata
@@ -37,9 +37,9 @@
 #'   not silently interpreted as years. Missing ages differ from present ages
 #'   outside the scheme's intervals. Even a complete scheme may have unmatched
 #'   inputs outside its declared domain.
-#' @seealso [age_scheme()], [scheme_groups()]
+#' @seealso [age_scheme()], [scheme_intervals()]
 #' @examples
-#' g <- age_group(c(10, 15), c(20, 25), unit = "year")
+#' g <- age_interval(c(10, 15), c(20, 25), unit = "year")
 #' names(g) <- c("Group A", "Group B")
 #' s <- age_scheme(g, "overlap_example", "Illustrative overlap",
 #'                 type = "classification")
@@ -48,7 +48,7 @@
 classify_age_scheme <- function(ages, scheme,
                                 convert_units = c("age_to_group", "group_to_age", "none"),
                                 allow_approx = FALSE) {
-  groups <- scheme_groups(scheme)
+  groups <- scheme_intervals(scheme)
   convert_units <- match.arg(convert_units)
   if (inherits(ages, "Date") || inherits(ages, "POSIXt") ||
       !(is.numeric(ages) || inherits(ages, "ivs_iv"))) {
@@ -58,7 +58,7 @@ classify_age_scheme <- function(ages, scheme,
     stop("allow_approx must be TRUE or FALSE", call. = FALSE)
   }
   if (inherits(ages, "ivs_iv")) {
-    new_age_group(ivs::iv_start(ages), ivs::iv_end(ages))
+    new_age_interval(ivs::iv_start(ages), ivs::iv_end(ages))
     missing <- is.na(ivs::iv_start(ages))
   } else {
     # Validate dimensions before numeric coercion can hide the unit expression.
@@ -70,7 +70,7 @@ classify_age_scheme <- function(ages, scheme,
     }
   }
   aligned <- age_cat_iv_align_units(ages, groups, convert_units, allow_approx)
-  locations <- age_group_locations(aligned$age, aligned$haystack %||% groups)
+  locations <- age_interval_locations(aligned$age, aligned$haystack %||% groups)
   keep <- !is.na(locations$haystack) & !missing[locations$needles]
   observation <- locations$needles[keep]
   index <- locations$haystack[keep]

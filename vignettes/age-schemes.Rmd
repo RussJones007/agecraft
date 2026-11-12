@@ -12,7 +12,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-An `age_group` vector defines intervals. An `age_scheme` packages that vector
+An `age_interval` vector defines intervals. An `age_scheme` packages that vector
 with an identifier, purpose, provenance, and validation rules. Store the scheme
 once and reuse it across observations. It is an S3 metadata object containing
 an interval vector, rather than another vector class attached to every age.
@@ -25,7 +25,7 @@ overlapping groups. Completeness is a separate claim against a declared domain.
 
 ```{r partition}
 cuts <- c(seq(0, 85, by = 5), Inf)
-g <- age_group(head(cuts, -1), tail(cuts, -1), unit = "year")
+g <- age_interval(head(cuts, -1), tail(cuts, -1), unit = "year")
 names(g) <- as.character(g)
 five_year <- age_scheme(
   g, id = "example_five_year", name = "Illustrative five-year bands",
@@ -61,14 +61,14 @@ observation unit (normalized to a supported name), rather than the units definin
 its category boundaries. For example, hour-based ages can match day-based bands:
 
 ```{r category-factor-units}
-day_groups <- age_group(c(0, 1), c(1, Inf), unit = "day")
+day_groups <- age_interval(c(0, 1), c(1, Inf), unit = "day")
 names(day_groups) <- c("Under one day", "One day or older")
 day_scheme <- age_scheme(day_groups, "example_days", "Illustrative day bands")
 hours <- age(c(12, 36, NA), unit = "hour")
 result <- categorize_age(hours, by = day_scheme)
 result
 attr(result, "units") # "hour"
-scheme_groups(day_scheme) # boundaries remain in days
+scheme_intervals(day_scheme) # boundaries remain in days
 categorize_age(hours, by = day_scheme, output = "interval") # matched day intervals
 ```
 
@@ -116,7 +116,7 @@ converting ages to group units can classify differently from converting group
 boundaries to age units. For example, with the conversion backend used here:
 
 ```{r floating-point-boundary}
-g <- age_group(c(0, 11), c(11, Inf), unit = "second")
+g <- age_interval(c(0, 11), c(11, Inf), unit = "second")
 names(g) <- c("Under eleven", "Eleven or more")
 seconds <- age_scheme(g, "seconds", "Second categories")
 x <- as_age(age(11, unit = "second"), unit = "day")
@@ -161,7 +161,7 @@ birth <- as.Date("2021-02-01")
 reference <- as.Date("2021-03-01")
 months <- calculate_age(birth, reference, unit = "month")
 years <- calculate_age(birth, reference, unit = "year")
-g <- age_group(c(0, 1), c(1, Inf), unit = "month")
+g <- age_interval(c(0, 1), c(1, Inf), unit = "month")
 names(g) <- c("Under one month", "One month or older")
 monthly <- age_scheme(g, "example_monthly", "Illustrative monthly bands")
 as.numeric(months) # 1 calendar month
@@ -187,7 +187,7 @@ The following bands are invented to illustrate overlapping memberships. They
 are not an official WHO, CDC, or clinical definition.
 
 ```{r overlap}
-g <- age_group(c(10, 15, 10), c(20, 25, 25), unit = "year")
+g <- age_interval(c(10, 15, 10), c(20, 25, 25), unit = "year")
 names(g) <- c("Example A", "Example B", "Example C")
 overlapping <- age_scheme(
   g, id = "example_overlap", name = "Illustrative overlapping bands",
@@ -214,14 +214,14 @@ should be split into finer bands without additional data or assumptions.
 An overlapping classification can use identical intervals for distinct semantic
 categories. The following labels are illustrative, not authoritative definitions.
 All schemes require unique, nonblank category labels: duplicate **intervals** are
-permitted here, but duplicate **labels** are not. Bare `age_group` vectors retain
+permitted here, but duplicate **labels** are not. Bare `age_interval` vectors retain
 their more permissive naming rules.
 
 ```{r duplicate-intervals}
-g <- age_group(c(0, 0), c(5, 5), unit = "year")
+g <- age_interval(c(0, 0), c(5, 5), unit = "year")
 names(g) <- c("Early childhood", "Preschool age")
 s <- age_scheme(
-  groups = g, id = "example", name = "Illustrative shared age range",
+  intervals = g, id = "example", name = "Illustrative shared age range",
   type = "classification", domain = c(0, 5), complete = TRUE
 )
 classify_age_scheme(age(c(2, 5), unit = "year"), s)
@@ -266,7 +266,7 @@ ili$notes
 ```
 
 All eight historical numeric presets have equivalent year-based schemes. The
-numeric `age_group_presets` list and its `age.groups` alias remain unchanged.
+numeric `age_interval_presets` list and its `age.groups` alias remain unchanged.
 The registry preserves their original boundaries and records source uncertainty;
 these legacy bands are not verified current clinical or surveillance standards.
 A package-snapshot version identifies the preserved definition, not an official
@@ -274,7 +274,7 @@ external edition. New authoritative definitions require source verification.
 
 ## Inspecting and changing a definition
 
-Use `scheme_groups()` for intervals, `summary()` for coverage and provenance,
+Use `scheme_intervals()` for intervals, `summary()` for coverage and provenance,
 and `as.data.frame()` for an inspection table. Its `scheme_metadata` attribute
 can be discarded by ordinary data-frame operations.
 
@@ -284,11 +284,11 @@ changes neither the local original nor the package catalog:
 ```{r derivative-label}
 original <- get_age_scheme("legacy_ili")
 modified <- original
-names(modified$groups)[1] <- "Revised youngest category"
+names(modified$intervals)[1] <- "Revised youngest category"
 modified$id                         # legacy_ili_derived
 modified$verified                   # FALSE
 modified$derived_from               # original ID, version and source information
-names(original$groups)[1]            # original category label
+names(original$intervals)[1]            # original category label
 modified$name <- "My reporting title" # descriptive: no new derivative
 ```
 
@@ -315,7 +315,7 @@ atomic list replacement so the final candidate can be validated together:
 
 ```{r derivative-batch}
 partial <- original
-partial[c("groups", "complete")] <- list(original$groups[1:2], FALSE)
+partial[c("intervals", "complete")] <- list(original$intervals[1:2], FALSE)
 summary(partial)$covered # FALSE
 ```
 

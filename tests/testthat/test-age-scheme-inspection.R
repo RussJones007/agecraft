@@ -1,5 +1,5 @@
 inspection_scheme <- function(...) {
-  g <- age_group(c(0, 5), c(5, Inf), unit = "year")
+  g <- age_interval(c(0, 5), c(5, Inf), unit = "year")
   names(g) <- c("Under 5", "5+")
   age_scheme(g, "example", "Example age bands", ...)
 }
@@ -10,7 +10,7 @@ test_that("summary keeps metadata accessible and prints provenance", {
                          organization = "Example Agency", verified = TRUE)
   info <- summary(s)
   expect_s3_class(info, "summary_age_scheme")
-  for (field in setdiff(names(s), "groups")) {
+  for (field in setdiff(names(s), "intervals")) {
     expect_identical(info[[field]], s[[field]])
   }
   expect_identical(info$n_groups, 2L)
@@ -20,7 +20,7 @@ test_that("summary keeps metadata accessible and prints provenance", {
   expect_output(print(info), "verified: TRUE")
   expect_output(print(info), "unknown")
   expect_identical(withVisible(print(info))$visible, FALSE)
-  s$groups <- rev(s$groups)
+  s$intervals <- rev(s$intervals)
   expect_output(print(summary(s)), "Derived from:")
   expect_identical(summary(s)$derived_from, s$derived_from)
 })
@@ -67,7 +67,7 @@ test_that("BibTeX distinguishes derivatives and supports older schemes", {
   s <- inspection_scheme(source = "Original handbook", version = "Release B",
                          reference = "Original reference", verified = TRUE)
   s$name <- "Local age bands"
-  s$groups <- rev(s$groups)
+  s$intervals <- rev(s$intervals)
   text <- paste(utils::toBibtex(s), collapse = "\n")
   for (part in c("@Misc{example_derived,", "title = {Local age bands}",
                  "Version: unknown", "Source verification claimed: FALSE",
@@ -81,7 +81,7 @@ test_that("BibTeX distinguishes derivatives and supports older schemes", {
   class(old) <- "age_scheme"
   expect_s3_class(utils::toBibtex(old), "Bibtex")
   bad <- unclass(old)
-  bad$groups <- unname(bad$groups)
+  bad$intervals <- unname(bad$intervals)
   class(bad) <- "age_scheme"
   expect_error(utils::toBibtex(bad), "names")
   expect_error(summary(bad), "names")

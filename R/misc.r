@@ -10,11 +10,13 @@
 # ------------------------------------------------------------------------------------------------------------------->
 
 # Age group variables ----
-#' Preset age-group definitions
+#' Reuse conventional age-interval cut points
 #'
-#' A named list of frequently used age group definitions.  The definitions are cut points that can be passed to the
-#' either [categorize_age()] or [cut()] functions.  These definitions are based on age groups by years and all
-#' include an "Age and above" group.
+#' Choose a named set of cut points for commonly used reporting age bands.
+#' Pass an entry to [categorize_age()] or [as_age_interval()] to define the
+#' intervals. The cut points describe ages in years and each entry ends in
+#' `Inf` for an open-ended upper band. When using [cut()], set `right = FALSE`
+#' to include each lower bound and exclude its upper bound.
 #'
 #' @source Preserved from the rage 0.1.0.9009 data-generation script. ILI was
 #'   attributed to ESSENCE/CDC ILI in the original documentation; an authoritative
@@ -25,9 +27,9 @@
 #'   table with intended use, available sources, and unknown source-version dates
 #'   is installed at `system.file("extdata", "age-group-provenance.csv", package = "agecraft")`.
 #'   Cut points were retained unchanged on October 9, 2026.
-#' @details `age.groups` is a compatibility alias with identical entries. It will
-#'   remain available through the next non-development release; removal requires
-#'   a later announced breaking release. Use `age_group_presets` in new scripts.
+#' @details `age_group_presets` and `age.groups` are compatibility aliases
+#'   with identical entries. They remain available through the next non-development release; removal requires
+#'   a later announced breaking release. Use `age_interval_presets` in new scripts.
 #' @format
 #' A named list of age groups
 #'
@@ -45,12 +47,15 @@
 #' @examples
 #'
 #' # Show the definition of some age groups
-#' age_group_presets$ILI
-#' age_group_presets$Annual
+#' age_interval_presets$ILI
+#' age_interval_presets$Annual
 #'
+"age_interval_presets"
+
+#' @rdname age_interval_presets
 "age_group_presets"
 
-#' @rdname age_group_presets
+#' @rdname age_interval_presets
 "age.groups"
 
 

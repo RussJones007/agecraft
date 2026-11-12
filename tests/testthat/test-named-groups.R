@@ -1,5 +1,5 @@
 test_that("named fractional groups label both classification interfaces", {
-  groups <- age_group(c(1, 0, 0.077), c(3, 0.077, 1), unit = "year")
+  groups <- age_interval(c(1, 0, 0.077), c(3, 0.077, 1), unit = "year")
   names(groups) <- c("Toddler", "Neonate", "Infant")
   ages <- units::set_units(c(0, 0.077, 1, 3, NA, 0.5), "year")
   expected <- c("Neonate", "Infant", "Toddler", NA, NA, "Infant")
@@ -15,19 +15,19 @@ test_that("named fractional groups label both classification interfaces", {
   expect_identical(names(intervals), expected)
   expect_identical(attr(intervals, "unit"), "year")
   expect_identical(as.character(intervals), c("[0, 0.077)", "[0.077, 1)", "1-2", NA, NA, "[0.077, 1)"))
-  expect_identical(as.character(categorize_age(age_group(0.1, 0.2, unit = "year"), by = as.age_group(groups, unit = "year"),
+  expect_identical(as.character(categorize_age(age_interval(0.1, 0.2, unit = "year"), by = as_age_interval(groups, unit = "year"),
                                              convert_units = "none")), "Infant")
 })
 
 test_that("names follow observations without changing interval identity", {
-  x <- age_group(c(1, 0), c(3, 1))
+  x <- age_interval(c(1, 0), c(3, 1))
   names(x) <- c("Toddler", "Infant")
   expect_identical(names(x[c(2, NA, 1, 2)]), c("Infant", NA, "Toddler", "Infant"))
   expect_identical(names(sort(x)), c("Infant", "Toddler"))
   expect_identical(names(vctrs::vec_c(x, x)), rep(names(x), 2))
   expect_identical(names(c(x, x)), rep(names(x), 2))
   expect_identical(names(rep(x, 2)), rep(names(x), 2))
-  expect_identical(names(as.age_group(x)), names(x))
+  expect_identical(names(as_age_interval(x)), names(x))
   expect_identical(names(vctrs::vec_cast(x, x[0])), names(x))
   bound <- vctrs::vec_rbind(data.frame(group = x), data.frame(group = x))
   expect_identical(names(bound$group), rep(names(x), 2))
@@ -45,7 +45,7 @@ test_that("names follow observations without changing interval identity", {
 })
 
 test_that("factor labels fall back and cannot silently merge distinct categories", {
-  groups <- age_group(c(0, 1, 3, 6), c(1, 3, 6, 10))
+  groups <- age_interval(c(0, 1, 3, 6), c(1, 3, 6, 10))
   names(groups) <- c("Infant", "", NA, "  ")
   expected <- c("Infant", "1-2", "3-5", "6-9")
   expect_identical(levels(categorize_age(c(0, 1), by = groups)), expected)

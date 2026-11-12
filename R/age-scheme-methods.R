@@ -20,7 +20,7 @@
 #' @param optional Logical, passed to [data.frame()].
 #' @name age_scheme_methods
 #' @examples
-#' g <- age_group(c(0, 10), c(5, 20), unit = "year")
+#' g <- age_interval(c(0, 10), c(5, 20), unit = "year")
 #' names(g) <- c("Young", "Older")
 #' s <- age_scheme(g, "partial", "Partial coverage", domain = c(0, 20),
 #'                 complete = FALSE)
@@ -33,13 +33,13 @@ NULL
 print.age_scheme <- function(x, ...) {
   validate_age_scheme(x)
   cat("<age_scheme:", x$id, ">", x$name, "\n")
-  cat("Type:", x$type, "| Unit:", get_unit(x$groups), "| Groups:",
-      length(x$groups), "| Verified:", x$verified, "\n")
+  cat("Type:", x$type, "| Unit:", get_unit(x$intervals), "| Groups:",
+      length(x$intervals), "| Verified:", x$verified, "\n")
   if (!is.null(x$derived_from)) {
     cat("Derived from:", x$derived_from$id, "| Source version:",
         x$derived_from$version %||% "unknown", "\n")
   }
-  print(x$groups)
+  print(x$intervals)
   invisible(x)
 }
 
@@ -47,8 +47,8 @@ print.age_scheme <- function(x, ...) {
 #' @export
 summary.age_scheme <- function(object, ...) {
   coverage <- age_scheme_assess(object)
-  out <- c(object[setdiff(names(object), "groups")],
-    list(unit = get_unit(object$groups), n_groups = length(object$groups),
+  out <- c(object[setdiff(names(object), "intervals")],
+    list(unit = get_unit(object$intervals), n_groups = length(object$intervals),
          overlaps = coverage$overlaps, gaps = coverage$gaps,
          covered = coverage$covered))
   class(out) <- "summary_age_scheme"
@@ -81,12 +81,12 @@ print.summary_age_scheme <- function(x, ...) {
 #' @export
 as.data.frame.age_scheme <- function(x, row.names = NULL, optional = FALSE, ...) {
   validate_age_scheme(x)
-  g <- x$groups
+  g <- x$intervals
   out <- data.frame(scheme_id = x$id, group_index = seq_along(g),
                     label = names(g), start = ivs::iv_start(g),
                     end = ivs::iv_end(g), unit = get_unit(g),
                     row.names = row.names, optional = optional,
                     stringsAsFactors = FALSE)
-  attr(out, "scheme_metadata") <- x[setdiff(names(x), "groups")]
+  attr(out, "scheme_metadata") <- x[setdiff(names(x), "intervals")]
   out
 }

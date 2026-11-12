@@ -23,7 +23,7 @@ Discover legacy age schemes
 }
 \details{
 The eight built-ins preserve the historical cut points of
-\link{age_group_presets}. They use explicit year units; classify unit-bearing
+\link{age_interval_presets}. They use explicit year units; classify unit-bearing
 ages, such as \code{age(x, unit = "year")}, rather than silently treating plain
 numbers as years. The original numeric presets and \code{age.groups} alias are
 unchanged. Several source editions are unknown. These definitions are

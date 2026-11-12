@@ -1,5 +1,5 @@
 test_that("factor units describe original observations rather than category coordinates", {
-  g <- age_group(c(0, 1), c(1, Inf), unit = "day")
+  g <- age_interval(c(0, 1), c(1, Inf), unit = "day")
   names(g) <- c("Under one day", "One day or older")
   s <- age_scheme(g, "days", "Day bands")
   for (unit in c("hour", "day")) {

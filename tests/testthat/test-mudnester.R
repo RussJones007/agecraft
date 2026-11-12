@@ -5,7 +5,7 @@ test_that("offline imports preserve all coordinates and cut classification", {
   for (i in seq_len(nrow(fixture))) {
     row <- fixture[i, , drop = FALSE]
     expect_warning(s <- mudnester_convert_row(row, "0.7.8"), "clinical applicability")
-    g <- scheme_groups(s)
+    g <- scheme_intervals(s)
     b <- row$breaks[[1L]]
     unit <- if (as.character(row$age_unit) == "years") "year" else "day"
     expect_identical(ivs::iv_start(g), head(b, -1L))
@@ -89,11 +89,11 @@ test_that("public imports are independent and edits track ancestry", {
   expect_error(import_mudnester_scheme("mudnester_abs_5yr"), "Unknown")
   expect_warning(a <- import_mudnester_scheme("abs_5yr"), "clinical")
   b <- suppressWarnings(import_mudnester_scheme("abs_5yr"))
-  names(a$groups)[1L] <- "Local label"
+  names(a$intervals)[1L] <- "Local label"
   expect_identical(a$derived_from$id, b$id)
   expect_identical(a$id, paste0(b$id, "_derived"))
   expect_false(a$verified)
-  expect_identical(names(b$groups), f$labels[[which(f$scheme == "abs_5yr")]])
+  expect_identical(names(b$intervals), f$labels[[which(f$scheme == "abs_5yr")]])
   table <- mudnester_catalogue(); table$source[1L] <- "Edited"
   expect_identical(mudnester_catalogue()$source, f$source)
   expect_identical(length(list_age_schemes()$id), 8L)
@@ -108,25 +108,25 @@ test_that("optional installed catalogue has exact import parity", {
   expect_identical(table$scheme, f$scheme)
   for (i in seq_len(nrow(f))) {
     s <- suppressWarnings(import_mudnester_scheme(f$scheme[i]))
-    expect_identical(ivs::iv_start(s$groups), head(f$breaks[[i]], -1L))
-    expect_identical(ivs::iv_end(s$groups), tail(f$breaks[[i]], -1L))
-    expect_identical(names(s$groups), f$labels[[i]])
+    expect_identical(ivs::iv_start(s$intervals), head(f$breaks[[i]], -1L))
+    expect_identical(ivs::iv_end(s$intervals), tail(f$breaks[[i]], -1L))
+    expect_identical(names(s$intervals), f$labels[[i]])
     expect_false(s$verified)
   }
 })
 
 test_that("all eight legacy schemes and numeric presets retain parity", {
   env <- new.env(parent = emptyenv())
-  utils::data("age_group_presets", "age.groups", package = "agecraft", envir = env)
-  expect_identical(env$age_group_presets, env$age.groups)
+  utils::data("age_interval_presets", "age.groups", package = "agecraft", envir = env)
+  expect_identical(env$age_interval_presets, env$age.groups)
   ids <- list_age_schemes()$id
   keys <- c("ILI", "IMM", "Yr.5", "Yr.10", "Spec", "Annual", "School", "Covid")
   expect_length(ids, 8L)
   for (i in seq_along(ids)) {
     s <- get_age_scheme(ids[i])
-    cuts <- env$age_group_presets[[keys[i]]]
-    expect_identical(ivs::iv_start(s$groups), head(cuts, -1L))
-    expect_identical(ivs::iv_end(s$groups), tail(cuts, -1L))
+    cuts <- env$age_interval_presets[[keys[i]]]
+    expect_identical(ivs::iv_start(s$intervals), head(cuts, -1L))
+    expect_identical(ivs::iv_end(s$intervals), tail(cuts, -1L))
     values <- sort(unique(c(head(cuts, -1L), head(cuts, -1L) + 0.1)))
     expect_identical(as.integer(categorize_age(age(values, unit = "year"), by = s)),
                      as.integer(categorize_age(values, by = cuts)))

@@ -170,12 +170,12 @@ by earlier development versions of agecraft.
 
 ## Group ages using the supplied definitions
 
-The package includes ready-to-use cut points in `age_group_presets` list. Start by
+The package includes ready-to-use cut points in `age_interval_presets` list. Start by
 looking at their names, then select a definition:
 
 ```{r supplied-groups}
-names(age_group_presets)
-reporting_groups <- as.age_group(age_group_presets$Yr.5, unit = "year")
+names(age_interval_presets)
+reporting_groups <- as_age_interval(age_interval_presets$Yr.5, unit = "year")
 head(reporting_groups)
 
 categories <- categorize_age(ages, by = reporting_groups)
@@ -183,7 +183,7 @@ categories
 table(categories)
 ```
 
-`as.age_group()` turns the cut points into an `age_group` vector. Here we
+`as_age_interval()` turns the cut points into an `age_interval` vector. Here we
 explicitly say that the supplied cut points represent years. Choose a
 definition that fits your analysis; the presets are inherited reporting
 conventions, and their names and provenance are documented in the package.
@@ -198,7 +198,7 @@ Suppose you want categories called Infant, Toddler, and Young child.
 Construct the interval boundaries, then give each interval a name:
 
 ```{r named-groups}
-child_groups <- age_group(start = c(0, 1, 3, 7, 19), end = c(1, 3, 6, 18, 50), unit = "year")
+child_groups <- age_interval(start = c(0, 1, 3, 7, 19), end = c(1, 3, 6, 18, 50), unit = "year")
 child_groups
 names(child_groups) <- c("Infant", "Toddler", "Young child")
 
@@ -231,7 +231,7 @@ Groups can also have fractional boundaries. For example, you could split the
 first year into an approximate neonatal period and later infancy:
 
 ```{r fractional-groups}
-fine_groups <- age_group(start = c(0, 0.077, 1, 3),
+fine_groups <- age_interval(start = c(0, 0.077, 1, 3),
                          end = c(0.077, 1, 3, 6), unit = "year")
 names(fine_groups) <- c("Neonate", "Infant", "Toddler", "Young child")
 

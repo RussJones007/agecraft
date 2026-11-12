@@ -5,7 +5,7 @@
 #'   names, legacy preset keys, type, unit, source/version, verification flag,
 #'   purpose, and reference. `get_age_scheme()` returns a validated `age_scheme`.
 #' @details The eight built-ins preserve the historical cut points of
-#'   [age_group_presets]. They use explicit year units; classify unit-bearing
+#'   [age_interval_presets]. They use explicit year units; classify unit-bearing
 #'   ages, such as `age(x, unit = "year")`, rather than silently treating plain
 #'   numbers as years. The original numeric presets and `age.groups` alias are
 #'   unchanged. Several source editions are unknown. These definitions are
@@ -44,10 +44,10 @@ get_age_scheme <- function(id) {
   }
   row <- info[match(id, info$id), , drop = FALSE]
   presets <- new.env(parent = emptyenv())
-  utils::data("age_group_presets", package = "agecraft", envir = presets)
-  cuts <- presets$age_group_presets[[row$definition]]
+  utils::data("age_interval_presets", package = "agecraft", envir = presets)
+  cuts <- presets$age_interval_presets[[row$definition]]
   # Adjacent cuts match categorize_age(), including its finite-terminal rule.
-  g <- age_group(utils::head(cuts, -1L), utils::tail(cuts, -1L), unit = "year")
+  g <- age_interval(utils::head(cuts, -1L), utils::tail(cuts, -1L), unit = "year")
   names(g) <- as.character(g)
   age_scheme(g, id = id, name = row$name, type = "partition",
              domain = c(cuts[1], cuts[length(cuts)]), complete = TRUE,

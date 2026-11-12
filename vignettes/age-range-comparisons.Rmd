@@ -26,10 +26,10 @@ package does not infer a birth-date range or advance a record's age to another
 date automatically.
 
 ```{r genealogy}
-record_a <- age_group(20, 25, unit = "year")
-record_b <- age_group(23, 28, unit = "year")
-compare_age_groups(record_a, record_b) # [23,25), printed 23-24
-contradiction <- compare_age_groups(record_a, age_group(30, 35, unit = "year"),
+record_a <- age_interval(20, 25, unit = "year")
+record_b <- age_interval(23, 28, unit = "year")
+compare_age_intervals(record_a, record_b) # [23,25), printed 23-24
+contradiction <- compare_age_intervals(record_a, age_interval(30, 35, unit = "year"),
                                     keep_empty = TRUE)
 contradiction # status empty, missing intersection bounds
 ```
@@ -43,7 +43,7 @@ the second person's age minus the first's is strictly between 15 and 25 years.
 Those are exclusive bounds on real-valued ages, not completed-age differences.
 
 ```{r genealogy-gap}
-compare_age_groups(record_a, age_group(40, 45, unit = "year"), "age_gap")
+compare_age_intervals(record_a, age_interval(40, 45, unit = "year"), "age_gap")
 ```
 
 ## Sociology: compare survey definitions and uncertain assignment
@@ -53,9 +53,9 @@ and `[25,65)`. The expected nonempty crosswalk contains `[0,5)`, `[5,18)`,
 `[18,25)`, and `[25,65)`, retaining the source row identifiers and labels.
 
 ```{r surveys}
-a <- age_group(c(0, 18), c(18, 65), unit = "year")
-b <- age_group(c(0, 5, 25), c(5, 25, 65), unit = "year")
-compare_age_groups(a, b)
+a <- age_interval(c(0, 18), c(18, 65), unit = "year")
+b <- age_interval(c(0, 5, 25), c(5, 25, 65), unit = "year")
+compare_age_intervals(a, b)
 ```
 
 A reported age range `[17,19)` crosses A's boundary at 18: neither assignment
@@ -63,9 +63,9 @@ is definite, while both are possible. Definite membership means containment;
 possible membership means nonempty overlap. Touching endpoints do not overlap.
 
 ```{r uncertain-membership}
-reported <- age_group(17, 19, unit = "year")
-compare_age_groups(reported, a, "membership")
-compare_age_groups(reported, a, "membership", membership = "possible")
+reported <- age_interval(17, 19, unit = "year")
+compare_age_intervals(reported, a, "membership")
+compare_age_intervals(reported, a, "membership", membership = "possible")
 # Request ambiguous = "warn" or "error" to flag multiple possible matches.
 categorize_age(reported, by = a, output = "interval") # Missing assignment
 ```
@@ -81,12 +81,12 @@ The crosswalk does not determine what share of a published band's count belongs
 to the study: that requires finer observations or explicit allocation assumptions.
 
 ```{r economics}
-study <- age_group(18, 65, unit = "year")
-published <- age_group(c(15, 25, 55), c(25, 55, 75), unit = "year")
-compare_age_groups(study, published)
+study <- age_interval(18, 65, unit = "year")
+published <- age_interval(c(15, 25, 55), c(25, 55, 75), unit = "year")
+compare_age_intervals(study, published)
 # Excluding [25,55) leaves disjoint [18,25) and [55,65) coverage:
-compare_age_groups(study, published[2], "difference")
-compare_age_groups(study, operation = "width") # 47 years of age coordinates
+compare_age_intervals(study, published[2], "difference")
+compare_age_intervals(study, operation = "width") # 47 years of age coordinates
 ```
 
 Household ages `[30,35)` and `[32,37)` measured at a common survey date permit
@@ -94,10 +94,10 @@ a second-minus-first age gap strictly between -3 and 7 years. The order is
 unresolved because the ranges overlap. Missing evidence yields missing bounds.
 
 ```{r household}
-person_a <- age_group(c(30, NA), c(35, NA), unit = "year")
-person_b <- age_group(32, 37, unit = "year")
-compare_age_groups(person_a, person_b, "age_gap")
-compare_age_groups(person_a, person_b, "ordering")
+person_a <- age_interval(c(30, NA), c(35, NA), unit = "year")
+person_b <- age_interval(32, 37, unit = "year")
+compare_age_intervals(person_a, person_b, "age_gap")
+compare_age_intervals(person_a, person_b, "ordering")
 ```
 
 ## Set coverage versus crosswalks

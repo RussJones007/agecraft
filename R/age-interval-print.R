@@ -1,20 +1,20 @@
-# agegroup-print.r
+# age-interval-print.R
 #
-# Formatting and display helpers for age_group objects.
-# This file contains methods used for rendering age_group values as character and factor-like outputs.
+# Formatting and display helpers for age_interval objects.
+# This file contains methods used for rendering age_interval values as character and factor-like outputs.
 
 # Changes the interval to print out as typical age groups
 #' @exportS3Method
-format.age_group <- function(x, ...){
-  as.character.age_group(x)
+format.age_interval <- function(x, ...){
+  as.character.age_interval(x)
 }
 
 #' @exportS3Method
-print.age_group <- function(x, ...){
+print.age_interval <- function(x, ...){
   unit <- get_unit(x)
   if (is.null(unit)) unit <- "unknown"
-  cat(sprintf("<age_group (%s) [%d]>\n", unit, length(x)))
-  out <- format.age_group(x, ...)
+  cat(sprintf("<age_interval (%s) [%d]>\n", unit, length(x)))
+  out <- format.age_interval(x, ...)
   print(out, quote = FALSE)
   invisible(x)
 }
@@ -22,8 +22,8 @@ print.age_group <- function(x, ...){
 # Function from iv age to character age groups ---------------------------------------------------------------
 #' Age group into a character vector
 #'
-#' This is the reverse of as.age_group().  Function arguments determine the format
-#' of the decoded character age group. For the encoding scheme see [as.age_group()] details section.
+#' This is the reverse of as_age_interval().  Function arguments determine the format
+#' of the decoded character age group. For the encoding scheme see [as_age_interval()] details section.
 #'
 #' @param groups is an iv vector
 #' @param sep defaults to " - ", but may be "to", "through", and "thru"
@@ -32,7 +32,7 @@ print.age_group <- function(x, ...){
 #' @param all_ages defaults to "all", but may be set to "total"
 #' @keywords internal
 #' @export
-age_group_to_char <- function(groups, sep = get_symbols(groups)[["sep"]] %||% "-",
+age_interval_to_char <- function(groups, sep = get_symbols(groups)[["sep"]] %||% "-",
                               above = get_symbols(groups)[["above"]] %||% " +",
                               below = get_symbols(groups)[["below"]] %||% "0",
                               all_ages = "All") {
@@ -77,30 +77,30 @@ age_group_to_char <- function(groups, sep = get_symbols(groups)[["sep"]] %||% "-
   ret
 }
 
-#' Coerce age_group to character vector
+#' Coerce age_interval to character vector
 #'
-#' Get a character vector from an age_group object.
+#' Get a character vector from an age_interval object.
 #'
 #' @param x  an age group object
 #' @param ... Reserved for future extensions; currently ignored.
 #'
 #' @return  age groups as a character vector.
-#' @exportS3Method base::as.character age_group
-as.character.age_group <- function(x, ...){
+#' @exportS3Method base::as.character age_interval
+as.character.age_interval <- function(x, ...){
   syms <- get_symbols(x)
-  if(!rlang::is_empty(x)) age_group_to_char(x, sep = syms$sep, above = syms$above, below = syms$below) else character(0)
+  if(!rlang::is_empty(x)) age_interval_to_char(x, sep = syms$sep, above = syms$above, below = syms$below) else character(0)
 }
 
-#' Coerce age_group to a nominal factor
+#' Coerce age_interval to a nominal factor
 #'
-#' @param x An age_group vector.
+#' @param x An age_interval vector.
 #' @param ... Reserved for future extensions; currently ignored.
 #' @return A nominal factor using nonblank group names, otherwise interval labels.
 #'   Levels follow interval order; distinct intervals require unique labels.
-#' @exportS3Method generics::as.factor age_group
+#' @exportS3Method generics::as.factor age_interval
 #' @examples
 #'
-#' ag <- as.age_group(c(0, 1, 5, 10, 20, 30, 40, 50))
+#' ag <- as_age_interval(c(0, 1, 5, 10, 20, 30, 40, 50))
 #' ag
 #' ag_fac <- generics::as.factor(ag)
 #' ag_fac
@@ -108,17 +108,17 @@ as.character.age_group <- function(x, ...){
 #' ag_ord <- generics::as.ordered(ag)
 #' ag_ord
 #'
-as.factor.age_group <- function(x, ...) {
-  factor(age_group_labels(x), levels = unique(age_group_labels(sort(x))))
+as.factor.age_interval <- function(x, ...) {
+  factor(age_interval_labels(x), levels = unique(age_interval_labels(sort(x))))
 }
 
-#' Coerce age_group to ordered factor
+#' Coerce age_interval to ordered factor
 #'
-#' @param x An age_group vector.
+#' @param x An age_interval vector.
 #' @param ... Reserved for future extensions; currently ignored.
 #' @return An ordinal factor using nonblank group names, otherwise interval labels.
 #'   Levels follow interval order; distinct intervals require unique labels.
-#' @exportS3Method generics::as.ordered age_group
-as.ordered.age_group <- function(x, ...) {
-  factor(age_group_labels(x), levels = unique(age_group_labels(sort(x))), ordered = TRUE)
+#' @exportS3Method generics::as.ordered age_interval
+as.ordered.age_interval <- function(x, ...) {
+  factor(age_interval_labels(x), levels = unique(age_interval_labels(sort(x))), ordered = TRUE)
 }

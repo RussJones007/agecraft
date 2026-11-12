@@ -82,14 +82,14 @@ test_that("supported transformations and summaries preserve class and units", {
 
 
 test_that("arithmetic preserves exact half-open classification boundaries", {
-  groups <- age_group(c(5, 10), c(10, Inf), unit = "year")
+  groups <- age_interval(c(5, 10), c(10, Inf), unit = "year")
   names(groups) <- c("5 to under 10", "10 plus")
   x <- age(c(4, 8.5, 9, NA)) + c(1, 1, 1, 1)
   expect_identical(as.character(categorize_age(x, by = groups)),
                    c("5 to under 10", "5 to under 10", "10 plus", NA))
   expect_identical(x >= age(5), c(TRUE, TRUE, TRUE, NA))
   expect_identical(x < age(10), c(TRUE, TRUE, FALSE, NA))
-  weeks <- age_group(c(1, 2), c(2, Inf), unit = "week")
+  weeks <- age_interval(c(1, 2), c(2, Inf), unit = "week")
   names(weeks) <- c("one week", "two plus")
   days <- age(c(0, 7), "day") + age(1, "week")
   expect_identical(as.character(categorize_age(days, by = weeks)), c("one week", "two plus"))

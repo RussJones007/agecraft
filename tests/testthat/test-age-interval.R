@@ -1,17 +1,17 @@
-# as.age_group function test------
+# as_age_interval function test------
 test_that(
-  "as.age_group using character value",
+  "as_age_interval using character value",
   {
     # character values to use in testing
     ages     <- c("< 5",  "10-14", "15 - 19", "20 to 24", "25 +", "65 >", "30", "45 thru 50",
                   "32 through 38")
-    expect_no_condition(as.age_group(ages))
-    age_gr <- as.age_group(ages)
-    expect_s3_class(age_gr, "age_group")
+    expect_no_condition(as_age_interval(ages))
+    age_gr <- as_age_interval(ages)
+    expect_s3_class(age_gr, "age_interval")
     expect_length(age_gr, 9)
     bad_age    <- c("1-4", "0 except 4", "1 to 4", "1thru4", "2 and 4")
-    expect_error(as.age_group(bad_age), regexp = "These age groups in x are malformed:")
-    valid <- valid_age_group_symbol(bad_age)
+    expect_error(as_age_interval(bad_age), regexp = "These age groups in x are malformed:")
+    valid <- valid_age_interval_symbol(bad_age)
     expect_false(valid)
     expect_contains(get_locations(valid), c(2,5))
 
@@ -23,10 +23,10 @@ test_that(
               "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91",
               "92", "93", "94", "95", "96", "97", "98", "99", "100-104", "105-109", "110 +", "All")
 
-    ages_iv <- as.age_group(ages)
+    ages_iv <- as_age_interval(ages)
     expect_length(ages_iv, length(ages))
-    expect_s3_class(ages_iv, "age_group")
-    age_char <- age_group_to_char(ages_iv)
+    expect_s3_class(ages_iv, "age_interval")
+    age_char <- age_interval_to_char(ages_iv)
     age_char2 <- as.character(ages_iv)
     expect_equal(age_char, age_char2)
     expect_equal(ages, age_char)
@@ -35,12 +35,12 @@ test_that(
 
 
 test_that(
-  desc = "as.age_group using numeric values",
+  desc = "as_age_interval using numeric values",
   code = {
     age_gr <- c(0, 5, 10, 15, 20, 25, 65, Inf)
     exp_age_gr <- ivs::iv_pairs( c(0, 5), c(5, 10), c(10, 15), c(15, 20), c( 20, 25),   c(25, 65), c(65, Inf))
-    grp <- as.age_group(x = age_gr)
-    expect_s3_class(grp, "age_group")
+    grp <- as_age_interval(x = age_gr)
+    expect_s3_class(grp, "age_interval")
     expect_s3_class(grp, "ivs_iv")
     expect_length(grp, length(exp_age_gr))
     expect_equal(ivs::iv_start(grp), ivs::iv_start(exp_age_gr))
@@ -51,11 +51,11 @@ test_that(
   })
 
 test_that(
-  desc = "Testing the age_group class constructor and S3 functions",
+  desc = "Testing the age_interval class constructor and S3 functions",
   code = {
     base_grp <- c(" 0-4",  "10-14", "15-19" , "20-24", "25-30", "35-39", "40-44", "45-49", "50-54", "55-59", "60 +")
-    ageGrp <-as.age_group(base_grp)
-    expect_s3_class(ageGrp, "age_group")
+    ageGrp <-as_age_interval(base_grp)
+    expect_s3_class(ageGrp, "age_interval")
     expect_length(ageGrp, 11)
     expect_identical(attr(ageGrp, which = "symbols")$sep, "-")
     expect_identical(attr(ageGrp, which = "symbols")$below, "0-")
@@ -65,47 +65,47 @@ test_that(
 
 test_that("Age group to character", {
   base_grp <- c("< 2", "2-4", "5-9", "10-14", "15-19" , "20-24", "25-30", "35-39", "40 +")
-  age_grps <- as.age_group(base_grp)
+  age_grps <- as_age_interval(base_grp)
   expect_length(age_grps, length(base_grp))
-  expect_s3_class(age_grps, "age_group")
+  expect_s3_class(age_grps, "age_interval")
   age_grps_char <- as.character(age_grps)
   expect_equal(base_grp, age_grps_char)
 
-  tmp0 <- c(0:5) |> as.age_group()
+  tmp0 <- c(0:5) |> as_age_interval()
   expect_equal(iv_start(tmp0), 0:5)
   expect_equal(as.character(tmp0), c("0", "1", "2", "3", "4", "5"))
 
   tmp1 <- c("0-2", "3-4", "5-9", "10-14", "15-19", "20-24", "25-30", "35-39", "40+") |>
-    as.age_group()
+    as_age_interval()
   expect_equal(as.character(tmp1), c("0-2", "3-4", "5-9", "10-14", "15-19", "20-24", "25-30", "35-39", "40+"))
 
 }
 )
 
 test_that(
-  "iv to age_group",
+  "iv to age_interval",
   {
     iv_grp <- ivs::iv_pairs( c(0, 5), c(5, 10), c(10, 15), c(15, 20), c( 20, 25),   c(25, 65), c(65, Inf))
-    grp <- as.age_group(iv_grp)
+    grp <- as_age_interval(iv_grp)
     #grp
-    expect_s3_class(grp, "age_group")
+    expect_s3_class(grp, "age_interval")
     expect_length(grp, length(iv_grp))
   })
 
 test_that(
-  "Testing age_group symbol attributes",
+  "Testing age_interval symbol attributes",
   {
     base_grp <- c(0, 5, 10, 15, 20, 25, 65)
-    grp <-as.age_group(base_grp)
+    grp <-as_age_interval(base_grp)
     syms <- get_symbols(grp)
     expect_identical(syms$below, "0-")
     expect_identical(syms$sep, "-")
     expect_identical(syms$above, "+")
     rm(syms)
-    expect_error(as.age_group(base_grp, below = "< ", sep = " to ", above = " and above"), "These age groups in x are malformed:")
-    grp2 <- as.age_group(base_grp, below = "< ", sep = " to ", above = " above")
+    expect_error(as_age_interval(base_grp, below = "< ", sep = " to ", above = " and above"), "These age groups in x are malformed:")
+    grp2 <- as_age_interval(base_grp, below = "< ", sep = " to ", above = " above")
     as.character(grp2)
-    as.character(grp2) |> as.age_group()
+    as.character(grp2) |> as_age_interval()
     format(grp2)
     syms2 <- get_symbols(grp2)
     expect_identical(syms2$below, "< ")
@@ -115,14 +115,14 @@ test_that(
 )
 
 test_that(
-  "Testing symbol validity and the valid_age_group_symbol",
+  "Testing symbol validity and the valid_age_interval_symbol",
   {
     valid_syms <-c("through", "thru", "to", " -", "-", ",", ">", "+", "all", "total", "plus", "above", ",")
-    res <- valid_age_group_symbol(valid_syms)
+    res <- valid_age_interval_symbol(valid_syms)
     expect_true(res)
     expect_null(get_problems(res))
     invalid_syms <- c("thru", "from here", "nope", "+", "degrees F", " <", ";", "&", "this above", "65", "12-15")
-    res <- valid_age_group_symbol(invalid_syms)
+    res <- valid_age_interval_symbol(invalid_syms)
     get_problems(res)
     get_locations(res)
     expect_false(res)
@@ -131,14 +131,14 @@ test_that(
 )
 
 test_that(
-  "Casting age_group to other types",
+  "Casting age_interval to other types",
   {
     base_grp <- c(0, 5, 10, 15, 20, 25, 65)
-    grp <- as.age_group(base_grp)
+    grp <- as_age_interval(base_grp)
     int_age  <- as.integer(grp)
     expect_equal(int_age, base_grp)
     char_age <- as.character(grp)
-    expect_equal(as.age_group(int_age), grp)
+    expect_equal(as_age_interval(int_age), grp)
     #undebug(as.factor)
     fac_age  <- as.factor(grp)
     ord_age  <- as.ordered(grp)
@@ -148,19 +148,19 @@ test_that(
 )
 
 test_that(
-  "age_group unit attribute and display",
+  "age_interval unit attribute and display",
   {
-    grp <- as.age_group(c(0, 5, 10, Inf), unit = "year")
+    grp <- as_age_interval(c(0, 5, 10, Inf), unit = "year")
     expect_identical(attr(grp, "unit"), "year")
     expect_identical(format(grp), c("0-4", "5-9", "10+"))
   }
 )
 
 test_that(
-  "age_cat_iv validates age and age_group unit compatibility",
+  "age_cat_iv validates age and age_interval unit compatibility",
   {
-    grp_year <- as.age_group(c(0, 5, 10, Inf), unit = "year")
-    grp_day <- as.age_group(c(0, 5, 10, Inf), unit = "day")
+    grp_year <- as_age_interval(c(0, 5, 10, Inf), unit = "year")
+    grp_day <- as_age_interval(c(0, 5, 10, Inf), unit = "day")
 
     expect_error(age_cat_iv(c(1, 7), grp_year), "one has units and the other does not")
     expect_no_error(age_cat_iv(units::set_units(c(1, 7), "year"), grp_year))
@@ -168,15 +168,15 @@ test_that(
     expect_no_error(age_cat_iv(units::set_units(c(365, 730), "day"), grp_year, allow_approx = TRUE))
     expect_error(age_cat_iv(c(1, 7), grp_day), "one has units and the other does not")
 
-    age_iv_year <- as.age_group(c(1, 7), unit = "year")
-    age_iv_day <- as.age_group(c(1, 7), unit = "day")
+    age_iv_year <- as_age_interval(c(1, 7), unit = "year")
+    age_iv_day <- as_age_interval(c(1, 7), unit = "day")
     expect_no_error(age_cat_iv(age_iv_year, grp_year))
     expect_error(age_cat_iv(age_iv_day, grp_year), "approximate")
   }
 )
 
 test_that("unitless groups inherit age units without rescaling boundaries", {
-  groups <- as.age_group(c(0, 5, 10, Inf))
+  groups <- as_age_interval(c(0, 5, 10, Inf))
   expected <- age_cat_iv(c(0, 5, 10, NA, -1), groups)
   for (mode in c("age_to_group", "group_to_age", "none")) {
     expect_identical(
@@ -187,8 +187,8 @@ test_that("unitless groups inherit age units without rescaling boundaries", {
   }
   expect_null(attr(groups, "unit"))
   expect_identical(
-    age_cat_iv(as.age_group(c("0-4", "5-9"), unit = "year"), groups),
-    age_cat_iv(as.age_group(c("0-4", "5-9")), groups)
+    age_cat_iv(as_age_interval(c("0-4", "5-9"), unit = "year"), groups),
+    age_cat_iv(as_age_interval(c("0-4", "5-9")), groups)
   )
   expect_identical(
     age_cat_iv(units::set_units(c(1, 7), "day"), c(0, 5, 10, Inf)),
@@ -199,7 +199,7 @@ test_that("unitless groups inherit age units without rescaling boundaries", {
 test_that(
   "age_cat_iv can convert group units to age units when requested",
   {
-    grp_year <- as.age_group(c(0, 5, 10, Inf), unit = "year")
+    grp_year <- as_age_interval(c(0, 5, 10, Inf), unit = "year")
     ages_day <- units::set_units(c(365, 365 * 8), "day")
     expect_no_error(res <- age_cat_iv(ages_day, grp_year, convert_units = "group_to_age", allow_approx = TRUE))
     expect_length(res, 2)
@@ -207,7 +207,7 @@ test_that(
 )
 
 test_that(
-  "Sorting age_group tests",
+  "Sorting age_interval tests",
   {
     # group that isnot in order
     iv_grp     <- ivs::iv_pairs( c(0, 5), c(10, 15), c(15, 20), c(5, 10),  c( 20, 25), c(25, 65), c(65, Inf))
@@ -215,9 +215,9 @@ test_that(
     expect_false(all(iv_grp == sorted_grp))
     expect_equal(sort(iv_grp), sorted_grp)
 
-    # test the age_group class
-    iv_grp     <- as.age_group(iv_grp)
-    sorted_grp <- as.age_group((sorted_grp))
+    # test the age_interval class
+    iv_grp     <- as_age_interval(iv_grp)
+    sorted_grp <- as_age_interval((sorted_grp))
     expect_equal(sort(iv_grp), sorted_grp)
 
   }

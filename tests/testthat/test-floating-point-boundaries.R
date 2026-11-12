@@ -1,5 +1,5 @@
 test_that("the documented 11-second conversion can classify differently by direction", {
-  g <- age_group(c(0, 11), c(11, Inf), unit = "second")
+  g <- age_interval(c(0, 11), c(11, Inf), unit = "second")
   names(g) <- c("Under eleven", "Eleven or more")
   s <- age_scheme(g, "seconds", "Second categories")
   x <- as_age(age(11, "second"), "day")
@@ -19,7 +19,7 @@ test_that("the documented 11-second conversion can classify differently by direc
 
 test_that("same-unit classification retains exact half-open boundaries without tolerance", {
   step <- 2^-49 # One representable step on either side of 11.
-  g <- age_group(c(0, 11), c(11, Inf), unit = "second")
+  g <- age_interval(c(0, 11), c(11, Inf), unit = "second")
   names(g) <- c("Under eleven", "Eleven or more")
   s <- age_scheme(g, "seconds", "Second categories")
   values <- c(0, 11 - step, 11, 11 + step, NA_real_)
@@ -31,7 +31,7 @@ test_that("same-unit classification retains exact half-open boundaries without t
     expect_identical(as.character(age_cat_iv(x, g, convert_units = direction)), expected)
   }
   # A genuine one-step gap must not be filled by a tolerance.
-  gap <- age_group(c(0, 11 + step), c(11, Inf), unit = "second")
+  gap <- age_interval(c(0, 11 + step), c(11, Inf), unit = "second")
   names(gap) <- names(g)
   partial <- age_scheme(gap, "gap", "One-step gap", domain = c(0, Inf), complete = FALSE)
   probes <- age(c(11 - step, 11, 11 + step), "second")

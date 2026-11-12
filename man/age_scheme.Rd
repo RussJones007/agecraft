@@ -3,7 +3,7 @@
 \name{age_scheme}
 \alias{age_scheme}
 \alias{is_age_scheme}
-\alias{scheme_groups}
+\alias{scheme_intervals}
 \alias{validate_age_scheme}
 \alias{$<-.age_scheme}
 \alias{[[<-.age_scheme}
@@ -11,7 +11,7 @@
 \title{Construct a reusable age classification scheme}
 \usage{
 age_scheme(
-  groups,
+  intervals,
   id,
   name,
   type = c("partition", "classification"),
@@ -28,7 +28,7 @@ age_scheme(
 
 is_age_scheme(x)
 
-scheme_groups(x)
+scheme_intervals(x)
 
 validate_age_scheme(x)
 
@@ -39,7 +39,7 @@ validate_age_scheme(x)
 \method{[}{age_scheme}(x, i, ...) <- value
 }
 \arguments{
-\item{groups}{A nonempty \code{age_group} vector with an explicit time unit and
+\item{intervals}{A nonempty \code{age_interval} vector with an explicit time unit and
 unique, nonblank names for every category. Missing intervals are not allowed.}
 
 \item{id}{Stable machine identifier, using letters, digits, underscores or
@@ -51,7 +51,7 @@ to replace; changing the title field \code{name} is descriptive, not substantive
 \item{type}{\code{"partition"} rejects overlap; \code{"classification"} permits it.}
 
 \item{domain}{NULL or two numeric bounds specifying the intended right-open
-age domain, in the groups' unit. All groups must lie within this domain.}
+age domain, in the intervals' unit. All intervals must lie within this domain.}
 
 \item{complete}{Logical coverage claim: NA (unknown), TRUE (complete), or FALSE
 (incomplete). TRUE/FALSE require a domain and must agree with actual coverage.}
@@ -77,16 +77,16 @@ Recursive indices and multidimensional replacement are not supported.}
 \value{
 \code{age_scheme()} returns a validated S3 scheme. \code{is_age_scheme()} returns
 a logical scalar. \code{validate_age_scheme()} invisibly returns the valid object
-or errors. \code{scheme_groups()} returns its \code{age_group} vector. Replacement
+or errors. \code{scheme_intervals()} returns its \code{age_interval} vector. Replacement
 methods return the validated updated scheme.
 }
 \description{
-A scheme contains an existing \code{\link[=age_group]{age_group()}} vector and scheme-level metadata.
-It does not inherit from \code{age_group}. All intervals are right-open \verb{[start,end)}.
+A scheme contains an existing \code{\link[=age_interval]{age_interval()}} vector and scheme-level metadata.
+It does not inherit from \code{age_interval}. All intervals are right-open \verb{[start,end)}.
 }
 \details{
 Scheme units must be second, minute, hour, day, week, month or year.
-Validation checks the complete stored \code{age_group} representation, including
+Validation checks the complete stored \code{age_interval} representation, including
 interval fields, bounds, units, category names and the actual \code{below}, \code{sep}
 and \code{above} display symbols. Malformed metadata is rejected without repair
 or substitution of defaults. Custom scalar-string display symbols remain
@@ -99,7 +99,7 @@ Classifications permit identical intervals with distinct category names:
 each name represents a separate category, and \code{\link[=classify_age_scheme]{classify_age_scheme()}} returns
 every membership with its original label and category index. Duplicate names
 are invalid in either scheme type. These scheme requirements do not tighten
-the naming rules for bare \code{age_group} vectors. No registry lookup is performed
+the naming rules for bare \code{age_interval} vectors. No registry lookup is performed
 by this constructor.
 }
 \section{Editing local copies}{
@@ -126,7 +126,7 @@ also assigns TRUE.
 
 \code{derived_from} is protected from ordinary replacement. Use one exact field name
 or position for \verb{[[<-}; recursive indices are rejected. Use a list of values
-for atomic batch edits, for example \code{x[c("groups", "complete")] <- list(g, FALSE)}.
+for atomic batch edits, for example \code{x[c("intervals", "complete")] <- list(g, FALSE)}.
 Each completed assignment must be valid; batch related policy/interval changes
 rather than relying on an invalid intermediate object. Optional fields can be
 cleared with NULL without deleting schema fields.
@@ -139,12 +139,12 @@ validation checks structure and ancestry shape, not historical authenticity.
 }
 
 \examples{
-g <- age_group(c(0, 18, 65), c(18, 65, Inf), unit = "year")
+g <- age_interval(c(0, 18, 65), c(18, 65, Inf), unit = "year")
 names(g) <- c("Children", "Adults", "Older adults")
 s <- age_scheme(g, "example", "Example bands", domain = c(0, Inf),
                 complete = TRUE)
 s
-scheme_groups(s)
+scheme_intervals(s)
 summary(s)
 }
 \seealso{

@@ -41,7 +41,7 @@ scheme's unit.}
 A base data frame with \code{observation} (one-based input index),
 \code{scheme_id}, \code{group_index} (original position in the scheme), \code{label},
 \code{status} (\code{"matched"}, \code{"missing"}, or \code{"unmatched"}), and \code{group} (the matched
-\code{age_group} interval in the scheme's original units). One row per match;
+\code{age_interval} interval in the scheme's original units). One row per match;
 missing/unmatched observations each have one placeholder row with missing
 group fields. Rows are ordered by observation and then original group index.
 Empty input yields zero rows with the same columns and types. Scheme metadata
@@ -61,12 +61,12 @@ outside the scheme's intervals. Even a complete scheme may have unmatched
 inputs outside its declared domain.
 }
 \examples{
-g <- age_group(c(10, 15), c(20, 25), unit = "year")
+g <- age_interval(c(10, 15), c(20, 25), unit = "year")
 names(g) <- c("Group A", "Group B")
 s <- age_scheme(g, "overlap_example", "Illustrative overlap",
                 type = "classification")
 classify_age_scheme(age(c(12, 17, 30, NA), unit = "year"), s)
 }
 \seealso{
-\code{\link[=age_scheme]{age_scheme()}}, \code{\link[=scheme_groups]{scheme_groups()}}
+\code{\link[=age_scheme]{age_scheme()}}, \code{\link[=scheme_intervals]{scheme_intervals()}}
 }

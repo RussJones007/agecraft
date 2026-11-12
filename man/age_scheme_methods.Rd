@@ -45,7 +45,7 @@ include \code{derived_from}. See \code{\link[=age_scheme]{age_scheme()}} for edi
 Inspect an age scheme
 }
 \examples{
-g <- age_group(c(0, 10), c(5, 20), unit = "year")
+g <- age_interval(c(0, 10), c(5, 20), unit = "year")
 names(g) <- c("Young", "Older")
 s <- age_scheme(g, "partial", "Partial coverage", domain = c(0, 20),
                 complete = FALSE)

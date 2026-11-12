@@ -46,7 +46,7 @@ test_that("smaller units retain elapsed fractions including daylight saving", {
 })
 
 test_that("calculated fractional ages flow directly to named groups", {
-  groups <- age_group(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
+  groups <- age_interval(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
   names(groups) <- c("Neonate", "Infant", "Toddler")
   ages <- calculate_age(as.Date("2024-01-01"), as.Date(c("2024-01-10", "2024-07-02", "2025-01-01", NA)))
   expect_identical(as.character(categorize_age(ages, by = groups)), c("Neonate", "Infant", "Toddler", NA))

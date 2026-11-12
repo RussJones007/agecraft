@@ -1,5 +1,5 @@
-coverage_groups <- function(start, end) {
-  g <- age_group(start, end, unit = "year")
+coverage_intervals <- function(start, end) {
+  g <- age_interval(start, end, unit = "year")
   names(g) <- paste0("G", seq_along(start))
   g
 }
@@ -18,7 +18,7 @@ test_that("Boolean overlap respects exact half-open endpoints", {
     list(0, Inf, FALSE)
   )
   for (case in cases) {
-    g <- coverage_groups(case[[1]], case[[2]])
+    g <- coverage_intervals(case[[1]], case[[2]])
     before <- g
     assessment <- agecraft:::age_scheme_coverage(g, NULL)
     expect_identical(assessment$overlaps, case[[3]])
@@ -26,7 +26,7 @@ test_that("Boolean overlap respects exact half-open endpoints", {
     expect_identical(assessment$covered, NA)
     expect_identical(g, before)
     if (case[[3]]) {
-      expect_error(age_scheme(g, "p", "Partition"), "partition groups must not overlap")
+      expect_error(age_scheme(g, "p", "Partition"), "partition intervals must not overlap")
     } else {
       expect_s3_class(age_scheme(g, "p", "Partition"), "age_scheme")
     }
@@ -50,13 +50,13 @@ test_that("sorted overlap agrees with an independent pairwise oracle", {
         }
       }
     }
-    g <- coverage_groups(start, end)
+    g <- coverage_intervals(start, end)
     expect_identical(agecraft:::age_scheme_coverage(g, NULL)$overlaps, expected)
   }
 })
 
 test_that("coverage and completeness retain exact gaps and infinite domains", {
-  g <- coverage_groups(c(1, 0, 0.5 + 2^-50), c(Inf, 0.5, 1))
+  g <- coverage_intervals(c(1, 0, 0.5 + 2^-50), c(Inf, 0.5, 1))
   s <- age_scheme(g, "gapped", "Gapped", domain = c(0, Inf), complete = FALSE)
   info <- summary(s)
   expect_false(info$covered)
@@ -65,38 +65,38 @@ test_that("coverage and completeness retain exact gaps and infinite domains", {
   expect_identical(ivs::iv_end(info$gaps), 0.5 + 2^-50)
   expect_error(age_scheme(g, "wrong", "Wrong", domain = c(0, Inf), complete = TRUE),
                "complete does not agree with domain coverage")
-  adjacent <- coverage_groups(c(1, 0), c(Inf, 1))
+  adjacent <- coverage_intervals(c(1, 0), c(Inf, 1))
   complete <- age_scheme(adjacent, "complete", "Complete", domain = c(0, Inf),
                           complete = TRUE)
   expect_true(summary(complete)$covered)
   expect_length(summary(complete)$gaps, 0)
   expect_error(age_scheme(adjacent, "wrong", "Wrong", domain = c(0, 2)),
-               "groups must lie within domain")
+               "intervals must lie within domain")
   expect_error(age_scheme(adjacent, "wrong", "Wrong", complete = TRUE),
                "completeness claim requires an explicit domain")
 })
 
 test_that("assessment preserves category order and classification memberships", {
-  g <- coverage_groups(c(2, 0, 1), c(Inf, 1, 2))
+  g <- coverage_intervals(c(2, 0, 1), c(Inf, 1, 2))
   s <- age_scheme(g, "ordered", "Ordered", domain = c(0, Inf), complete = TRUE)
   a <- age(c(0, 1, 2, NA), unit = "year")
-  expect_identical(scheme_groups(s), g)
+  expect_identical(scheme_intervals(s), g)
   expect_identical(classify_age_scheme(a, s)$group_index, c(2L, 3L, 1L, NA_integer_))
   expect_identical(categorize_age(a, by = s), categorize_age(a, by = g))
-  overlapping <- coverage_groups(c(1, 0, 0), c(2, 3, 3))
+  overlapping <- coverage_intervals(c(1, 0, 0), c(2, 3, 3))
   s <- age_scheme(overlapping, "overlap", "Overlap", type = "classification",
                   domain = c(0, 3), complete = TRUE)
   expect_true(summary(s)$overlaps)
   expect_true(summary(s)$covered)
   expect_identical(classify_age_scheme(age(1, unit = "year"), s)$group_index, 1:3)
-  expect_identical(scheme_groups(s), overlapping)
+  expect_identical(scheme_intervals(s), overlapping)
   result <- withVisible(validate_age_scheme(s))
   expect_false(result$visible)
   expect_identical(result$value, s)
 })
 
 test_that("summary performs one coverage assessment while validating", {
-  g <- coverage_groups(c(0, 1), c(1, 2))
+  g <- coverage_intervals(c(0, 1), c(1, 2))
   s <- age_scheme(g, "summary", "Summary", domain = c(0, 2), complete = TRUE)
   calls <- 0L
   original <- agecraft:::age_scheme_coverage

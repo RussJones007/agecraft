@@ -6,18 +6,21 @@ reference:
       - calculate_age
       - age_auto_unit
       - age_cat_iv
-      - age_group_presets
-  - title: Age group vectors
+      - age_interval_presets
+  - title: Age interval vectors
     contents:
-      - age_group
-      - compare_age_groups
-      - as.age_group
-      - age_group_to_char
-      - as.character.age_group
-      - as.factor.age_group
-      - as.ordered.age_group
-      - valid_age_group_symbol
-      - new_age_group
+      - age_interval
+      - compare_age_intervals
+      - as_age_interval
+      - age_interval_to_char
+      - as.character.age_interval
+      - as.factor.age_interval
+      - as.ordered.age_interval
+      - valid_age_interval_symbol
+      - new_age_interval
+  - title: Assigned age categories
+    contents:
+      - age_category
   - title: Reusable age schemes
     contents:
       - age_scheme

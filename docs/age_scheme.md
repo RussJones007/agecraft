@@ -8,12 +8,12 @@
 
 `agecraft` should support more than converting an age to a conventional five-year band. Different disciplines and reporting systems use age categories for different purposes: demographic denominators, infectious-disease surveillance, mortality reporting, immunization, eligibility, and developmental life stages. A classification should therefore be **explicit, reproducible, inspectable, and attributable to a source**.
 
-The central design is a new S3 **`age_scheme`** class that *contains* the package's existing **`age_group`** interval vector. It does not replace `age_group`, introduce a second interval engine, or require `age_scheme` to inherit from `age_group`.
+The central design is a new S3 **`age_scheme`** class that *contains* the package's existing **`age_interval`** interval vector. It does not replace `age_interval`, introduce a second interval engine, or require `age_scheme` to inherit from `age_interval`.
 
 ## 2. Design principles
 
-1. **Keep `ivs` as the interval foundation.** `age_group` already uses `ivs::new_iv()` and right-open intervals `[start, end)`. Preserve that model.
-2. **Separate ages, groups, and schemes.** An age value is an observation; an `age_group` is an interval (or vector of intervals); an `age_scheme` is a named, validated set of intervals with metadata and usage rules.
+1. **Keep `ivs` as the interval foundation.** `age_interval` already uses `ivs::new_iv()` and right-open intervals `[start, end)`. Preserve that model.
+2. **Separate ages, groups, and schemes.** An age value is an observation; an `age_interval` is an interval (or vector of intervals); an `age_scheme` is a named, validated set of intervals with metadata and usage rules.
 3. **Preserve units explicitly.** A scheme has a unit shared by its groups (for example, years or days). Never silently equate a month with a fixed number of days or a year with 365 days where calendar semantics matter.
 4. **Make analytical intent explicit.** A mutually exclusive partition differs from an overlapping classification. Overlapping groups must never be silently summed as if they partitioned a population.
 5. **Treat provenance as data, not commentary.** Keep source, version/edition, reference, purpose, and verification status with each scheme.
@@ -29,7 +29,7 @@ age values / age vectors
           | classified using
           v
      age_scheme (S3)
-       |-- age_group vector (existing S3 class, backed by ivs)
+       |-- age_interval vector (existing S3 class, backed by ivs)
        |     |-- [start, end) intervals
        |     |-- names / labels
        |     `-- unit
@@ -38,7 +38,7 @@ age values / age vectors
        `-- partition / classification rules
 ```
 
-`age_scheme` uses **composition**, not inheritance from `age_group`. The existing `age_group()` constructor, interval comparisons, names, formatting, and `vctrs` methods remain the foundation. A scheme should expose its underlying intervals through a documented accessor such as `groups()` or `scheme_groups()` (final naming TBD).
+`age_scheme` uses **composition**, not inheritance from `age_interval`. The existing `age_interval()` constructor, interval comparisons, names, formatting, and `vctrs` methods remain the foundation. A scheme should expose its underlying intervals through a documented accessor such as `groups()` or `scheme_intervals()` (final naming TBD).
 
 ## 4. Proposed `age_scheme` contract
 
@@ -48,9 +48,9 @@ Each scheme should include the following information. Some fields are required f
 |---|---|---|
 | `id` | Stable machine-readable identifier, e.g. `legacy_ili` | Required; unique within a registry |
 | `name` | Human-readable title | Required |
-| `groups` | Named `age_group` vector | Required; retains `ivs` interval semantics |
+| `intervals` | Named `age_interval` vector | Required; retains `ivs` interval semantics |
 | `type` | `partition` or `classification` | Required |
-| `unit` | Unit for all interval endpoints | Taken from/consistent with `groups` |
+| `unit` | Unit for all interval endpoints | Taken from/consistent with `intervals` |
 | `domain` | Intended age range or population | Optional but strongly recommended |
 | `complete` | Whether groups cover the stated domain | Validated or explicitly unknown |
 | `purpose` | Intended analytical/reporting use | Recommended |
@@ -61,11 +61,11 @@ Each scheme should include the following information. Some fields are required f
 | `verified` | Whether cut points were checked against the cited source | Explicit for built-ins |
 | `notes` | Caveats, historical status, boundary interpretation | Optional |
 
-**Names and intervals:** Group labels are presentation and category identifiers, not interval identity. The existing `age_group` equality semantics should remain based on interval bounds rather than names. Labels should nevertheless be nonblank and unique within a scheme when used as output categories.
+**Names and intervals:** Group labels are presentation and category identifiers, not interval identity. The existing `age_interval` equality semantics should remain based on interval bounds rather than names. Labels should nevertheless be nonblank and unique within a scheme when used as output categories.
 
 **Boundaries:** Preserve `[start, end)` throughout. Thus completed ages 5–9 are represented by `[5, 10)` years, and 85+ by `[85, Inf)`. Avoid ambiguous inclusive-upper-bound storage. Fractional bounds must remain possible.
 
-**Missingness:** The underlying `age_group` class supports missing intervals; the scheme constructor should normally reject missing category intervals, since a reference scheme with undefined cut points is not usable.
+**Missingness:** The underlying `age_interval` class supports missing intervals; the scheme constructor should normally reject missing category intervals, since a reference scheme with undefined cut points is not usable.
 
 ## 5. Two kinds of schemes
 
@@ -95,7 +95,7 @@ The exact names and signatures should be finalized after reviewing existing `age
 
 ```r
 # Existing foundation:
-g <- age_group(
+g <- age_interval(
   start = c(0, 1, 5, 15, 25, 40, 65),
   end   = c(1, 5, 15, 25, 40, 65, Inf),
   unit  = "year"
@@ -104,7 +104,7 @@ names(g) <- c("<1", "1-4", "5-14", "15-24", "25-39", "40-64", "65+")
 
 # Proposed new constructor:
 s <- age_scheme(
-  groups = g,
+  intervals = g,
   id = "example_surveillance",
   name = "Example surveillance age bands",
   type = "partition",
@@ -115,7 +115,7 @@ s <- age_scheme(
 # Proposed discovery/accessors:
 list_age_schemes()
 get_age_scheme("legacy_ili")
-scheme_groups(s)
+scheme_intervals(s)
 summary(s)
 as.data.frame(s)
 
@@ -135,7 +135,7 @@ The cut points above are **illustrative**, not a claim about the current officia
 
 The built-in library should be **small, curated, versioned, and discoverable**. It should not be an indiscriminate catalog of every age grouping ever published. Prioritize commonly useful demographic and epidemiologic definitions, while allowing users to construct any other scheme.
 
-### 7.1 Migrate existing `age_group_presets`
+### 7.1 Migrate existing `age_interval_presets`
 
 The repository currently documents eight presets in `R/misc.r`:
 
@@ -150,7 +150,7 @@ The repository currently documents eight presets in `R/misc.r`:
 | `School` | School-oriented reporting bands | Preserve with reporting context |
 | `Covid` | COVID-19 reporting bands | Preserve as historical/versioned |
 
-The existing `age_group_presets` list is a set of numeric cut points used by `categorize_age()`/`cut()`, **not yet a collection of `age_scheme` objects**. Migration should convert the cut points into named `age_group` intervals and attach metadata **without changing their boundaries**.
+The existing `age_interval_presets` list is a set of numeric cut points used by `categorize_age()`/`cut()`, **not yet a collection of `age_scheme` objects**. Migration should convert the cut points into named `age_interval` intervals and attach metadata **without changing their boundaries**.
 
 The repository also documents a legacy alias `age.groups` and a provenance file at `inst/extdata/age-group-provenance.csv`. Preserve these compatibility commitments. The existing documentation says that `age.groups` will remain through the next non-development release, with removal only after a later announced breaking release.
 
@@ -171,7 +171,7 @@ Do **not** expose a vague `age_scheme_cdc()` as if CDC had one universal set of 
 
 ## 8. Units and age semantics
 
-`age_group` already supports a vector-level unit. A scheme should continue to have **one unit per scheme**, with explicit conversions when needed.
+`age_interval` already supports a vector-level unit. A scheme should continue to have **one unit per scheme**, with explicit conversions when needed.
 
 - Support age bands in years, months, weeks, days, and hours as appropriate.
 - Distinguish **completed age** (for example, completed years) from elapsed duration.
@@ -195,24 +195,24 @@ This specification does not propose changing `tarr.pop`'s S4 inheritance or forc
 
 ## 10. Migration plan
 
-1. **Inventory the existing code:** `age_group` constructor, `ivs` operations, `categorize_age()`, existing presets, tests, and public compatibility commitments.
+1. **Inventory the existing code:** `age_interval` constructor, `ivs` operations, `categorize_age()`, existing presets, tests, and public compatibility commitments.
 2. **Implement `age_scheme`:** S3 constructor, validator, accessors, printing, summary, data-frame conversion, and partition/classification contracts.
-3. **Adapt `categorize_age()`:** Accept a scheme by extracting its `age_group` vector; preserve existing behavior for raw numeric cut points and `age_group` inputs.
+3. **Adapt `categorize_age()`:** Accept a scheme by extracting its `age_interval` vector; preserve existing behavior for raw numeric cut points and `age_interval` inputs.
 4. **Migrate the eight presets:** Create equivalent scheme definitions, retaining original cut points and uncertain provenance. Add equivalence tests.
 5. **Provide registry discovery:** List, retrieve, and inspect schemes. Keep user-defined construction first-class.
 6. **Add authoritative schemes selectively:** Verify sources and editions before inclusion; record provenance and overlapping/gap semantics.
-7. **Document and release carefully:** Add a vignette comparing partitions and classifications; retain `age_group_presets` and `age.groups` according to the documented compatibility policy.
+7. **Document and release carefully:** Add a vignette comparing partitions and classifications; retain `age_interval_presets` and `age.groups` according to the documented compatibility policy.
 
 ## 11. Tests to add (`testthat`)
 
-- Construction preserves the exact `age_group` interval bounds, `Inf`, labels, and unit.
+- Construction preserves the exact `age_interval` interval bounds, `Inf`, labels, and unit.
 - Right-open boundaries behave correctly at every cut point; fractional endpoints are preserved.
 - Partitions reject overlaps and detect gaps; completeness is evaluated relative to the declared domain.
 - Classifications permit overlaps and return all matching groups without silently selecting one.
 - Duplicate/blank labels, missing intervals, invalid domains, contradictory units, and malformed metadata fail informatively.
 - Out-of-domain and missing ages have documented results.
 - Scheme-based classification agrees with existing `categorize_age()` for each legacy preset on representative ages and all boundaries.
-- Existing `age_group_presets` and `age.groups` remain compatible as promised.
+- Existing `age_interval_presets` and `age.groups` remain compatible as promised.
 - Print/summary/data-frame conversions preserve labels, bounds, and provenance.
 - No scheme operation accidentally changes interval identity based on display names.
 - `tarr.pop` integration does not force HDF5-backed arrays into memory and refuses inexact regrouping without an explicit policy.
@@ -228,7 +228,7 @@ For exported constructors and accessors, use roxygen2 `@param`, `@return`, `@exa
 The following should be settled before implementation rather than assumed:
 
 1. Whether `age_partition` and `age_classification` are separate subclasses or one class with a validated `type` field.
-2. Whether `age_scheme()` is strictly a constructor, with `get_age_scheme()` reserved for registry lookup (recommended), and the final accessor name for the underlying `age_group`.
+2. Whether `age_scheme()` is strictly a constructor, with `get_age_scheme()` reserved for registry lookup (recommended), and the final accessor name for the underlying `age_interval`.
 3. Whether the registry stores serialized scheme objects, constructor functions, or compact source definitions.
 4. The multiple-membership output format for overlapping classifications.
 5. The policy for completeness, gaps, and open-ended domains.
@@ -237,15 +237,15 @@ The following should be settled before implementation rather than assumed:
 
 ## 14. Working decision
 
-**Build `age_scheme` as a small, source-aware S3 wrapper around the existing `ivs`-based `age_group` class.** Make user-defined schemes easy; distinguish partitions from overlapping classifications; migrate the eight historical presets without breaking callers; and add a curated, carefully verified library of epidemiologic and demographic definitions. Reuse existing `agecraft` interval and classification machinery rather than creating a parallel system.
+**Build `age_scheme` as a small, source-aware S3 wrapper around the existing `ivs`-based `age_interval` class.** Make user-defined schemes easy; distinguish partitions from overlapping classifications; migrate the eight historical presets without breaking callers; and add a curated, carefully verified library of epidemiologic and demographic definitions. Reuse existing `agecraft` interval and classification machinery rather than creating a parallel system.
 
 ## 15. Initial implementation contract — implemented 2026-11-10
 
 The implementation follows `age_scheme_implementation_plan.md`. Use one S3
 `age_scheme` class with a validated `type` field, without partition/classification
-subclasses. The constructor requires named, nonempty `age_group` intervals with
+subclasses. The constructor requires named, nonempty `age_interval` intervals with
 an explicit supported time unit. Category names must be nonblank and unique.
-`scheme_groups()` accesses intervals; `is_age_scheme()` identifies the class;
+`scheme_intervals()` accesses intervals; `is_age_scheme()` identifies the class;
 `validate_age_scheme()` checks the full object, including after direct mutation.
 
 `domain` is NULL or a numeric pair describing a right-open interval in the group
@@ -264,7 +264,7 @@ There are no provenance-preserving scheme set-operation methods.
 
 `categorize_age(..., by = scheme)` delegates to existing single-assignment
 behavior. `classify_age_scheme(ages, scheme)` returns a base data frame with
-`observation`, `scheme_id`, `group_index`, `label`, `status`, and an `age_group`
+`observation`, `scheme_id`, `group_index`, `label`, `status`, and an `age_interval`
 column named `group`. Matches retain original category indices and are ordered
 by observation then category. Missing and unmatched observations each produce
 one placeholder row (`status` is `missing` or `unmatched`); matches have status

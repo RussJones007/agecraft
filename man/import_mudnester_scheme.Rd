@@ -61,5 +61,5 @@ if (requireNamespace("mudnester", quietly = TRUE)) {
 }
 }
 \seealso{
-\code{\link[=age_scheme]{age_scheme()}}, \code{\link[=scheme_groups]{scheme_groups()}}, \code{\link[=list_age_schemes]{list_age_schemes()}}
+\code{\link[=age_scheme]{age_scheme()}}, \code{\link[=scheme_intervals]{scheme_intervals()}}, \code{\link[=list_age_schemes]{list_age_schemes()}}
 }

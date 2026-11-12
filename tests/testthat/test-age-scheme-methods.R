@@ -1,5 +1,5 @@
 test_that("scheme inspection preserves provenance and interval coordinates", {
-  g <- age_group(c(0, 5.25), c(5, Inf), unit = "year")
+  g <- age_interval(c(0, 5.25), c(5, Inf), unit = "year")
   names(g) <- c("Young", "Older")
   s <- age_scheme(g, "test", "Example", domain = c(0, Inf), complete = FALSE,
                   source = "Example source", reference = "Example citation",
@@ -21,7 +21,7 @@ test_that("scheme inspection preserves provenance and interval coordinates", {
   expect_null(unknown$gaps)
   expect_true(is.na(unknown$covered))
   altered <- unclass(s)
-  altered$groups <- age_group(0, 10, unit = "year")
+  altered$intervals <- age_interval(0, 10, unit = "year")
   class(altered) <- "age_scheme"
   expect_error(print(altered), "names")
   expect_error(summary(altered), "names")

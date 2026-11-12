@@ -1,5 +1,10 @@
 # Agecraft coding guidelines
 
+> Phase-one naming refactor (2026-11-12): interval vectors use `age_interval`;
+> categorical assignments remain `age_category`. See
+> [the migration guide](age_class_naming_migration.md) for compatibility changes.
+
+
 **Status:** Development instructions for contributors and coding agents\
 **Updated:** 2026-11-10\
 **Scope:** The `agecraft` R package (`RussJones007/agecraft`)
@@ -30,12 +35,12 @@ If documents disagree, **do not silently choose a new behavior**. Preserve the c
 
 ## 3. S3, vctrs, and class design
 
-- Preserve the existing S3 `age` and `age_group` classes and their contracts. `age_group` is an `ivs`-based interval vector; do not replace it with a plain data frame or lower/upper cut-point list.
+- Preserve the existing S3 `age` and `age_interval` classes and their contracts. `age_interval` is an `ivs`-based interval vector; do not replace it with a plain data frame or lower/upper cut-point list.
 - Follow the established `vctrs` proxy, prototype, casting, restoration, slicing, and concatenation behavior. Test class and metadata retention after vector operations.
 - Use established S3 generics and register methods correctly. Do not add methods to bare `ivs_iv` beyond existing compatibility registrations without an explicit design decision.
 - Use validated constructors rather than setting class or internal record fields ad hoc. Keep internal helpers private unless a public use case justifies export.
 - Handle length-zero vectors, missing values, and incompatible types deliberately.
-- `age_scheme` is a metadata-bearing S3 object **containing** an `age_group` vector, not inheriting from `age_group` and not attached to every observation. Consult `docs/age_scheme.md` section 15 for implemented constructors, registry accessors, and validation contracts.
+- `age_scheme` is a metadata-bearing S3 object **containing** an `age_interval` vector, not inheriting from `age_interval` and not attached to every observation. Consult `docs/age_scheme.md` section 15 for implemented constructors, registry accessors, and validation contracts.
 
 ## 4. Age values and interval semantics
 
@@ -44,18 +49,18 @@ These are correctness requirements, not display preferences:
 - All age intervals are **left-closed, right-open**: `[start, end)`. For completed whole-year ages, `[1, 5)` corresponds to ages 1–4.
 - Preserve fractional boundaries and fractional stored ages. Never round a value merely because its default printed representation shows completed units.
 - Require nonnegative finite lower bounds; allow `Inf` only as an upper bound. Missing intervals require both endpoints missing. Reject reversed and zero-width intervals.
-- Gaps and overlaps are valid for `age_group` vectors. Never assume disjointness or complete coverage without scheme-level validation.
+- Gaps and overlaps are valid for `age_interval` vectors. Never assume disjointness or complete coverage without scheme-level validation.
 - Keep interval identity separate from names and labels. Names affect display and categories, not interval equality or ordering. Distinct intervals must not silently collapse into one factor label.
-- Retain `age_group` names and units when existing vector contracts require it. Coverage operations that merge or split intervals must not carry misleading old labels.
+- Retain `age_interval` names and units when existing vector contracts require it. Coverage operations that merge or split intervals must not carry misleading old labels.
 
 ## 5. Units and calendar semantics
 
-- One `age` or `age_group` vector has one explicit or documented unspecified unit; do not silently introduce mixed per-element units.
+- One `age` or `age_interval` vector has one explicit or documented unspecified unit; do not silently introduce mixed per-element units.
 - Preserve `calculate_age()`'s current default: a fractional `age` vector whose ordinary display shows completed units. `as.numeric()` returns the retained fractional values; `as.integer()` returns completed units. The `output = "numeric"` and `output = "units"` options return completed values as documented.
 - Preserve established calendar-anniversary rules for years and months, including March 1 handling of leap-day birthdays in non-leap years and month-end rollback. Finer units use elapsed time as documented.
 - Do not treat calendar months or years as universally fixed numbers of days. Require `allow_approx = TRUE` for month/year conversions and approximate fine/coarse unit conversions.
 - Honor existing classification unit rules: unspecified group units may inherit age units; unitless ages with explicitly unit-bearing groups are rejected; conversion direction is controlled by `convert_units`.
-- `compare_age_groups()` requires matching units and must not introduce implicit conversion.
+- `compare_age_intervals()` requires matching units and must not introduce implicit conversion.
 
 ## 6. Classification and analytical integrity
 
@@ -69,11 +74,11 @@ These are correctness requirements, not display preferences:
 
 When extending the initial implementation in `docs/age_scheme.md` section 15:
 
-- Reuse `age_group` for boundaries, units, labels, and matching. Scheme metadata should describe identity, purpose, provenance, and validation policy without duplicating interval coordinates.
+- Reuse `age_interval` for boundaries, units, labels, and matching. Scheme metadata should describe identity, purpose, provenance, and validation policy without duplicating interval coordinates.
 - Distinguish an individually valid interval from a valid **partition** and from a potentially overlapping **classification**. Treat coverage completeness as a separate, explicit property.
 - Define how sorting, subsetting, relabeling, combining, and set operations affect scheme validity and provenance. Do not silently retain claims of completeness or official identity after altering boundaries.
 - Provide stable identifiers, human-readable names, source/edition/date where known, and explicit uncertainty where not known. Do not present historical presets as current official clinical guidance.
-- Preserve all eight `age_group_presets` cut-point definitions and the `age.groups` compatibility alias under the documented deprecation policy. Migrate through an additive interface rather than replacing numeric presets abruptly.
+- Preserve all eight `age_interval_presets` cut-point definitions and the `age.groups` compatibility alias under the documented deprecation policy. Migrate through an additive interface rather than replacing numeric presets abruptly.
 - Keep scheme definitions lightweight and reusable. Prefer a small curated registry with clear provenance and user-defined schemes over hard-coded assumptions about a single universal CDC or WHO standard.
 - Confirm any proposed function name, signature, and S3 dispatch approach before treating it as a public contract.
 

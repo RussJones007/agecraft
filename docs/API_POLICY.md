@@ -1,12 +1,24 @@
+# Phase-one naming transition — 2026-11-12
+
+This branch intentionally breaks the old interval API: `age_group` is replaced
+by `age_interval`, with snake_case coercion/predicate names. Schemes take/store
+`intervals` and expose `scheme_intervals()`; `age_category` takes/stores
+`intervals` and exposes `category_intervals()`. The assignment class remains
+`age_category`; no new factor `age_group` class exists in phase one.
+`age_interval_presets` is canonical; `age_group_presets` and `age.groups` remain
+identical data aliases through the existing compatibility window. Old interval
+constructor/class aliases are not retained. See `age_class_naming_migration.md`
+for the function map and saved-object reconstruction requirements.
+
 # Public interface and compatibility
 
 ## Primary workflow
 
 The main workflow uses `calculate_age()`, `age()`, `as_age()`, `is_age()`,
-`categorize_age()`, `age_group()`, `as.age_group()`, `is.age_group()`,
-`age_auto_unit()`, and `compare_age_groups()`. Registered S3 methods remain
-infrastructure. `age_group_to_char()` and `valid_age_group_symbol()` stay exported
-for compatibility; use `as.character()` and `as.age_group()` in new code.
+`categorize_age()`, `age_interval()`, `as_age_interval()`, `is_age_interval()`,
+`age_auto_unit()`, and `compare_age_intervals()`. Registered S3 methods remain
+infrastructure. `age_interval_to_char()` and `valid_age_interval_symbol()` are exported
+formatting/parsing helpers; use `as.character()` and `as_age_interval()` in new code.
 
 ## Age precision and return formats
 
@@ -67,28 +79,28 @@ Unspecified group units inherit the input ages' unit for classification.
 Unitless ages with explicitly unit-bearing groups are rejected. When specified
 units differ, `convert_units` chooses conversion of ages or groups, or rejects
 conversion with `"none"`. Approximate conversions require `allow_approx = TRUE`.
-`compare_age_groups()` requires matching units and does not convert implicitly.
+`compare_age_intervals()` requires matching units and does not convert implicitly.
 
 ## Compatibility commitments
 
 `age_cat()` warns once per session. `calc_age()` and `age.cat()` retain their
 once-per-session messages and direct users to the primary functions. All three
 remain available through the next non-development release. `age.groups` remains
-a compatibility alias for `age_group_presets` through that release. Removal
+a compatibility alias for `age_interval_presets` through that release. Removal
 requires a later announced breaking release; no removal date is set.
 
 The existing `as.character.ivs_iv()` and `summary.ivs_iv()` registrations are
-retained for compatibility. New features operate on `age_group` explicitly and
+retained for compatibility. New features operate on `age_interval` explicitly and
 will not add methods to the bare ivs class.
 
 ## Age schemes
 
-`age_scheme()`, `is_age_scheme()`, `validate_age_scheme()`, `scheme_groups()`,
+`age_scheme()`, `is_age_scheme()`, `validate_age_scheme()`, `scheme_intervals()`,
 `classify_age_scheme()`, `get_age_scheme()`, and `list_age_schemes()` are additive
 public interfaces. A scheme contains the existing interval vector; it does not
-change `age_group` equality or vector semantics. It requires nonempty named
+change `age_interval` equality or vector semantics. It requires nonempty named
 intervals with an explicit supported time unit. Validation checks the complete
-stored `age_group` representation, including actual display symbols, interval
+stored `age_interval` representation, including actual display symbols, interval
 fields and category metadata, without repair or default substitution. Custom
 scalar-string display symbols remain valid. Partitions prohibit overlaps;
 coverage is independently checked against an optional right-open domain.
@@ -98,7 +110,7 @@ a domain; NA makes no claim.
 Identical intervals overlap and are invalid in partitions. Classifications permit
 identical intervals with distinct labels as separate semantic categories. Every
 scheme requires unique, nonblank category labels, independently of interval
-equality; bare `age_group` vectors retain their more permissive naming rules.
+equality; bare `age_interval` vectors retain their more permissive naming rules.
 Duplicates do not extend coverage or fill gaps. The all-membership table preserves
 original category order and indices. Single-assignment classification resolves
 matches in interval order; its factor output represents one selected membership,
@@ -197,11 +209,11 @@ remain unsupported. Age-group and scheme arithmetic are outside this contract.
 ## Age-category assignments — 2026-11-11
 
 Age-group standalone printing shows class, common unit and vector length in a
-header. `format.age_group()` returns interval labels without unit suffixes;
+header. `format.age_interval()` returns interval labels without unit suffixes;
 this intentionally changes previously unit-suffixed formatted strings.
 
 `categorize_age(output = "factor")` now returns `age_category`, an ordered-factor
-subclass with level-aligned `age_group` definitions accessed by `category_groups()`.
+subclass with level-aligned `age_interval` definitions accessed by `category_intervals()`.
 Readable labels, codes, unused categories, missing assignments and matching rules
 are retained. This intentionally changes exact class and attribute comparisons.
 Interval output and `age_cat_iv()` are unchanged. Original ages and scheme

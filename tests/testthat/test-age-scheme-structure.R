@@ -1,5 +1,5 @@
 structure_test_groups <- function() {
-  g <- age_group(c(0, 11), c(11, Inf), unit = "second")
+  g <- age_interval(c(0, 11), c(11, Inf), unit = "second")
   names(g) <- c("Under eleven", "Eleven or more")
   g
 }
@@ -8,11 +8,11 @@ expect_scheme_rejects_groups <- function(g, pattern) {
   expect_error(age_scheme(g, "broken", "Broken"), pattern)
   s <- age_scheme(structure_test_groups(), "example", "Example")
   s <- unclass(s)
-  s$groups <- g
+  s$intervals <- g
   class(s) <- "age_scheme"
   original <- serialize(s, NULL)
   expect_error(validate_age_scheme(s), pattern)
-  expect_error(scheme_groups(s), pattern)
+  expect_error(scheme_intervals(s), pattern)
   expect_error(categorize_age(age(1, "second"), by = s), pattern)
   expect_error(classify_age_scheme(age(1, "second"), s), pattern)
   expect_error(print(s), pattern)
@@ -113,7 +113,7 @@ test_that("scheme validation rejects corrupted interval records without repair",
 test_that("validated schemes support ordinary operations and custom display symbols", {
   for (symbols in list(list(above = " and up", below = "< ", sep = " through "),
                        list(below = "", sep = "", above = ""))) {
-    g <- age_group(c(0, 5, 11.5), c(5, 11.5, Inf), unit = "second",
+    g <- age_interval(c(0, 5, 11.5), c(5, 11.5, Inf), unit = "second",
                    below = symbols$below, sep = symbols$sep, above = symbols$above)
     names(g) <- c("Young", "Middle", "Older")
     # Named list ordering has no semantic significance.
@@ -122,7 +122,7 @@ test_that("validated schemes support ordinary operations and custom display symb
     s <- age_scheme(g, "custom", "Custom", domain = c(0, Inf), complete = TRUE)
     before <- serialize(s, NULL)
     expect_identical(validate_age_scheme(s), s)
-    out <- scheme_groups(s)
+    out <- scheme_intervals(s)
     expect_identical(out, g)
     expect_identical(attr(out[c(3, 1)], "symbols"), symbols)
     expect_identical(names(out[c(3, 1)]), c("Older", "Young"))
@@ -141,19 +141,19 @@ test_that("validated schemes support ordinary operations and custom display symb
   for (id in list_age_schemes()$id) {
     s <- get_age_scheme(id)
     expect_identical(validate_age_scheme(s), s)
-    expect_no_error(format(scheme_groups(s)[1]))
+    expect_no_error(format(scheme_intervals(s)[1]))
     expect_equal(nrow(classify_age_scheme(age(1, "year"), s)), 1)
   }
 })
 
 test_that("general interval validation retains optional metadata and empty vectors", {
-  empty <- age_group()
-  expect_identical(validate_age_group(empty), empty)
+  empty <- age_interval()
+  expect_identical(validate_age_interval(empty), empty)
   expect_error(age_scheme(empty, "empty", "Empty"), "nonempty")
-  g <- age_group(c(0, NA_real_), c(5, NA_real_))
+  g <- age_interval(c(0, NA_real_), c(5, NA_real_))
   names(g) <- c("", NA_character_)
-  expect_identical(validate_age_group(g), g)
-  # Arbitrary nonblank units remain permitted by age_group, but not by schemes.
-  custom <- age_group(0, 5, unit = "custom")
-  expect_identical(validate_age_group(custom), custom)
+  expect_identical(validate_age_interval(g), g)
+  # Arbitrary nonblank units remain permitted by age_interval, but not by schemes.
+  custom <- age_interval(0, 5, unit = "custom")
+  expect_identical(validate_age_interval(custom), custom)
 })

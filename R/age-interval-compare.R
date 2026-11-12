@@ -2,7 +2,7 @@
 #'
 #' Compare all pairs of intervals or operate on their overall coverage. All
 #' intervals are lower inclusive and upper exclusive; touching intervals do not
-#' overlap. Both inputs must be age_group vectors with identical units (or both
+#' overlap. Both inputs must be age_interval vectors with identical units (or both
 #' unitless). No implicit or approximate conversion is performed.
 #'
 #' @param x,y Age-group vectors. y is unnecessary for operation = "width".
@@ -19,12 +19,12 @@
 #'
 #' @return Crosswalk, membership, ordering and age_gap return a data frame with
 #'   x_id, y_id, x_label, and y_label in input order (each x paired with every y).
-#'   Crosswalks add status and an age_group intersection column. Membership adds
+#'   Crosswalks add status and an age_interval intersection column. Membership adds
 #'   a logical member column; ordering adds "before", "after", or "unresolved".
 #'   Age gaps describe y minus x with lower and upper bounds, both exclusive,
 #'   and a unit column. These are possible real-valued differences, not rounded
 #'   differences between completed ages. Infinite bounds denote unbounded gaps.
-#'   Set operations return age_group coverage, merging touching ranges and
+#'   Set operations return age_interval coverage, merging touching ranges and
 #'   preserving gaps, following ivs set semantics (including missing intervals).
 #'   Width returns end minus start per x, with units when present; calendar-unit
 #'   widths describe age coordinates, not elapsed durations.
@@ -37,12 +37,12 @@
 #'   at a record date to age at another date or shift calendar ages.
 #' @export
 #' @examples
-#' a <- age_group(c(0, 18), c(18, 65), unit = "year")
-#' b <- age_group(c(0, 5, 25), c(5, 25, 65), unit = "year")
-#' compare_age_groups(a, b)
-#' compare_age_groups(a, b, operation = "membership", membership = "possible")
-#' compare_age_groups(a, operation = "width")
-compare_age_groups <- function(x, y = NULL,
+#' a <- age_interval(c(0, 18), c(18, 65), unit = "year")
+#' b <- age_interval(c(0, 5, 25), c(5, 25, 65), unit = "year")
+#' compare_age_intervals(a, b)
+#' compare_age_intervals(a, b, operation = "membership", membership = "possible")
+#' compare_age_intervals(a, operation = "width")
+compare_age_intervals <- function(x, y = NULL,
                                operation = c("crosswalk", "membership", "ordering", "age_gap",
                                              "intersection", "union", "difference", "width"),
                                membership = c("definite", "possible"), keep_empty = FALSE,
@@ -50,7 +50,7 @@ compare_age_groups <- function(x, y = NULL,
   operation <- match.arg(operation)
   membership <- match.arg(membership)
   ambiguous <- match.arg(ambiguous)
-  if (!is.age_group(x)) stop("x must be an age_group vector", call. = FALSE)
+  if (!is_age_interval(x)) stop("x must be an age_interval vector", call. = FALSE)
   if (!is.logical(keep_empty) || length(keep_empty) != 1L || is.na(keep_empty)) {
     stop("keep_empty must be TRUE or FALSE", call. = FALSE)
   }
@@ -59,8 +59,8 @@ compare_age_groups <- function(x, y = NULL,
     if (!is.null(get_unit(x))) width <- units::set_units(width, get_unit(x), mode = "standard")
     return(width)
   }
-  if (!is.age_group(y)) stop("y must be an age_group vector", call. = FALSE)
-  age_group_common_unit(x, y)
+  if (!is_age_interval(y)) stop("y must be an age_interval vector", call. = FALSE)
+  age_interval_common_unit(x, y)
   if (operation %in% c("intersection", "union", "difference")) {
     fun <- switch(operation, intersection = ivs::iv_set_intersect,
                   union = ivs::iv_set_union, difference = ivs::iv_set_difference)
@@ -80,7 +80,7 @@ compare_age_groups <- function(x, y = NULL,
     absent <- missing | !overlap
     start[absent] <- end[absent] <- NA_real_
     out$status <- ifelse(missing, "missing", ifelse(overlap, "overlap", "empty"))
-    out$intersection <- new_age_group(start, end, get_symbols(x), get_unit(x))
+    out$intersection <- new_age_interval(start, end, get_symbols(x), get_unit(x))
     if (!keep_empty) out <- out[!missing & overlap, , drop = FALSE]
   } else if (operation == "membership") {
     out$member <- if (membership == "possible") overlap else xs >= ys & xe <= ye

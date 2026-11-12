@@ -1,9 +1,9 @@
 #' Construct a reusable age classification scheme
 #'
-#' A scheme contains an existing [age_group()] vector and scheme-level metadata.
-#' It does not inherit from `age_group`. All intervals are right-open `[start,end)`.
+#' A scheme contains an existing [age_interval()] vector and scheme-level metadata.
+#' It does not inherit from `age_interval`. All intervals are right-open `[start,end)`.
 #'
-#' @param groups A nonempty `age_group` vector with an explicit time unit and
+#' @param intervals A nonempty `age_interval` vector with an explicit time unit and
 #'   unique, nonblank names for every category. Missing intervals are not allowed.
 #' @param id Stable machine identifier, using letters, digits, underscores or
 #'   hyphens and starting with a letter.
@@ -11,7 +11,7 @@
 #'   to replace; changing the title field `name` is descriptive, not substantive.
 #' @param type `"partition"` rejects overlap; `"classification"` permits it.
 #' @param domain NULL or two numeric bounds specifying the intended right-open
-#'   age domain, in the groups' unit. All groups must lie within this domain.
+#'   age domain, in the intervals' unit. All intervals must lie within this domain.
 #' @param complete Logical coverage claim: NA (unknown), TRUE (complete), or FALSE
 #'   (incomplete). TRUE/FALSE require a domain and must agree with actual coverage.
 #' @param purpose,organization,source,reference,version,notes Optional nonblank
@@ -23,10 +23,10 @@
 #'   an external source. Legacy built-ins are unverified.
 #' @return `age_scheme()` returns a validated S3 scheme. `is_age_scheme()` returns
 #'   a logical scalar. `validate_age_scheme()` invisibly returns the valid object
-#'   or errors. `scheme_groups()` returns its `age_group` vector. Replacement
+#'   or errors. `scheme_intervals()` returns its `age_interval` vector. Replacement
 #'   methods return the validated updated scheme.
 #' @details Scheme units must be second, minute, hour, day, week, month or year.
-#'   Validation checks the complete stored `age_group` representation, including
+#'   Validation checks the complete stored `age_interval` representation, including
 #'   interval fields, bounds, units, category names and the actual `below`, `sep`
 #'   and `above` display symbols. Malformed metadata is rejected without repair
 #'   or substitution of defaults. Custom scalar-string display symbols remain
@@ -39,7 +39,7 @@
 #'   each name represents a separate category, and [classify_age_scheme()] returns
 #'   every membership with its original label and category index. Duplicate names
 #'   are invalid in either scheme type. These scheme requirements do not tighten
-#'   the naming rules for bare `age_group` vectors. No registry lookup is performed
+#'   the naming rules for bare `age_interval` vectors. No registry lookup is performed
 #'   by this constructor.
 #' @section Editing local copies:
 #' Schemes are independent R value objects. Copy with `modified <- original`,
@@ -64,7 +64,7 @@
 #'
 #' `derived_from` is protected from ordinary replacement. Use one exact field name
 #' or position for `[[<-`; recursive indices are rejected. Use a list of values
-#' for atomic batch edits, for example `x[c("groups", "complete")] <- list(g, FALSE)`.
+#' for atomic batch edits, for example `x[c("intervals", "complete")] <- list(g, FALSE)`.
 #' Each completed assignment must be valid; batch related policy/interval changes
 #' rather than relying on an invalid intermediate object. Optional fields can be
 #' cleared with NULL without deleting schema fields.
@@ -76,20 +76,20 @@
 #' validation checks structure and ancestry shape, not historical authenticity.
 #' @seealso [categorize_age()], [classify_age_scheme()], [get_age_scheme()]
 #' @examples
-#' g <- age_group(c(0, 18, 65), c(18, 65, Inf), unit = "year")
+#' g <- age_interval(c(0, 18, 65), c(18, 65, Inf), unit = "year")
 #' names(g) <- c("Children", "Adults", "Older adults")
 #' s <- age_scheme(g, "example", "Example bands", domain = c(0, Inf),
 #'                 complete = TRUE)
 #' s
-#' scheme_groups(s)
+#' scheme_intervals(s)
 #' summary(s)
 #' @export
-age_scheme <- function(groups, id, name, type = c("partition", "classification"),
+age_scheme <- function(intervals, id, name, type = c("partition", "classification"),
                        domain = NULL, complete = NA, purpose = NULL,
                        organization = NULL, source = NULL, reference = NULL,
                        version = NULL, verified = FALSE, notes = NULL) {
   type <- match.arg(type)
-  x <- structure(list(groups = groups, id = id, name = name, type = type,
+  x <- structure(list(intervals = intervals, id = id, name = name, type = type,
                       domain = domain, complete = complete, purpose = purpose,
                       organization = organization, source = source,
                       reference = reference, version = version,
@@ -105,9 +105,9 @@ is_age_scheme <- function(x) inherits(x, "age_scheme")
 
 #' @rdname age_scheme
 #' @export
-scheme_groups <- function(x) {
+scheme_intervals <- function(x) {
   validate_age_scheme(x)
-  x$groups
+  x$intervals
 }
 
 #' @rdname age_scheme
@@ -119,7 +119,7 @@ validate_age_scheme <- function(x) {
 
 # Validate before returning the coverage assessment for internal consumers.
 age_scheme_assess <- function(x) {
-  required <- c("groups", "id", "name", "type", "domain", "complete", "purpose",
+  required <- c("intervals", "id", "name", "type", "domain", "complete", "purpose",
                 "organization", "source", "reference", "version", "verified", "notes")
   if (!is_age_scheme(x) || !is.list(x) || !(identical(names(x), required) ||
         identical(names(x), c(required, "derived_from")))) {
@@ -170,26 +170,26 @@ age_scheme_assess <- function(x) {
                                is.null, logical(1)))) {
     stop("verified schemes require source, reference and version", call. = FALSE)
   }
-  g <- x$groups
-  if (!is.age_group(g)) {
-    stop("groups must be a nonempty age_group vector", call. = FALSE)
+  g <- x$intervals
+  if (!is_age_interval(g)) {
+    stop("intervals must be a nonempty age_interval vector", call. = FALSE)
   }
-  validate_age_group(g)
+  validate_age_interval(g)
   if (!length(g)) {
-    stop("groups must be a nonempty age_group vector", call. = FALSE)
+    stop("intervals must be a nonempty age_interval vector", call. = FALSE)
   }
   unit <- get_unit(g)
   if (!is.character(unit) || length(unit) != 1L || is.na(unit) ||
       !unit %in% c("second", "minute", "hour", "day", "week", "month", "year")) {
-    stop("groups require an explicit supported time unit", call. = FALSE)
+    stop("intervals require an explicit supported time unit", call. = FALSE)
   }
   if (anyNA(ivs::iv_start(g)) || anyNA(ivs::iv_end(g))) {
-    stop("groups cannot contain missing intervals", call. = FALSE)
+    stop("intervals cannot contain missing intervals", call. = FALSE)
   }
   labels <- attr(g, "group_names", exact = TRUE)
   if (is.null(labels) || length(labels) != length(g) || anyNA(labels) ||
       any(!nzchar(trimws(labels))) || anyDuplicated(labels)) {
-    stop("groups require unique nonblank names", call. = FALSE)
+    stop("intervals require unique nonblank names", call. = FALSE)
   }
   if (!is.null(x$domain)) {
     d <- x$domain
@@ -198,14 +198,14 @@ age_scheme_assess <- function(x) {
       stop("domain must be two numeric bounds with 0 <= start < end", call. = FALSE)
     }
     if (any(ivs::iv_start(g) < d[1] | ivs::iv_end(g) > d[2])) {
-      stop("groups must lie within domain", call. = FALSE)
+      stop("intervals must lie within domain", call. = FALSE)
     }
   } else if (!is.na(x$complete)) {
     stop("a completeness claim requires an explicit domain", call. = FALSE)
   }
   coverage <- age_scheme_coverage(g, x$domain)
   if (x$type == "partition" && coverage$overlaps) {
-    stop("partition groups must not overlap", call. = FALSE)
+    stop("partition intervals must not overlap", call. = FALSE)
   }
   if (!is.na(x$complete) && x$complete != coverage$covered) {
     stop("complete does not agree with domain coverage", call. = FALSE)

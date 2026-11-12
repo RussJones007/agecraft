@@ -1,5 +1,5 @@
 test_that("duplicate-only classifications retain labels, boundaries and statuses", {
-  g <- age_group(c(0, 0), c(5, 5), unit = "year")
+  g <- age_interval(c(0, 0), c(5, 5), unit = "year")
   names(g) <- c("Early childhood", "Preschool age")
   s <- age_scheme(g, "duplicates", "Shared range", type = "classification",
                   domain = c(0, 5), complete = TRUE)
@@ -28,7 +28,7 @@ test_that("duplicate-only classifications retain labels, boundaries and statuses
 })
 
 test_that("three identical intervals retain every original semantic category", {
-  g <- age_group(rep(0, 3), rep(5, 3), unit = "year")
+  g <- age_interval(rep(0, 3), rep(5, 3), unit = "year")
   names(g) <- c("Third meaning", "First meaning", "Second meaning")
   s <- age_scheme(g, "triple", "Three meanings", type = "classification")
   out <- classify_age_scheme(age(2, unit = "year"), s)
@@ -39,11 +39,11 @@ test_that("three identical intervals retain every original semantic category", {
                                                multiple = "last")), names(g)[3])
   names(g) <- rep("Same label", 3)
   expect_error(age_scheme(g, "invalid", "Invalid", type = "classification"),
-               "groups require unique nonblank names")
+               "intervals require unique nonblank names")
 })
 
 test_that("duplicate intervals cannot fill uncovered portions of a domain", {
-  g <- age_group(c(0, 0, 3), c(1, 1, 5), unit = "year")
+  g <- age_interval(c(0, 0, 3), c(1, 1, 5), unit = "year")
   names(g) <- c("First", "Second", "Later")
   s <- age_scheme(g, "gap", "Gap", type = "classification",
                   domain = c(0, 5), complete = FALSE)

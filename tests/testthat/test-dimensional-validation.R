@@ -1,5 +1,5 @@
 test_that("all age interfaces reject unsupported dimensional expressions", {
-  g <- age_group(c(0, 1), c(1, Inf), unit = "year")
+  g <- age_interval(c(0, 1), c(1, Inf), unit = "year")
   names(g) <- c("Under one", "One or older")
   s <- age_scheme(g, "example", "Example")
   expressions <- c("year/day", "year^2", "1/day", "m", "kg", "1",
@@ -23,7 +23,7 @@ test_that("all age interfaces reject unsupported dimensional expressions", {
 
 test_that("same-unit shortcuts and conversion options cannot conceal dimensions", {
   for (unit in c("year", "day")) {
-    g <- age_group(c(0, 1), c(1, Inf), unit = unit)
+    g <- age_interval(c(0, 1), c(1, Inf), unit = unit)
     names(g) <- c("Under one", "One or older")
     s <- age_scheme(g, "same_numerator", "Same numerator")
     for (expression in c(paste0(unit, "/day"), paste0(unit, "^2"))) {
@@ -48,7 +48,7 @@ test_that("simple time quantities retain precision, missingness and classificati
                   week = c("week", "weeks"), month = c("month", "months"),
                   year = c("year", "yr", "years"))
   for (unit in names(aliases)) {
-    g <- age_group(c(0, 1), c(1, Inf), unit = unit)
+    g <- age_interval(c(0, 1), c(1, Inf), unit = unit)
     names(g) <- c("Under one", "One or older")
     s <- age_scheme(g, "simple", "Simple unit")
     for (alias in aliases[[unit]]) {
@@ -88,7 +88,7 @@ test_that("explicit constructor units and unit attributes cannot hide malformed 
   for (unit in list(NULL, c("year", "day"), NA_character_, 1)) {
     expect_error(age(0.5, unit), "one time-unit string")
   }
-  g <- age_group(0, Inf, unit = "year")
+  g <- age_interval(0, Inf, unit = "year")
   names(g) <- "All"
   # Explicit scalar unit attributes remain supported, but are validated in full.
   expect_identical(as.character(categorize_age(structure(0.5, units = "year"), by = g)), "All")

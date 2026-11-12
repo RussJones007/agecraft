@@ -39,7 +39,7 @@ second.}
 vector; "numeric" returns completed ages as plain doubles; "units" returns
 completed ages with units, preserving the previous format.
 For categorize_age(): "factor" (default) returns an \code{age_category} ordered factor; "interval" returns
-the matched age_group per observation, in the original group units. Both
+the matched age_interval per observation, in the original group units. Both
 preserve input order, repeats and missing/unmatched observations. Interval
 inputs match only when completely contained in a group. Named groups use
 their nonblank names as factor labels; other groups use interval labels.}
@@ -57,7 +57,7 @@ matching unit-bearing groups or schemes.}
 \item{upper}{is the max age (default is 70), above which the ages are aggregated}
 
 \item{by}{may be a single number for the span of ages in each age group (e.g. '5' creates five year age groups) or a
-vector of cut points that defines each age group. It also accepts an age_group
+vector of cut points that defines each age group. It also accepts an age_interval
 vector or a validated age_scheme; scheme units require unit-bearing ages. When a single number is given, the upper age group will always
 be inclusive of all ages above.  When giving a vector or cut points like 'c(5, 15, 35, 65)' the upper age group will
 not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf)'.}
@@ -89,14 +89,14 @@ For calculate_age(), an age vector by default. With output = "units",
 a completed-age units vector; with output = "numeric", completed ages as doubles.
 
 For \code{categorize_age()}, an \code{\link[=age_category]{age_category()}} ordered factor by default,
-retaining defining intervals through \code{\link[=category_groups]{category_groups()}}. Its \code{units}
+retaining defining intervals through \code{\link[=category_intervals]{category_intervals()}}. Its \code{units}
 attribute records the original observation unit, normalized to a supported
 unit name, when present. It does not specify the category boundaries' units
 or necessarily the internal comparison unit. Factor integer codes identify
 categories, not numerical ages. This attribute is not a complete or durable
 provenance record; ordinary factor operations may discard it. Retain the
-grouping definition or use \code{category_groups()} for boundaries and units, or request
-\code{output = "interval"} to return matched \code{age_group} intervals in that
+grouping definition or use \code{category_intervals()} for boundaries and units, or request
+\code{output = "interval"} to return matched \code{age_interval} intervals in that
 definition's units. Comparisons use group units with \code{"age_to_group"} and
 observation units with \code{"group_to_age"}; the factor attribute always describes
 the original observations. See the age-schemes vignette for a day/hour example.
@@ -159,9 +159,9 @@ grp10
 data.frame(age = age_vec, grp10)
 
 # special age groups with a different age separator
-categorize_age(ages = age_vec,  sep = " to ", by = age_group_presets$Spec)
+categorize_age(ages = age_vec,  sep = " to ", by = age_interval_presets$Spec)
 
 }
 \seealso{
-\link{age_group_presets} for a pre-defined list of age groups that are often used.
+\link{age_interval_presets} for a pre-defined list of age groups that are often used.
 }

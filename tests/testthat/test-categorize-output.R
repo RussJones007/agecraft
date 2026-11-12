@@ -1,5 +1,5 @@
 test_that("factor and interval outputs preserve assignment and observation order", {
-  groups <- age_group(c(0, 10), c(5, Inf), unit = "year")
+  groups <- age_interval(c(0, 10), c(5, Inf), unit = "year")
   ages <- units::set_units(c(12, 2, 12, NA, 7, 5), "year")
   x <- categorize_age(ages, by = groups, output = "interval")
   expect_identical(as.character(x), c("10+", "0-4", "10+", NA, NA, NA))
@@ -12,15 +12,15 @@ test_that("factor and interval outputs preserve assignment and observation order
 })
 
 test_that("advanced matching controls work through the main interface", {
-  groups <- age_group(c(0, 2), c(5, 8))
+  groups <- age_interval(c(0, 2), c(5, 8))
   expect_error(categorize_age(3, by = groups), "more than one")
   expect_identical(as.character(categorize_age(3, by = groups, multiple = "last", output = "interval")), "2-7")
-  expect_identical(as.character(categorize_age(ivs::iv(c(0, 4), c(2, 6)), by = age_group(0, 5))), c("0-4", NA))
-  weeks <- age_group(0, 2, unit = "week")
+  expect_identical(as.character(categorize_age(ivs::iv(c(0, 4), c(2, 6)), by = age_interval(0, 5))), c("0-4", NA))
+  weeks <- age_interval(0, 2, unit = "week")
   days <- units::set_units(c(7, 14), "day")
   expect_identical(as.character(categorize_age(days, by = weeks, output = "interval")), c("0-1", NA))
   expect_identical(categorize_age(days, by = weeks, convert_units = "group_to_age", output = "interval"), weeks[c(1, NA)])
   expect_error(categorize_age(days, by = weeks, convert_units = "none"), "compatible")
-  expect_error(categorize_age(days, by = age_group(0, 1, unit = "year")), "approximate")
+  expect_error(categorize_age(days, by = age_interval(0, 1, unit = "year")), "approximate")
   expect_error(categorize_age(c(1, 2), by = weeks), "one has units")
 })

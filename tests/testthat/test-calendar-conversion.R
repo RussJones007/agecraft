@@ -26,7 +26,7 @@ test_that("February calendar classification blocks silent cross-unit assignments
   for (target in c("month", "year")) {
     # Equivalent nominal one-month cutoffs expose the calendar-coordinate mismatch.
     boundary <- if (target == "month") 1 else 1 / 12
-    g <- age_group(c(0, boundary), c(boundary, Inf), unit = target)
+    g <- age_interval(c(0, boundary), c(boundary, Inf), unit = target)
     names(g) <- c("Below cutoff", "At or above cutoff")
     s <- age_scheme(g, "calendar_example", "Calendar example")
     direct <- if (target == "month") months else years
@@ -39,7 +39,7 @@ test_that("February calendar classification blocks silent cross-unit assignments
     source <- attr(cross_unit, "unit")
     value <- as.numeric(cross_unit)
     inputs <- list(cross_unit, units::set_units(value, source, mode = "standard"),
-                   age_group(value, value + value / 100, unit = source))
+                   age_interval(value, value + value / 100, unit = source))
     for (direction in c("age_to_group", "group_to_age")) {
       for (x in inputs) {
         expect_error(classify_age_scheme(x, s, convert_units = direction),
@@ -67,7 +67,7 @@ test_that("February calendar classification blocks silent cross-unit assignments
 
 test_that("matching calendar units and elapsed conversions keep their behavior", {
   for (unit in c("month", "year", "week")) {
-    g <- age_group(c(0, 1), c(1, Inf), unit = unit)
+    g <- age_interval(c(0, 1), c(1, Inf), unit = unit)
     names(g) <- c("Below", "Above")
     s <- age_scheme(g, "same_unit", "Same unit")
     x <- age(c(0.5, 1, NA), unit)

@@ -1,6 +1,8 @@
-# Source this file for migrate_age_group_presets(), or use Rscript with paths.
+# Source this file for migrate_age_interval_presets(), or use Rscript with paths.
 # Preview is the default. --write creates .bak backups and applies safe edits.
-migrate_age_group_presets <- function(paths, write = FALSE) {
+migrate_age_interval_presets <- function(paths, write = FALSE) {
+  old_names <- c("age.groups", "age_group_presets")
+  is_old_name <- function(x) is.symbol(x) && as.character(x) %in% old_names
   results <- list()
   for (path in paths) {
     lines <- readLines(path, warn = FALSE)
@@ -13,15 +15,15 @@ migrate_age_group_presets <- function(paths, write = FALSE) {
       if (!is.call(x) && !is.expression(x) && !is.pairlist(x)) return(FALSE)
       if (is.call(x)) {
         op <- as.character(x[[1L]])[1L]
-        if (op %in% c("<-", "=", "<<-") && identical(x[[2L]], as.name("age.groups"))) return(TRUE)
-        if (op %in% c("->", "->>") && identical(x[[3L]], as.name("age.groups"))) return(TRUE)
-        if (op == "for" && identical(x[[2L]], as.name("age.groups"))) return(TRUE)
-        if (op == "function" && "age.groups" %in% names(x[[2L]])) return(TRUE)
+        if (op %in% c("<-", "=", "<<-") && is_old_name(x[[2L]])) return(TRUE)
+        if (op %in% c("->", "->>") && is_old_name(x[[3L]])) return(TRUE)
+        if (op == "for" && is_old_name(x[[2L]])) return(TRUE)
+        if (op == "function" && any(old_names %in% names(x[[2L]]))) return(TRUE)
       }
       any(vapply(as.list(x), has_binding, logical(1)))
     }
     shadowed <- has_binding(parsed)
-    hits <- pd[pd$terminal & pd$text %in% c("age.groups", "`age.groups`"), , drop = FALSE]
+    hits <- pd[pd$terminal & pd$text %in% c(old_names, paste0("`", old_names, "`")), , drop = FALSE]
     edits <- list()
     for (i in seq_len(nrow(hits))) {
       h <- hits[i, ]
@@ -33,13 +35,13 @@ migrate_age_group_presets <- function(paths, write = FALSE) {
         if (qualified && !identical(namespace, "agecraft")) "other package namespace: review manually" else
         if (shadowed && !qualified) "local binding: review manually" else
         if (h$token != "SYMBOL") "non-value symbol: review manually" else "replace"
-      replacement <- if (startsWith(h$text, "`")) "`age_group_presets`" else "age_group_presets"
+      replacement <- if (startsWith(h$text, "`")) "`age_interval_presets`" else "age_interval_presets"
       results[[length(results) + 1L]] <- data.frame(path = path, line = h$line1, column = h$col1,
         before = h$text, after = if (reason == "replace") replacement else h$text, action = reason)
       if (reason == "replace") edits[[length(edits) + 1L]] <- list(h = h, text = replacement)
     }
     # String-based lookups need review; ordinary strings and comments are untouched.
-    strings <- pd[pd$terminal & pd$token == "STR_CONST" & grepl("age.groups", pd$text, fixed = TRUE), , drop = FALSE]
+    strings <- pd[pd$terminal & pd$token == "STR_CONST" & (grepl("age.groups", pd$text, fixed = TRUE) | grepl("age_group_presets", pd$text, fixed = TRUE)), , drop = FALSE]
     for (i in seq_len(nrow(strings))) {
       h <- strings[i, ]
       results[[length(results) + 1L]] <- data.frame(path = path, line = h$line1, column = h$col1,
@@ -88,5 +90,5 @@ if (sys.nframe() == 0L) {
   write <- "--write" %in% args
   paths <- args[args != "--write"]
   if (!length(paths)) stop("Usage: Rscript migrate-age-groups.R [--write] file.R ...")
-  print(migrate_age_group_presets(paths, write = write), row.names = FALSE)
+  print(migrate_age_interval_presets(paths, write = write), row.names = FALSE)
 }

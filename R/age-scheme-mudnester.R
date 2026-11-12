@@ -35,7 +35,7 @@
 #'   Catalogue definitions: copyright 2026 Nicolas Smoll, Sunshine Coast Hospital
 #'   and Health Service; mudnester is MIT licensed. See the installed package's
 #'   LICENSE and the upstream repository <https://github.com/nrsmoll/mudnester>.
-#' @seealso [age_scheme()], [scheme_groups()], [list_age_schemes()]
+#' @seealso [age_scheme()], [scheme_intervals()], [list_age_schemes()]
 #' @examples
 #' if (requireNamespace("mudnester", quietly = TRUE)) {
 #'   catalogue <- mudnester_catalogue()
@@ -175,7 +175,7 @@ mudnester_convert_row <- function(row, package_version, warn = TRUE) {
   mudnester_validate_row(row)
   breaks <- row$breaks[[1L]]
   unit <- c(years = "year", days = "day")[[as.character(row$age_unit)]]
-  groups <- age_group(utils::head(breaks, -1L), utils::tail(breaks, -1L), unit = unit)
+  groups <- age_interval(utils::head(breaks, -1L), utils::tail(breaks, -1L), unit = unit)
   names(groups) <- row$labels[[1L]]
   optional <- function(x) if (is.na(x) || !nzchar(trimws(x))) NULL else x
   issues <- mudnester_issues(row)

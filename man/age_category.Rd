@@ -3,40 +3,48 @@
 \name{age_category}
 \alias{age_category}
 \alias{is_age_category}
-\alias{category_groups}
-\title{Categorized ages with retained interval definitions}
+\alias{category_intervals}
+\title{Assign category labels to age intervals}
 \usage{
-age_category(x = character(), groups)
+age_category(x = character(), intervals)
 
 is_age_category(x)
 
-category_groups(x)
+category_intervals(x)
 }
 \arguments{
 \item{x}{Character category labels or a factor; missing values are allowed.}
 
-\item{groups}{An \code{age_group} vector in chronological order, with unique labels.}
+\item{intervals}{An \code{age_interval} vector in chronological order. Each
+interval must be present and have a unique nonblank label, supplied by
+its name or formatted bounds. Unused intervals are retained as levels.}
 }
 \value{
 \code{age_category()} returns an ordered-factor subclass;
-\code{is_age_category()} returns a logical scalar; \code{category_groups()} returns
-the defining \code{age_group} vector, including unused categories.
+\code{is_age_category()} returns a logical scalar; \code{category_intervals()} returns
+the defining \code{age_interval} vector, including unused categories.
 }
 \description{
-Creates an age_category object which is an ordered factor whose levels map one-to-one to chronological age intervals.
-Subsetting retains unused categories; use \code{droplevels()} to remove them. When combining two or more of age_category
-vectors, they must match on the age intervals used, labels and units.
-Convert explicitly with \code{generics::as.factor()} or \code{generics::as.ordered()} to discard interval metadata. Base
-coercers leave existing factor subclasses unchanged. Use \code{vctrs::vec_rbind()} for binding: base data-frame binding
-can discard metadata. Reordering and implicit category merging are rejected. Original exact ages and scheme
-provenance are not stored. The legacy \code{units} attribute describes observations; definition units live in \code{groups}.
-Differing observation units are dropped on combination; definition units must match.
-Printing shows the class, length and category-definition unit in the header.
-vctrs type descriptions also use the category-definition unit.
+Create an ordered factor when you already have age-category labels and
+their interval definitions. Each level corresponds to one defining interval.
+To classify numerical ages instead, use \code{\link[=categorize_age]{categorize_age()}}.
+}
+\details{
+Subsetting retains unused levels and their definitions. Use \code{droplevels()}
+to remove them together, or \code{\link[=category_intervals]{category_intervals()}} to retrieve the definitions.
+When combining vectors, the bounds, labels and definition units must match.
+Unique nonblank relabeling is allowed; reordering or merging levels is not.
+
+Use \code{generics::as.factor()} or \code{generics::as.ordered()} to discard interval
+metadata. Base coercers retain existing factor subclasses. For data-frame
+binding, use \code{vctrs::vec_rbind()}; base binding can discard the metadata.
+Original numerical ages and scheme provenance are not stored. The \code{units}
+attribute, when present, describes the original observations; definition
+units are available from \code{category_intervals()}.
 }
 \examples{
-groups <- age_group(c(0, 5), c(5, Inf))
-x <- age_category(c("0-4", "5+", NA), groups)
-category_groups(x)
+intervals <- age_interval(c(0, 5), c(5, Inf))
+x <- age_category(c("0-4", "5+", NA), intervals)
+category_intervals(x)
 droplevels(x[1])
 }

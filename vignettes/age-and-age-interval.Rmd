@@ -1,8 +1,8 @@
 ---
-title: "Working with age and age_group classes"
+title: "Working with age and age_interval classes"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Working with age and age_group classes}
+  %\VignetteIndexEntry{Working with age and age_interval classes}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -22,9 +22,9 @@ agecraft provides two complementary S3 classes for these tasks:
 | Class | What one element represents | Example |
 |:--|:--|:--|
 | `age` | A numeric age in a specified unit | 2.75 years |
-| `age_group` | A right-open interval in a specified unit | From 1 up to 3 years |
+| `age_interval` | A right-open interval in a specified unit | From 1 up to 3 years |
 
-Both classes use the vctrs framework to support vector operations. `age_group`
+Both classes use the vctrs framework to support vector operations. `age_interval`
 also builds on the ivs interval framework. You can use them as columns in an
 ordinary data frame without learning their internal implementation.
 
@@ -229,12 +229,12 @@ median(age(c(1.25, 2.75), "day"))
 | `as.numeric(x)` | Extract fractional numeric values |
 | `as.integer(x)` | Extract completed whole units |
 
-## The age_group class
+## The age_interval class
 
 ### Why represent groups as intervals?
 
 A text label such as `"Toddler"` does not tell R where that category begins or
-ends. An `age_group` vector stores the interval boundaries separately from its
+ends. An `age_interval` vector stores the interval boundaries separately from its
 optional name. Classification can use the boundaries while tables display the
 name.
 
@@ -249,10 +249,10 @@ Define a set of categories for the same sample data. The boundaries and names
 below illustrate the mechanics; choose definitions appropriate to your analysis.
 
 ```{r construct-groups}
-groups <- age_group(start = c(0, 0.077, 1, 3, 13, 20),
+groups <- age_interval(start = c(0, 0.077, 1, 3, 13, 20),
                     end = c(0.077, 1, 3, 13, 20, Inf), unit = "year")
 groups
-is.age_group(groups)
+is_age_interval(groups)
 ```
 
 Fractional boundaries are preserved without rounding. Only upper boundaries
@@ -265,12 +265,12 @@ boundary, define groups in days and classify `visits$age_days` instead.
 
 ### Convert existing definitions
 
-`as.age_group()` accepts numeric cut points, supported completed-age labels,
+`as_age_interval()` accepts numeric cut points, supported completed-age labels,
 factors of those labels, or ivs intervals. For example, the same sample can
 also be classified using the package's five-year preset:
 
 ```{r supplied-definitions}
-preset_groups <- as.age_group(age_group_presets$Yr.5, unit = "year")
+preset_groups <- as_age_interval(age_interval_presets$Yr.5, unit = "year")
 head(preset_groups)
 categorize_age(visits$age_years, by = preset_groups)
 ```
@@ -280,8 +280,8 @@ when constructing the group vector. Confirm that a preset fits the reporting
 conventions of your analysis.
 
 For custom numeric cuts, a final `Inf` creates an open-ended final group.
-A final finite cut also creates a final one-unit interval in `as.age_group()`;
-use `age_group(start, end)` when you want to control every upper bound explicitly.
+A final finite cut also creates a final one-unit interval in `as_age_interval()`;
+use `age_interval(start, end)` when you want to control every upper bound explicitly.
 
 ### Name the groups
 
@@ -334,7 +334,7 @@ visits$matched_group
 names(visits$matched_group)
 ```
 
-This returns one matched `age_group` per observation, preserving repeated
+This returns one matched `age_interval` per observation, preserving repeated
 assignments, missing observations, units, and category names. A factor alone
 does not retain structured interval boundaries.
 
@@ -350,21 +350,21 @@ generics::as.ordered(groups)
 
 Names follow the intervals through selection, sorting, and concatenation.
 Combining group vectors requires matching units, including whether a unit
-is specified. Trying to change an existing group unit with `as.age_group()` is rejected:
+is specified. Trying to change an existing group unit with `as_age_interval()` is rejected:
 relabeling the numeric bounds would not convert them.
 
-`compare_age_groups()` can inspect widths and relationships between interval
+`compare_age_intervals()` can inspect widths and relationships between interval
 vectors. For example:
 
 ```{r group-widths}
-compare_age_groups(groups, operation = "width")
+compare_age_intervals(groups, operation = "width")
 ```
 
 Widths are measured in the group's coordinate unit: a width in years is not
 an exact elapsed-day duration. The function also supports crosswalks,
 membership, ordering, age-gap bounds, and interval set operations. Set operations
 can merge or split intervals, so they discard category names. See
-`?compare_age_groups` for those more advanced operations.
+`?compare_age_intervals` for those more advanced operations.
 
 ### Keep matching rules explicit
 
@@ -385,15 +385,15 @@ ages with explicitly unit-bearing groups are rejected.
 
 | Function or operation | Use |
 |:--|:--|
-| `age_group(start, end, unit)` | Define explicit interval boundaries |
-| `as.age_group(x, unit)` | Convert cuts, labels, factors, or intervals |
-| `is.age_group(x)` | Check whether a vector has the age_group class |
+| `age_interval(start, end, unit)` | Define explicit interval boundaries |
+| `as_age_interval(x, unit)` | Convert cuts, labels, factors, or intervals |
+| `is_age_interval(x)` | Check whether a vector has the age_interval class |
 | `names(x) <- labels` | Assign category names |
 | `categorize_age(ages, by = groups)` | Return an ordered category factor |
 | `categorize_age(..., output = "interval")` | Return matched intervals |
-| `age_cat_iv(age, age_group)` | Alternative interval classification interface |
+| `age_cat_iv(age, age_interval)` | Alternative interval classification interface |
 | `generics::as.factor(x)` / `generics::as.ordered(x)` | Convert groups to factors using names |
-| `compare_age_groups(x, ...)` | Inspect interval relationships and widths |
+| `compare_age_intervals(x, ...)` | Inspect interval relationships and widths |
 
 The sample data frame now contains the original dates, precise ages in explicit
 units, and named categories. Keep the precise age column for classification and

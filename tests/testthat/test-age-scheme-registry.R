@@ -1,15 +1,15 @@
 test_that("all eight registry definitions preserve legacy boundaries and assignments", {
   listing <- list_age_schemes()
-  expect_identical(listing$preset, names(age_group_presets))
+  expect_identical(listing$preset, names(age_interval_presets))
   expect_equal(nrow(listing), 8)
   expect_false(anyDuplicated(listing$id) > 0)
   expect_true(all(!listing$verified))
-  expect_identical(age.groups, age_group_presets)
-  before <- serialize(age_group_presets, NULL)
+  expect_identical(age.groups, age_interval_presets)
+  before <- serialize(age_interval_presets, NULL)
   for (i in seq_len(nrow(listing))) {
     s <- get_age_scheme(listing$id[i])
-    cuts <- age_group_presets[[listing$preset[i]]]
-    g <- scheme_groups(s)
+    cuts <- age_interval_presets[[listing$preset[i]]]
+    g <- scheme_intervals(s)
     expect_identical(ivs::iv_start(g), as.double(utils::head(cuts, -1)))
     expect_identical(ivs::iv_end(g), as.double(utils::tail(cuts, -1)))
     expect_identical(get_unit(g), "year")
@@ -31,10 +31,10 @@ test_that("all eight registry definitions preserve legacy boundaries and assignm
     expect_identical(s$version, listing$version[i])
     expect_false(s$verified)
   }
-  expect_identical(serialize(age_group_presets, NULL), before)
+  expect_identical(serialize(age_interval_presets, NULL), before)
   s <- get_age_scheme(listing$id[1])
   s$name <- "Changed"
-  names(s$groups)[1] <- "Changed"
+  names(s$intervals)[1] <- "Changed"
   expect_false(identical(get_age_scheme(listing$id[1]), s))
   for (id in list("missing", "ILI", NA_character_, character(), c("a", "b"))) {
     expect_error(get_age_scheme(id), "Unknown scheme id")

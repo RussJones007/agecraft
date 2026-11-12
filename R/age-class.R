@@ -94,7 +94,7 @@
 #' x
 #' as.numeric(x)
 #' format(x, fractional = TRUE)
-#' groups <- age_group(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
+#' groups <- age_interval(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
 #' names(groups) <- c("Neonate", "Infant", "Toddler")
 #' categorize_age(x, by = groups)
 age <- function(x = double(), unit = "year") {
@@ -207,11 +207,11 @@ vec_cast.double.age <- function(x, to, ...) vctrs::vec_data(x)
 as.double.age <- function(x, ...) as.double(vctrs::vec_data(x))
 
 #' @exportS3Method
-age_cat_iv.age <- function(age, age_group,
+age_cat_iv.age <- function(age, intervals,
                            multiple = c("error", "first", "last"),
                            convert_units = c("age_to_group", "group_to_age", "none"),
                            allow_approx = FALSE) {
-  age_cat_iv.numeric(age, age_group, multiple, convert_units, allow_approx)
+  age_cat_iv.numeric(age, intervals, multiple, convert_units, allow_approx)
 }
 
 # Only operations whose results are still ages retain the class.

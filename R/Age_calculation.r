@@ -40,7 +40,7 @@
 #'
 #' @return For calculate_age(), an age vector by default. With output = "units",
 #'   a completed-age units vector; with output = "numeric", completed ages as doubles.
-#' @seealso [age_group_presets] for a pre-defined list of age groups that are often used.
+#' @seealso [age_interval_presets] for a pre-defined list of age groups that are often used.
 #' @export
 #' @examples
 #'  # create 10 random birth dates
@@ -215,14 +215,14 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #'   vector; "numeric" returns completed ages as plain doubles; "units" returns
 #'   completed ages with units, preserving the previous format.
 #'   For categorize_age(): "factor" (default) returns an `age_category` ordered factor; "interval" returns
-#'   the matched age_group per observation, in the original group units. Both
+#'   the matched age_interval per observation, in the original group units. Both
 #'   preserve input order, repeats and missing/unmatched observations. Interval
 #'   inputs match only when completely contained in a group. Named groups use
 #'   their nonblank names as factor labels; other groups use interval labels.
 #' @param lower is the lowest age (default is 0) to include
 #' @param upper is the max age (default is 70), above which the ages are aggregated
 #' @param by may be a single number for the span of ages in each age group (e.g. '5' creates five year age groups) or a
-#'   vector of cut points that defines each age group. It also accepts an age_group
+#'   vector of cut points that defines each age group. It also accepts an age_interval
 #'   vector or a validated age_scheme; scheme units require unit-bearing ages. When a single number is given, the upper age group will always
 #'   be inclusive of all ages above.  When giving a vector or cut points like 'c(5, 15, 35, 65)' the upper age group will
 #'   not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf)'.
@@ -231,14 +231,14 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' @param above.char is the character used for the upper summary group.  It can be '>', '+', 'plus' and 'above'
 #' @rdname calculate_age
 #' @return For `categorize_age()`, an [age_category()] ordered factor by default,
-#'   retaining defining intervals through [category_groups()]. Its `units`
+#'   retaining defining intervals through [category_intervals()]. Its `units`
 #'   attribute records the original observation unit, normalized to a supported
 #'   unit name, when present. It does not specify the category boundaries' units
 #'   or necessarily the internal comparison unit. Factor integer codes identify
 #'   categories, not numerical ages. This attribute is not a complete or durable
 #'   provenance record; ordinary factor operations may discard it. Retain the
-#'   grouping definition or use `category_groups()` for boundaries and units, or request
-#'   `output = "interval"` to return matched `age_group` intervals in that
+#'   grouping definition or use `category_intervals()` for boundaries and units, or request
+#'   `output = "interval"` to return matched `age_interval` intervals in that
 #'   definition's units. Comparisons use group units with `"age_to_group"` and
 #'   observation units with `"group_to_age"`; the factor attribute always describes
 #'   the original observations. See the age-schemes vignette for a day/hour example.
@@ -252,7 +252,7 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' data.frame(age = age_vec, grp10)
 #'
 #' # special age groups with a different age separator
-#' categorize_age(ages = age_vec,  sep = " to ", by = age_group_presets$Spec)
+#' categorize_age(ages = age_vec,  sep = " to ", by = age_interval_presets$Spec)
 #'
 #' @export
 categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
@@ -270,12 +270,12 @@ categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
   if (!is.logical(allow_approx) || length(allow_approx) != 1L || is.na(allow_approx)) {
     stop("allow_approx must be TRUE or FALSE", call. = FALSE)
   }
-  if (is_age_scheme(by)) by <- scheme_groups(by)
-  if (is.age_group(by)) {
+  if (is_age_scheme(by)) by <- scheme_intervals(by)
+  if (is_age_interval(by)) {
     groups <- sort(by)
   } else {
     if (!is.numeric(by) || !length(by) || anyNA(by)) {
-      stop("by must be a positive width, numeric cut points, or an age_group", call. = FALSE)
+      stop("by must be a positive width, numeric cut points, or an age_interval", call. = FALSE)
     }
     if (length(by) == 1L) {
       if (!is.finite(by) || by <= 0 || length(lower) != 1L || length(upper) != 1L ||
@@ -286,18 +286,18 @@ categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
       cuts <- c(seq(lower, upper, by = by), Inf)
     } else cuts <- by
     # Validate cuts without adding the converter's final single-age interval.
-    as.age_group(cuts)
-    groups <- age_group(utils::head(cuts, -1L), utils::tail(cuts, -1L),
+    as_age_interval(cuts)
+    groups <- age_interval(utils::head(cuts, -1L), utils::tail(cuts, -1L),
                         unit = age_cat_iv_age_unit(ages),
                         below = paste0(lower, "-"), sep = sep, above = above.char)
   }
   aligned <- age_cat_iv_align_units(ages, groups, convert_units, allow_approx)
   haystack <- aligned$haystack %||% groups
-  locations <- age_group_locations(aligned$age, haystack)
+  locations <- age_interval_locations(aligned$age, haystack)
   idx <- age_match_indices(locations, length(ages), multiple)
   if (output == "interval") return(groups[idx])
-  ret <- factor(idx, levels = seq_along(groups), labels = age_group_labels(groups), ordered = TRUE)
-  definitions <- aligned$age_group[match(levels(ret), age_group_labels(groups))]
+  ret <- factor(idx, levels = seq_along(groups), labels = age_interval_labels(groups), ordered = TRUE)
+  definitions <- aligned$intervals[match(levels(ret), age_interval_labels(groups))]
   ret <- age_category(as.character(ret), definitions)
   names(ret) <- names(ages)
   unit <- age_cat_iv_age_unit(ages)

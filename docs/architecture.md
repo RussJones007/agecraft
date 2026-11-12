@@ -1,5 +1,10 @@
 # Agecraft architecture
 
+> Phase-one naming refactor (2026-11-12): interval vectors use `age_interval`;
+> categorical assignments remain `age_category`. See
+> [the migration guide](age_class_naming_migration.md) for compatibility changes.
+
+
 **Status:** Living architecture and implementation guide\
 **Reviewed:** 2026-11-10\
 **Repository:** `RussJones007/agecraft`, default branch `main`\
@@ -19,12 +24,12 @@ The package is an **experimental**, S3/vctrs-oriented R package (R >= 4.1.0). It
 | --- | --- | --- |
 | Age calculation | `calculate_age()` and `age_auto_unit()` | Compute age from birth/reference dates under documented calendar and elapsed-time rules |
 | Age value | S3 `age` vector (`age()`, `as_age()`, `is_age()`) | Compact numeric observations with fractional precision and one unit per vector |
-| Age interval | S3 `age_group` vector built on `ivs` | Right-open interval boundaries, names, units, matching, comparisons, set operations |
+| Age interval | S3 `age_interval` vector built on `ivs` | Right-open interval boundaries, names, units, matching, comparisons, set operations |
 | Classification | `categorize_age()`, `age_cat_iv()` | Match ages or interval observations to group intervals, return factors or intervals |
-| Reusable definitions | `age_group_presets` (legacy alias `age.groups`) | Numeric cut points for eight conventional reporting groupings |
-| Scheme | S3 `age_scheme` object | Compose an `age_group` vector with purpose, validation policy, provenance, and registry identity |
+| Reusable definitions | `age_interval_presets` (legacy alias `age.groups`) | Numeric cut points for eight conventional reporting groupings |
+| Scheme | S3 `age_scheme` object | Compose an `age_interval` vector with purpose, validation policy, provenance, and registry identity |
 
-**Design principle:** An `age_scheme` **contains** an `age_group` vector. It does not inherit from `age_group` or replace the `ivs` interval engine. Schemes are small definitions shared across many observations, not an additional per-observation vector class.
+**Design principle:** An `age_scheme` **contains** an `age_interval` vector. It does not inherit from `age_interval` or replace the `ivs` interval engine. Schemes are small definitions shared across many observations, not an additional per-observation vector class.
 
 ## 3. Age calculation and `age` vectors — Current
 
@@ -37,12 +42,12 @@ The package is an **experimental**, S3/vctrs-oriented R package (R >= 4.1.0). It
 
 **Implication for schemes:** Classify the *stored fractional value*, not the rounded display. Do not assume a universal exact mapping between age in months and age in days. A mixed-unit surveillance input column requires deliberate normalization or a separate classification workflow; a single `age` vector does not have per-element units.
 
-## 4. `age_group` intervals — Current
+## 4. `age_interval` intervals — Current
 
-`age_group(start, end, unit = NULL, ...)` uses `ivs::new_iv()` through the package's validated constructor. The interval convention is **`[start, end)`**: lower inclusive, upper exclusive. `[1,5)` represents completed ages 1–4; fractional boundaries are retained and displayed as explicit interval notation, e.g. `[0, 0.077)`.
+`age_interval(start, end, unit = NULL, ...)` uses `ivs::new_iv()` through the package's validated constructor. The interval convention is **`[start, end)`**: lower inclusive, upper exclusive. `[1,5)` represents completed ages 1–4; fractional boundaries are retained and displayed as explicit interval notation, e.g. `[0, 0.077)`.
 
 - Finite starts are nonnegative; only upper ends may be `Inf`; missing intervals have two missing endpoints; reversed or zero-width bounds are rejected.
-- Gaps and overlaps are valid *interval data* and are preserved. `age_group` does not itself promise an exhaustive or disjoint partition.
+- Gaps and overlaps are valid *interval data* and are preserved. `age_interval` does not itself promise an exhaustive or disjoint partition.
 - A vector has one normalized unit, or an unspecified unit. Unit metadata is maintained by the documented vector operations. Explicit mismatches are not silently ignored.
 - `names()` exposes optional observation/group names (internally `group_names`), distinct from the `ivs` record's physical field names. Nonblank names become factor labels; blank/missing names fall back to formatted intervals. Distinct intervals cannot silently share a classification label.
 - Equality and ordering depend on interval bounds, **not names**. Slicing, sorting, concatenation, casts, and supported bindings retain names and units. Coverage set operations may merge/split intervals and therefore discard names.
@@ -52,18 +57,18 @@ The package is an **experimental**, S3/vctrs-oriented R package (R >= 4.1.0). It
 
 ## 5. Classification and comparison — Current
 
-`categorize_age()` accepts numeric cut points, widths, or `age_group` definitions. It classifies using fractional age values and supports ordered-factor output (default) or matched `age_group` intervals (`output = "interval"`). Missing or unmatched observations remain missing.
+`categorize_age()` accepts numeric cut points, widths, or `age_interval` definitions. It classifies using fractional age values and supports ordered-factor output (default) or matched `age_interval` intervals (`output = "interval"`). Missing or unmatched observations remain missing.
 
 - Overlapping matches **error by default**; `multiple = "first"` or `"last"` selects in sorted interval order.
 - Unspecified group units inherit the input ages' unit; unitless ages cannot be matched to explicitly unit-bearing groups without resolution. `convert_units` governs direction/denial of conversion; month/year conversions and approximate calendar-to-finer conversions require explicit permission.
-- `compare_age_groups()` provides crosswalk, definite/possible membership, ordering, age-gap bounds, coverage intersection/union/difference, and widths. It requires matching units and performs **no implicit conversion**.
+- `compare_age_intervals()` provides crosswalk, definite/possible membership, ordering, age-gap bounds, coverage intersection/union/difference, and widths. It requires matching units and performs **no implicit conversion**.
 - Pairwise comparisons can produce `length(x) * length(y)` rows. Crosswalks express possible/definite interval relationships, **not allocation of aggregate counts**. Splitting an aggregated band into finer bands is not justified without additional data or assumptions.
 
 **Analytical safety:** Overlapping classifications cannot be treated as additive partitions. For population denominators, incidence rates, or other summed quantities, validate disjointness and coverage separately from whether the intervals are individually valid.
 
 ## 6. Preset definitions and provenance — Current
 
-`age_group_presets` is a named list of numeric cut points used by `categorize_age()` or `cut()`. The legacy `age.groups` is an identical compatibility alias. Documented entries:
+`age_interval_presets` is a named list of numeric cut points used by `categorize_age()` or `cut()`. The legacy `age.groups` is an identical compatibility alias. Documented entries:
 
 | Key | Described purpose |
 | --- | --- |
@@ -81,15 +86,15 @@ These are **historical cut-point conventions**, not necessarily current authorit
 ## 7. Implemented `age_scheme` layer
 
 `age_scheme()` constructs one S3 metadata object containing a named, nonempty,
-unit-bearing `age_group` vector. `is_age_scheme()`, `validate_age_scheme()`, and
-`scheme_groups()` identify, validate, and access it. Printing, summary, and
+unit-bearing `age_interval` vector. `is_age_scheme()`, `validate_age_scheme()`, and
+`scheme_intervals()` identify, validate, and access it. Printing, summary, and
 data-frame inspection expose its identity, bounds, unit, provenance, coverage,
 gaps, and overlaps. Metadata is stored once per definition, not per observation.
 
 A validated `type` distinguishes nonoverlapping partitions from classifications
 that may overlap. A domain is optional; any `complete = TRUE` or FALSE claim
 requires an explicit domain and must agree with actual coverage. Category names
-must be nonblank and unique. Unit and coordinate metadata live in `groups`.
+must be nonblank and unique. Unit and coordinate metadata live in `intervals`.
 Ordinary replacement uses a shared validated update transaction with exact,
 label-aware definition comparison. The first substantive or asserted-source edit
 captures `derived_from`; current identity becomes local and verification is
@@ -121,7 +126,7 @@ Agecraft defines intervals and classification semantics; `tarr.pop` owns HDF5-ba
 
 ## 9. Public API and compatibility — Current commitments
 
-`API_POLICY.md` identifies the primary public workflow as `calculate_age()`, `age()`, `as_age()`, `is_age()`, `categorize_age()`, `age_group()`, `as.age_group()`, `is.age_group()`, `age_auto_unit()`, and `compare_age_groups()`. S3 registrations are supporting infrastructure. `age_group_to_char()` and `valid_age_group_symbol()` remain exported for compatibility but are not preferred for new usage.
+`API_POLICY.md` identifies the primary public workflow as `calculate_age()`, `age()`, `as_age()`, `is_age()`, `categorize_age()`, `age_interval()`, `as_age_interval()`, `is_age_interval()`, `age_auto_unit()`, and `compare_age_intervals()`. S3 registrations are supporting infrastructure. `age_interval_to_char()` and `valid_age_interval_symbol()` remain exported for compatibility but are not preferred for new usage.
 
 The deprecated `age_cat()`, `calc_age()`, `age.cat()` and the `age.groups` alias must remain through the **next non-development release**; removal requires a later announced breaking release, with no current removal date. Existing `as.character.ivs_iv()` and `summary.ivs_iv()` registrations are retained; do not extend bare `ivs` with new scheme methods.
 
@@ -163,7 +168,7 @@ Scheme implementation should be additive and must not silently change `calculate
 - [`CURRENT_STATE.md`](CURRENT_STATE.md) — implemented functionality and validation baseline.
 - [`DESCRIPTION`](../DESCRIPTION) — package metadata and dependencies.
 - [`R/age-class.R`](../R/age-class.R), [`R/Age_calculation.r`](../R/Age_calculation.r) — age values and calculations.
-- [`R/agegroup-class.r`](../R/agegroup-class.r), [`R/agegroup-coerce.r`](../R/agegroup-coerce.r), [`R/agegroup-methods.r`](../R/agegroup-methods.r), [`R/agegroup-compare.r`](../R/agegroup-compare.r) — interval class, coercion, classification, comparisons.
+- [`R/age-interval-class.R`](../R/age-interval-class.R), [`R/age-interval-coerce.R`](../R/age-interval-coerce.R), [`R/age-interval-classify.R`](../R/age-interval-classify.R), [`R/age-interval-compare.R`](../R/age-interval-compare.R) — interval class, coercion, classification, comparisons.
 - [`R/misc.r`](../R/misc.r), [`inst/extdata/age-group-provenance.csv`](../inst/extdata/age-group-provenance.csv) — legacy presets and provenance.
 - [`age_scheme.md`](age_scheme.md) — detailed scheme proposal, if placed alongside this file.
 
@@ -192,7 +197,7 @@ not an independently authoritative built-in catalogue.
 ## Age-category assignments — 2026-11-11
 
 `categorize_age(output = "factor")` now returns `age_category`, an ordered-factor
-subclass with level-aligned `age_group` definitions accessed by `category_groups()`.
+subclass with level-aligned `age_interval` definitions accessed by `category_intervals()`.
 Readable labels, codes, unused categories, missing assignments and matching rules
 are retained. This intentionally changes exact class and attribute comparisons.
 Interval output and `age_cat_iv()` are unchanged. Original ages and scheme

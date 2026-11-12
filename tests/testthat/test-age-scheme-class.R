@@ -1,5 +1,5 @@
 scheme_test_groups <- function(start = c(0, 5), end = c(5, Inf)) {
-  g <- age_group(start, end, unit = "year")
+  g <- age_interval(start, end, unit = "year")
   names(g) <- paste0("Group ", seq_along(g))
   g
 }
@@ -8,8 +8,8 @@ test_that("schemes preserve groups and validate coverage independently of overla
   g <- scheme_test_groups()
   s <- age_scheme(g, "test", "Test", domain = c(0, Inf), complete = TRUE)
   expect_true(is_age_scheme(s))
-  expect_false(is.age_group(s))
-  expect_identical(scheme_groups(s), g)
+  expect_false(is_age_interval(s))
+  expect_identical(scheme_intervals(s), g)
   expect_identical(validate_age_scheme(s), s)
   expect_identical(unserialize(serialize(s, NULL)), s)
   overlap <- scheme_test_groups(c(0, 2), c(5, Inf))
@@ -32,8 +32,8 @@ test_that("schemes preserve groups and validate coverage independently of overla
 
 test_that("scheme construction rejects malformed definitions and metadata", {
   g <- scheme_test_groups()
-  expect_error(age_scheme(age_group(), "test", "Test"), "nonempty")
-  missing <- age_group(NA_real_, NA_real_, unit = "year")
+  expect_error(age_scheme(age_interval(), "test", "Test"), "nonempty")
+  missing <- age_interval(NA_real_, NA_real_, unit = "year")
   names(missing) <- "Missing"
   expect_error(age_scheme(missing, "test", "Test"), "missing")
   expect_error(age_scheme(unname(g), "test", "Test"), "names")
@@ -63,8 +63,8 @@ test_that("scheme construction rejects malformed definitions and metadata", {
   class(s) <- "age_scheme"
   expect_error(validate_age_scheme(s), "type")
   s <- unclass(s)
-  s$groups <- unitless
+  s$intervals <- unitless
   class(s) <- "age_scheme"
-  expect_error(scheme_groups(s))
+  expect_error(scheme_intervals(s))
   expect_error(validate_age_scheme(structure(list(), class = "age_scheme")), "fields")
 })

@@ -1,8 +1,8 @@
 # Ephemeral comparison key: labels and order are definition content, while display
 # symbols and unrelated attributes are cosmetic. No snapshot is stored.
 age_scheme_definition <- function(x) {
-  g <- x$groups
-  validate_age_group(g)
+  g <- x$intervals
+  validate_age_interval(g)
   list(start = unname(ivs::iv_start(g)), end = unname(ivs::iv_end(g)),
        unit = get_unit(g), labels = unname(names(g)), type = unname(x$type),
        domain = if (is.null(x$domain)) NULL else as.double(x$domain),
@@ -84,7 +84,7 @@ age_scheme_update <- function(x, fields, values) {
   }
   if (anyNA(positions)) stop("Unknown or missing scheme field indices", call. = FALSE)
   fields <- names(x)[unname(positions)]
-  if (is.age_group(value) || is_age_scheme(value)) {
+  if (is_age_interval(value) || is_age_scheme(value)) {
     stop("Use a list of replacement values, such as list(new_groups)", call. = FALSE)
   }
   values <- if (is.null(value)) rep(list(NULL), length(fields)) else as.list(value)

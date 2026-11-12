@@ -1,3 +1,71 @@
+# Phase-one class naming refactor — 2026-11-12
+
+Branch: `refactor/age-class-names`. Git staging/commit is blocked by read-only
+`.git/index.lock` access in this session; changes remain in the working tree.
+Version remains 0.1.0.9020; this is a
+branch checkpoint, not a release. Phase two has not begun.
+
+## Implemented naming contract
+
+- The ivs-based interval vector is `age_interval`, constructed by
+  `age_interval()`, coerced with `as_age_interval()` and identified by
+  `is_age_interval()`. Comparison uses `compare_age_intervals()`; formatting
+  helpers and all S3/vctrs registrations use interval names.
+- `age_category` remains the ordered-factor assignment class. Its constructor
+  takes `intervals`; its definitions are stored in the `intervals` attribute and
+  accessed with `category_intervals()`. Schemes take/store `intervals`, accessed
+  with `scheme_intervals()`. `age_cat_iv()` takes `intervals` as its second
+  argument. No old interval constructor/class alias is retained.
+- `age_interval_presets` is canonical. Both `age_group_presets` and `age.groups`
+  remain identical numeric-list data aliases under the existing release policy.
+  The token-aware preset migration script handles both old data names.
+- Interval source/test files and the interval contract/vignette were renamed.
+  Roxygen help and NAMESPACE were regenerated. Live documentation, pkgdown,
+  design contracts and contributor guidance use phase-one names. The user's
+  documentation-style guidance and AGENTS addition were preserved.
+- A baseline RDS fixture retains old interval/category/scheme objects, primitive
+  classification results, presets and exports. Regression tests compare the new
+  representation against those captured values. Historical validation records
+  remain unchanged. Migration guidance is in `age_class_naming_migration.md`.
+
+## Executed validation
+
+| Check | Outcome |
+| --- | --- |
+| Baseline `devtools::test()` | 3,289 passing assertions; 0 failures, 0 test warnings, 1 optional mudnester skip |
+| Baseline `devtools::check(document = FALSE)` | 0 errors, 0 warnings, 2 environment notes |
+| Phase-one `devtools::document()` | Completed; generated registrations and help updated |
+| Final full `devtools::test()` | 3,324 passing assertions; 0 failures, 0 warnings, 1 optional mudnester skip |
+| Final `devtools::check(document = FALSE)` | 0 errors, 0 warnings, 1 environment note; examples, installed tests and all seven rebuilt vignettes passed |
+| Independent installed-package check | Dispatch, captured-result parity, eight registry schemes, export manifest and three dataset names passed |
+| pkgdown reference-topic validation | All configured topics have generated help files |
+| `git diff --check` and new-text whitespace review | Passed |
+
+The baseline emitted a timedatectl/system-bus warning outside the test runner.
+Its check notes concerned remote clock verification and the inaccessible system
+bus. Phase-one checks used `TZ=UTC`, leaving only the remote clock-verification
+note. No application test failure was attributed to these environment issues.
+An initial refactor test run found three outdated error-text expectations; they
+were updated to the renamed interval terminology before final validation.
+
+`mudnester` is unavailable and network name resolution prevented fetching it.
+Offline fixture imports, public-interface mocks and missing-dependency behavior
+passed; real installed-catalogue parity remains unverified and is the one skip.
+The complete pkgdown website was not built; references and runnable vignettes
+were checked. Old RDS objects require explicit reconstruction; no automatic
+upgrader or phase-two assignment class was introduced.
+
+Reproducible installed-check and baseline-capture scripts, export manifests,
+session information, and check transcripts are under
+`scripts/validation/age-class-naming/`. Temporary execution logs are
+`/tmp/agecraft-naming-baseline-tests.log`,
+`/tmp/agecraft-naming-baseline-check.log`,
+`/tmp/agecraft-naming-phase1-tests.log`,
+`/tmp/agecraft-naming-phase1-final-check.log`, and
+`/tmp/agecraft-naming-installed.log`.
+
+---
+
 # Age-group display — 2026-11-12
 
 - Standalone headers show `<age_group (year) [length]>`; unitless vectors show

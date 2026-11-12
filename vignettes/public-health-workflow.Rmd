@@ -41,7 +41,7 @@ or years.
 ## Assign reporting groups
 
 ```{r groups}
-groups <- as.age_group(age_group_presets$Annual, unit = "year")
+groups <- as_age_interval(age_interval_presets$Annual, unit = "year")
 category <- categorize_age(age, by = groups)
 data.frame(birth, age, category)
 table(category, useNA = "ifany")
@@ -56,7 +56,7 @@ endorsement.
 ## Resolve overlaps explicitly
 
 ```{r overlaps}
-overlapping <- as.age_group(c("0-9", "5-14"), unit = "year")
+overlapping <- as_age_interval(c("0-9", "5-14"), unit = "year")
 categorize_age(units::set_units(c(3, 7, 12), "year"), by = overlapping, multiple = "first")
 ```
 
@@ -67,7 +67,7 @@ refer to sorted interval order, not the original input order.
 
 ```{r units}
 days <- calculate_age(as.Date("2025-01-01"), as.Date("2025-02-15"), "day")
-day_groups <- as.age_group(c(0, 7, 14, 30, 60, Inf), unit = "day")
+day_groups <- as_age_interval(c(0, 7, 14, 30, 60, Inf), unit = "day")
 categorize_age(days, by = day_groups)
 ```
 
@@ -82,8 +82,8 @@ unit when possible.
 ## Combine observations safely
 
 ```{r combine}
-one <- as.age_group(c("0-4", "5-9"), unit = "year")
-two <- as.age_group("10-14", unit = "year")
+one <- as_age_interval(c("0-4", "5-9"), unit = "year")
+two <- as_age_interval("10-14", unit = "year")
 vctrs::vec_c(one, two)
 generics::as.ordered(one[c(2, 1)])
 ```

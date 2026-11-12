@@ -65,7 +65,7 @@ x == age(5.75, "year")
 sort(x, decreasing = TRUE)
 # Ages ordered as 10.5, 5.75, 2.25
 
-groups <- age_group(
+groups <- age_interval(
   c(0, 5, 18),
   c(5, 18, Inf),
   unit = "year"
@@ -93,25 +93,25 @@ scheme <- age_scheme(
 categorize_age(x, by = scheme)  # Ordered category factor
 classify_age_scheme(x, scheme) # Membership table
 
-scheme_groups(scheme)         # Underlying intervals
+scheme_intervals(scheme)         # Underlying intervals
 as.data.frame(scheme)         # Labels and numerical boundaries
 summary(scheme)               # Coverage and validation summary
 
 list_age_schemes()            # Available built-in schemes
 
-a <- age_group(0, 18, unit = "year")
-b <- age_group(5, 25, unit = "year")
+a <- age_interval(0, 18, unit = "year")
+b <- age_interval(5, 25, unit = "year")
 
-compare_age_groups(a, b, operation = "intersection")
+compare_age_intervals(a, b, operation = "intersection")
 # [5, 18)
 
-compare_age_groups(a, b, operation = "union")
+compare_age_intervals(a, b, operation = "union")
 # [0, 25)
 
-compare_age_groups(a, b, operation = "difference")
+compare_age_intervals(a, b, operation = "difference")
 # [0, 5): the part of a outside b
 
-compare_age_groups(a, operation = "width")
+compare_age_intervals(a, operation = "width")
 # 18 years
 
 # x - x

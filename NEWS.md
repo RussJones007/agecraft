@@ -1,3 +1,19 @@
+# Development: interval naming refactor, phase 1
+
+* **Breaking:** interval vectors and `age_group()` are renamed to `age_interval`
+  and `age_interval()`. Coercion, identification and comparison use
+  `as_age_interval()`, `is_age_interval()` and `compare_age_intervals()`.
+* Schemes take/store `intervals`, accessed by `scheme_intervals()`.
+  `age_category` still represents assignments, takes/stores `intervals`, and
+  exposes `category_intervals()`. `age_cat_iv()` takes `intervals` as its
+  second argument. Classification and numerical behavior are unchanged.
+* `age_interval_presets` is the canonical numeric cut-point dataset.
+  `age_group_presets` and `age.groups` remain identical compatibility aliases.
+  The installed preset migration script targets the new canonical name.
+* Old saved interval, category and scheme objects require reconstruction before
+  use. The old interval class name is not retained as an alias. Phase two,
+  assigning `age_group` to categorized values, is not implemented here.
+
 # agecraft 0.1.0.9019
 
 - Print age-group class, common unit and vector length in a header, without repeating units on each interval. `format()` now returns interval labels without unit suffixes.

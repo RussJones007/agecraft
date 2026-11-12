@@ -120,7 +120,7 @@ x <- age(c(0.02, 0.5, 2.75, NA), unit = "year")
 x
 as.numeric(x)
 format(x, fractional = TRUE)
-groups <- age_group(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
+groups <- age_interval(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
 names(groups) <- c("Neonate", "Infant", "Toddler")
 categorize_age(x, by = groups)
 }

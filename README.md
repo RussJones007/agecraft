@@ -14,12 +14,12 @@ The package provides:
 
 - Calendar-based fractional ages from birth and reference or event dates.
 - An **`age`** class that retains fractions while displaying completed whole units.
-- An **`age_group`** class with explicit units, fractional interval boundaries, and optional category names.
+- An **`age_interval`** class with explicit units, fractional interval boundaries, and optional category names.
 - Classification into ordered factors for tables and analysis, or matched intervals when you need to retain the boundaries.
 - Reusable `age_scheme` definitions with provenance, partition validation, and explicit all-membership output for overlapping classifications.
 - Reusable group definitions, automatic reporting-unit selection, and interval comparisons such as crosswalks, membership, and coverage operations.
 
-The `age` and `age_group` vector classes use the [vctrs](https://vctrs.r-lib.org/) framework. Group intervals build on [ivs](https://davisvaughan.github.io/ivs/), and explicit unit conversions use [units](https://r-quantities.github.io/units/). Requires R 4.1.0 or later. The package is under active development; see [NEWS](NEWS.md) for API changes.
+The `age` and `age_interval` vector classes use the [vctrs](https://vctrs.r-lib.org/) framework. Group intervals build on [ivs](https://davisvaughan.github.io/ivs/), and explicit unit conversions use [units](https://r-quantities.github.io/units/). Requires R 4.1.0 or later. The package is under active development; see [NEWS](NEWS.md) for API changes.
 
 ## Start with dates, finish with named categories
 
@@ -35,7 +35,7 @@ visits <- data.frame(
 visits$age <- calculate_age(visits$birth_date, visits$visit_date, unit = "year")
 
 # Include each lower bound and exclude each upper bound.
-groups <- age_group(start = c(0, 1, 3), end = c(1, 3, 6), unit = "year")
+groups <- age_interval(start = c(0, 1, 3), end = c(1, 3, 6), unit = "year")
 names(groups) <- c("Infant", "Toddler", "Young child")
 
 visits$category <- categorize_age(visits$age, by = groups)
@@ -61,7 +61,7 @@ For development in the repository, use `devtools::load_all()`.
 | Guide | What it covers |
 |:---|:---|
 | [Getting started](vignettes/getting-started.Rmd) | A beginner workflow: dates, output choices, supplied groups, names, and tables |
-| [Working with age and age_group](vignettes/age-and-age-group.Rmd) | Both classes in detail, using one sample data frame throughout |
+| [Working with age and age_interval](vignettes/age-and-age-interval.Rmd) | Both classes in detail, using one sample data frame throughout |
 | [A public-health age workflow](vignettes/public-health-workflow.Rmd) | Reporting groups, units, and overlapping definitions |
 | [Comparing age ranges](vignettes/age-range-comparisons.Rmd) | Crosswalks, membership, ordering, age gaps, and interval coverage |
 
@@ -135,10 +135,10 @@ The fractional part is now a fraction of a day. Conversion uses the units packag
 
 ## Define groups with boundaries, units, and names
 
-`age_group(start, end, unit)` constructs right-open intervals directly. Fractional bounds are preserved without rounding; `[0, 0.077)` displays explicitly, while whole-number intervals retain completed-age labels such as `1-4` for `[1, 5)`. One unit applies to every interval in a group vector; `NULL` leaves the unit unspecified. Only upper bounds may be infinite. A scalar `end` is recycled to the length of `start`; starts are not recycled. Missing intervals require both bounds to be missing.
+`age_interval(start, end, unit)` constructs right-open intervals directly. Fractional bounds are preserved without rounding; `[0, 0.077)` displays explicitly, while whole-number intervals retain completed-age labels such as `1-4` for `[1, 5)`. One unit applies to every interval in a group vector; `NULL` leaves the unit unspecified. Only upper bounds may be infinite. A scalar `end` is recycled to the length of `start`; starts are not recycled. Missing intervals require both bounds to be missing.
 
 ``` r
-fine_groups <- age_group(c(0, 0.077, 1, 3), c(0.077, 1, 3, 6), unit = "year")
+fine_groups <- age_interval(c(0, 0.077, 1, 3), c(0.077, 1, 3, 6), unit = "year")
 names(fine_groups) <- c("Neonate", "Infant", "Toddler", "Young child")
 fine_ages <- age(c(0.02, 0.5, 2, 4, NA), unit = "year")
 categorize_age(fine_ages, by = fine_groups)
@@ -147,25 +147,25 @@ categorize_age(fine_ages, by = fine_groups)
 
 The `0.077`-year cutoff approximates 28 days. Use day-based ages and groups when an exact day boundary matters. Classification uses the stored fractional values, even when several ages display as `0` under a year header.
 
-Use `as.age_group()` for supported completed-age labels, factors of those labels, numeric cut points, or `ivs::iv()` intervals:
+Use `as_age_interval()` for supported completed-age labels, factors of those labels, numeric cut points, or `ivs::iv()` intervals:
 
 ``` r
-as.age_group(c("< 5", "5-9", "10+"), unit = "year")
-as.age_group(c(0, 5, 10, Inf), unit = "year")
+as_age_interval(c("< 5", "5-9", "10+"), unit = "year")
+as_age_interval(c(0, 5, 10, Inf), unit = "year")
 ```
 
-A final `Inf` in numeric cuts produces an open-ended final group. With a final finite cut, `as.age_group()` adds a final one-unit interval. Use explicit `age_group(start, end)` bounds when every upper boundary must be specified.
+A final `Inf` in numeric cuts produces an open-ended final group. With a final finite cut, `as_age_interval()` adds a final one-unit interval. Use explicit `age_interval(start, end)` bounds when every upper boundary must be specified.
 
 ### Supplied age-group definitions
 
-`age_group_presets` is a named list of numeric cut points: `ILI`, `IMM`, `Yr.5`, `Yr.10`, `Spec`, `Annual`, `School`, and `Covid`. Assign their intended unit when constructing groups:
+`age_interval_presets` is a named list of numeric cut points: `ILI`, `IMM`, `Yr.5`, `Yr.10`, `Spec`, `Annual`, `School`, and `Covid`. Assign their intended unit when constructing groups:
 
 ``` r
-reporting_groups <- as.age_group(age_group_presets$Yr.5, unit = "year")
+reporting_groups <- as_age_interval(age_interval_presets$Yr.5, unit = "year")
 categorize_age(visits$age, by = reporting_groups)
 ```
 
-These are inherited reporting conventions. Their provenance and limitations are recorded in `inst/extdata/age-group-provenance.csv` and the `age_group_presets` help page. Confirm that a definition fits your reporting requirements.
+These are inherited reporting conventions. Their provenance and limitations are recorded in `inst/extdata/age-group-provenance.csv` and the `age_interval_presets` help page. Confirm that a definition fits your reporting requirements.
 
 ## Classification and interval analysis
 
@@ -183,12 +183,12 @@ Gaps and overlaps are allowed. Multiple matches raise an error by default; `mult
 
 Groups with unspecified units inherit the age vector's unit for matching. Unitless numeric ages with explicitly unit-bearing groups are rejected. When specified units differ, `convert_units = "age_to_group"` (default) or `"group_to_age"` converts one side; `"none"` rejects conversion. Approximate conversions require `allow_approx = TRUE`.
 
-`compare_age_groups()` supports crosswalks, definite or possible membership, ordering, possible age-gap bounds, intersection, union, difference, and widths:
+`compare_age_intervals()` supports crosswalks, definite or possible membership, ordering, possible age-gap bounds, intersection, union, difference, and widths:
 
 ``` r
-broad_groups <- age_group(c(0, 18, 65), c(18, 65, Inf), unit = "year")
-compare_age_groups(broad_groups, operation = "width")
-head(compare_age_groups(reporting_groups, broad_groups, operation = "crosswalk"))
+broad_groups <- age_interval(c(0, 18, 65), c(18, 65, Inf), unit = "year")
+compare_age_intervals(broad_groups, operation = "width")
+head(compare_age_intervals(reporting_groups, broad_groups, operation = "crosswalk"))
 ```
 
 Comparison requires matching units. Widths use the interval's coordinate unit; they are not exact calendar-day durations. Crosswalks describe overlaps but cannot redistribute aggregate counts without additional information.
@@ -215,9 +215,9 @@ The package was renamed from `rage`. Replace `library(rage)` with `library(agecr
 |:-----------------------------|:-------------------------|
 | `calc_age()`                 | `calculate_age()`        |
 | `age.cat()`, `age_cat()`     | `categorize_age()`       |
-| `age.groups$Yr.5`            | `age_group_presets$Yr.5` |
-| Label or interval conversion | `as.age_group()`         |
-| Direct start/end bounds      | `age_group()`            |
+| `age.groups$Yr.5`            | `age_interval_presets$Yr.5` |
+| Label or interval conversion | `as_age_interval()`         |
+| Direct start/end bounds      | `age_interval()`            |
 
 `calculate_age()` now defaults to fractional `age` output. Use `output = "units"` for the previous completed-age units vector, or `output = "numeric"` for plain completed ages. `calc_age()` and `age_auto_unit()` retain completed-age outputs.
 
@@ -228,8 +228,8 @@ For targeted preset-reference changes in R scripts, preview the installed helper
 ``` r
 tool <- system.file("tools", "migrate-age-groups.R", package = "agecraft")
 source(tool)
-migrate_age_group_presets("analysis.R")
-# After reviewing: migrate_age_group_presets("analysis.R", write = TRUE)
+migrate_age_interval_presets("analysis.R")
+# After reviewing: migrate_age_interval_presets("analysis.R", write = TRUE)
 ```
 
 The helper preserves list entry selections, comments, strings, and line endings. Strings, local bindings, member names, and other package namespaces are flagged for review. Writes keep `.bak` backups and refuse to overwrite existing backups. It is a targeted R-script helper; edit R Markdown/Quarto chunks manually.
@@ -265,7 +265,7 @@ Unit-bearing observations must use a supported simple time unit (second, minute,
 
 Scheme construction, classification and inspection validate the complete stored interval representation, including display symbols, units, category names and boundaries. Malformed metadata errors without default substitution; valid custom display symbols remain supported. Structural validity does not verify external source authority or provenance.
 
-Ordinary edits to local scheme copies now track minimal derivative ancestry. For example, `names(modified$groups)[1] <- "Revised category"` creates a local `_derived` identity, clears verification, and retains original identity/source metadata in `derived_from`. Changing the descriptive title does not create a derivative. See the age-schemes guide for batch edits and tracking limits.
+Ordinary edits to local scheme copies now track minimal derivative ancestry. For example, `names(modified$intervals)[1] <- "Revised category"` creates a local `_derived` identity, clears verification, and retains original identity/source metadata in `derived_from`. Changing the descriptive title does not create a derivative. See the age-schemes guide for batch edits and tracking limits.
 
 ### Optional external catalogue
 
@@ -277,10 +277,10 @@ With `mudnester` installed, `import_mudnester_scheme("abs_5yr")` imports a valid
 and retained interval definitions.
 
 ```r
-groups <- age_group(c(0, 5, 10), c(5, 10, Inf), sep = " to ")
+groups <- age_interval(c(0, 5, 10), c(5, 10, Inf), sep = " to ")
 categories <- categorize_age(c(2, 7, NA), by = groups)
-category_groups(categories)
-category_groups(droplevels(categories[1]))
+category_intervals(categories)
+category_intervals(droplevels(categories[1]))
 ```
 
 Subsetting retains unused categories. Combining requires matching definitions,
@@ -288,3 +288,12 @@ labels and units. Use `vctrs::vec_rbind()` for binding with metadata validation,
 and `generics::as.factor()` for an ordinary factor. Base coercers retain factor
 subclasses, while base data-frame binding may discard their metadata. See the
 [age-categories guide](vignettes/age-categories.Rmd) for the full contracts.
+
+### Interval naming transition
+
+On this development branch, use `age_interval()` to define age ranges and
+`age_category` for assigned categories. Schemes and categories expose definitions
+through `scheme_intervals()` and `category_intervals()`. The canonical cut-point
+list is `age_interval_presets`; its two earlier names remain data aliases.
+See the [phase-one migration guide](docs/age_class_naming_migration.md) for renamed
+functions, arguments and saved-object handling.

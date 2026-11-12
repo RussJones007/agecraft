@@ -71,7 +71,7 @@ test_that("explicit age conversions normalize units and guard approximation", {
 })
 
 test_that("classification uses fractional age values and explicit units", {
-  groups <- age_group(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
+  groups <- age_interval(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
   names(groups) <- c("Neonate", "Infant", "Toddler")
   x <- age(c(0, 0.0769, 0.077, 0.5, 1, 3, NA), "year")
   expected <- c("Neonate", "Neonate", "Infant", "Infant", "Toddler", NA, NA)
@@ -82,7 +82,7 @@ test_that("classification uses fractional age values and explicit units", {
   expect_identical(attr(categorize_age(x, by = groups), "units"), "year")
   expect_identical(as.character(categorize_age(age(c(0.2, 0.6)), by = c(0, 0.5, 1))),
                    c("[0, 0.5)", "[0.5, 1)"))
-  weeks <- age_group(c(0, 1), c(1, 2), unit = "week")
+  weeks <- age_interval(c(0, 1), c(1, 2), unit = "week")
   days <- age(c(3.5, 7, 14), "day")
   expect_identical(as.character(categorize_age(days, by = weeks)), c("0", "1", NA))
   expect_identical(as.character(age_cat_iv(days, weeks)), c("0", "1", NA))
