@@ -1,11 +1,37 @@
+# Development version 0.1.0.9021 — 2026-11-12
+
+Both naming phases are committed on refactor/age-class-names: e25155c (intervals)
+and 040ba11 (assignments). DESCRIPTION identifies the completed interface as
+0.1.0.9021; NEWS consolidates the breaking API changes, preset aliases and
+saved-object requirements under that version. The downstream tarr.pop migration
+plan now specifies agecraft >= 0.1.0.9021, with installed-API verification.
+
+Validation at this version:
+
+- `TZ=UTC Rscript -e 'devtools::test()'`: 3,389 assertions passed, zero failures
+  and warnings, one skip because the optional mudnester package is unavailable.
+- `TZ=UTC Rscript -e 'devtools::check(document = FALSE,
+  check_dir = "/tmp/agecraft-9021-check")'`: zero errors, zero warnings and one
+  environment note about remote clock verification. Installed tests, examples
+  and all seven vignette rebuilds passed.
+- `git diff --check` passed. No production algorithms, public signatures or
+  generated help sources changed during this version checkpoint.
+
+The check transcript is saved in
+`scripts/validation/age-class-naming/version-9021-check.log`. Temporary full logs
+are `/tmp/agecraft-9021-tests.log` and `/tmp/agecraft-9021-check.log`.
+No merge, push or publication was performed.
+
+---
+
 # Phase-two class naming refactor — 2026-11-12
 
 Branch: `refactor/age-class-names`. Started from the clean phase-one commit
 `e25155c`. Phase one is committed; older blocked-commit statements below are
 historical. Version remains 0.1.0.9020 pending release/version selection.
-Phase-two Git staging was attempted but blocked by read-only `.git/index.lock`
-access in this session; the validated changes remain uncommitted. A prepared
-commit message is at `/tmp/agecraft-phase2-commit-message.txt`.
+Git staging was initially blocked during implementation; phase two was
+subsequently committed as 040ba11. The validation record below describes that
+phase-two checkpoint.
 
 ## Implemented
 

@@ -165,7 +165,8 @@ started from that clean checkpoint after explicit user authorization. Both
 phases' behavior and validation are recorded in CURRENT_STATE.md. No merge,
 push or publication is authorized for this task.
 
-Phase-two validation is complete. Staging the checkpoint was blocked by the
-current session's read-only Git metadata; phase two remains in the working tree.
-The phase-one commit e25155c is intact. Record the phase-two commit from a session
-with Git write permission before integration or release work.
+Phase two was committed as 040ba11. Both checkpoints are committed. Development
+version 0.1.0.9021 identifies the completed refactor; see CURRENT_STATE.md for
+version-checkpoint validation. Historical Git permission limitations are resolved
+for the two refactor commits, although individual sessions may still restrict
+new Git writes.
