@@ -1,0 +1,91 @@
+---
+title: "Age categories: assignments with interval definitions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Age categories: assignments with interval definitions}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(agecraft)
+```
+
+An `age_group` defines intervals; an `age_category` stores assignments to those
+intervals. An `age_scheme` adds identity and provenance to a definition. Category
+vectors retain neither original exact ages nor scheme provenance.
+
+## Readable labels and retrievable bounds
+
+```{r}
+groups <- age_group(c(0, 5, 10), c(5, 10, Inf), sep = " to ")
+categories <- categorize_age(c(2, 5, 8, NA), by = groups)
+categories
+class(categories)
+category_groups(categories)
+```
+
+These are ordered factors with integer category codes. Codes are identifiers,
+not numerical ages. Bounds retain their half-open meaning: age 5 belongs to
+`[5, 10)`. Optional group names supply labels instead of formatted intervals.
+
+## Subsets keep unused categories
+
+```{r}
+subset <- categories[1]
+levels(subset)
+category_groups(subset)
+category_groups(droplevels(subset))
+```
+
+`droplevels()` removes unused levels and their intervals together. Missing ages
+and ages outside the definition both produce `NA`; missingness is not a level.
+
+## Safe relabeling and combination
+
+```{r}
+renamed <- categories
+levels(renamed) <- c("Under 5", "5 through 9", "10 and older")
+category_groups(renamed)
+combined <- c(categories, categories[1])
+combined
+vctrs::vec_rbind(data.frame(category = categories),
+                data.frame(category = categories[1]))
+```
+
+Combining requires matching chronological bounds, labels and definition units.
+Labels alone cannot establish compatibility. Conflicting cosmetic symbols
+normalize to package defaults. Relabeling updates interval names without changing
+bounds; duplicate labels and level reordering are rejected. Merging or changing
+boundaries requires explicit reconstruction, usually from original ages.
+
+Use `vctrs::vec_rbind()` for binding. Base `rbind.data.frame()` reconstructs
+factor columns and can discard the subclass and definitions. Base concatenation
+can also discard subclasses when an ordinary factor is the first argument;
+convert all inputs explicitly when mixing representations.
+
+## Ordinary factors and unit metadata
+
+```{r}
+ordinary <- generics::as.factor(categories)
+class(ordinary)
+is.null(attr(ordinary, "groups"))
+```
+
+`generics::as.ordered()` similarly produces an ordinary ordered factor. Base
+`as.factor()` and `as.ordered()` return existing factor subclasses unchanged.
+For custom plot ordering, convert to an ordinary factor first.
+
+```{r}
+weekly <- age_group(c(0, 1), c(1, Inf), unit = "week")
+result <- categorize_age(age(c(3, 8), unit = "day"), by = weekly)
+category_groups(result)
+attr(result, "units")
+```
+
+The intervals use weeks. The legacy `units` attribute records the original
+observation unit, days. Combining categories with different observation units
+drops that attribute; definition units must still match. Unitless groups inherit
+observation units. `output = "interval"` continues to return matched intervals
+per observation, while `age_cat_iv()` retains its existing output behavior.

@@ -4,6 +4,12 @@
 #' Subsetting retains unused categories; use `droplevels()` to remove them.
 #' Combining requires matching bounds, labels and units. Convert explicitly with
 #' `generics::as.factor()` or `generics::as.ordered()` to discard interval metadata.
+#' Base coercers leave existing factor subclasses unchanged. Use
+#' `vctrs::vec_rbind()` for binding: base data-frame binding can discard metadata.
+#' Reordering and implicit category merging are rejected. Original exact ages
+#' and scheme provenance are not stored. The legacy `units` attribute describes
+#' observations; definition units live in `groups`. Differing observation units
+#' are dropped on combination; definition units must match.
 #' @param x Character category labels or a factor; missing values are allowed.
 #' @param groups An `age_group` vector in chronological order, with unique labels.
 #' @return `age_category()` returns an ordered-factor subclass;
@@ -41,7 +47,8 @@ validate_age_category <- function(x) {
   labels <- levels(x)
   codes <- unclass(x)
   if (!identical(class(x), c("age_category", "ordered", "factor")) ||
-      !is.integer(codes) || length(labels) != length(g) || anyNA(g) ||
+      !is.integer(codes) || !is.character(labels) ||
+      length(labels) != length(g) || anyNA(g) ||
       anyNA(labels) || anyDuplicated(labels) || any(!nzchar(trimws(labels))) ||
       !identical(labels, age_group_labels(g)) ||
       !identical(order(g), seq_along(g)) ||
@@ -78,6 +85,9 @@ category_groups <- function(x) {
 #' @export
 droplevels.age_category <- function(x, exclude = NA, ...) {
   validate_age_category(x)
+  if (!identical(exclude, NA)) {
+    stop("age_category only supports exclude = NA; missing values are not categories", call. = FALSE)
+  }
   used <- seq_along(levels(x)) %in% as.integer(x)
   out <- new_age_category(match(as.integer(x), which(used)), category_groups(x)[used],
                           levels(x)[used], attr(x, "units", exact = TRUE))
@@ -101,14 +111,15 @@ droplevels.age_category <- function(x, exclude = NA, ...) {
 }
 
 #' @export
-as.factor.age_category <- function(x) {
+as.factor.age_category <- function(x, ...) {
+  validate_age_category(x)
   out <- factor(as.character(x), levels = levels(x))
   names(out) <- names(x)
   out
 }
 
 #' @export
-as.ordered.age_category <- function(x) {
+as.ordered.age_category <- function(x, ...) {
   out <- as.factor.age_category(x)
   class(out) <- c("ordered", "factor")
   out
@@ -170,14 +181,14 @@ c.age_category <- function(..., recursive = FALSE) {
   out
 }
 
-#' @export
+#' @exportS3Method vctrs::vec_proxy
 vec_proxy.age_category <- function(x, ...) {
   out <- as.integer(x)
   names(out) <- names(x)
   out
 }
 
-#' @export
+#' @exportS3Method vctrs::vec_restore
 vec_restore.age_category <- function(x, to, ...) {
   out <- new_age_category(x, category_groups(to), levels(to), attr(to, "units"))
   names(out) <- names(x)
@@ -185,10 +196,10 @@ vec_restore.age_category <- function(x, to, ...) {
   out
 }
 
-#' @export
+#' @exportS3Method vctrs::vec_ptype2
 vec_ptype2.age_category.age_category <- function(x, y, ...) age_category_common(x, y)
 
-#' @export
+#' @exportS3Method vctrs::vec_cast
 vec_cast.age_category.age_category <- function(x, to, ...) {
   age_category_common(x, to)
   codes <- as.integer(x)
@@ -211,19 +222,19 @@ Ops.age_category <- function(e1, e2) {
   NextMethod()
 }
 
-#' @export
+#' @exportS3Method vctrs::vec_ptype2
 vec_ptype2.age_category.factor <- function(x, y, ...) {
   stop("Convert explicitly before mixing age_category with other types", call. = FALSE)
 }
-#' @export
+#' @exportS3Method vctrs::vec_ptype2
 vec_ptype2.factor.age_category <- function(x, y, ...) vec_ptype2.age_category.factor(y, x, ...)
-#' @export
+#' @exportS3Method vctrs::vec_ptype2
 vec_ptype2.age_category.ordered <- function(x, y, ...) vec_ptype2.age_category.factor(x, y, ...)
-#' @export
+#' @exportS3Method vctrs::vec_ptype2
 vec_ptype2.ordered.age_category <- function(x, y, ...) vec_ptype2.age_category.factor(y, x, ...)
-#' @export
+#' @exportS3Method vctrs::vec_ptype2
 vec_ptype2.age_category.character <- function(x, y, ...) vec_ptype2.age_category.factor(x, y, ...)
-#' @export
+#' @exportS3Method vctrs::vec_ptype2
 vec_ptype2.character.age_category <- function(x, y, ...) vec_ptype2.age_category.factor(y, x, ...)
 
 #' @export
@@ -231,4 +242,14 @@ print.age_category <- function(x, ...) {
   validate_age_category(x)
   print(as.ordered.age_category(x), ...)
   invisible(x)
+}
+
+#' @exportS3Method stats::reorder
+reorder.age_category <- function(x, ...) {
+  stop("Category levels must remain chronological; convert to an ordinary factor for display ordering", call. = FALSE)
+}
+
+#' @exportS3Method stats::relevel
+relevel.age_category <- function(x, ref, ...) {
+  stop("Category levels must remain chronological; convert to an ordinary factor for display ordering", call. = FALSE)
 }

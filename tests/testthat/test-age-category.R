@@ -107,3 +107,19 @@ test_that("restoration, comparison and names do not lose interval meaning", {
   attr(broken, "groups") <- g[1]
   expect_error(category_groups(broken), "mapping")
 })
+
+test_that("structural edits are explicit and observation units are separate", {
+  x <- categorize_age(age(c(1, 2), unit = "day"), by = age_group(0, Inf, unit = "week"))
+  y <- categorize_age(age(1, unit = "week"), by = age_group(0, Inf, unit = "week"))
+  combined <- c(x, y)
+  expect_null(attr(combined, "units"))
+  expect_identical(attr(category_groups(combined), "unit"), "week")
+  expect_null(attr(vctrs::vec_c(x, y), "units"))
+  expect_error(stats::reorder(x, c(2, 1)), "chronological")
+  expect_error(stats::relevel(x, ref = levels(x)[1]), "chronological")
+  expect_error(droplevels(x, exclude = "0+"), "exclude")
+  expect_identical(as.character(categorize_age(c(1, NA), by = age_group(c(0, NA), c(5, NA)))), c("0-4", NA))
+  expect_identical(category_groups(x[FALSE]), category_groups(x))
+  expect_identical(category_groups(vctrs::vec_init(x, 2)), category_groups(x))
+  expect_true(all(is.na(vctrs::vec_init(x, 2))))
+})
