@@ -1,3 +1,14 @@
+# agecraft 0.1.0.9019
+
+## Age-category assignments
+
+- Return `age_category`, an ordered-factor subclass, from `categorize_age()` factor output. Retain readable labels and a level-aligned `age_group` definition available through `category_groups()`; matching policies and interval output are unchanged.
+- Add `age_category()` and `is_age_category()`. Preserve unused categories on subset; explicit `droplevels()` removes levels and intervals together. Support validated relabeling, replacement, repetition, concatenation, comparison and vctrs slicing/casting/binding.
+- Require matching ordered bounds, labels and definition units when combining. Normalize conflicting cosmetic symbols to package defaults; reject implicit merging and reordering. Original exact ages and scheme provenance are not stored.
+- Keep the legacy observation `units` attribute separate from definition units and drop it when combined inputs differ. Document base factor coercion/binding limitations, explicit conversions, and the intentional default subclass change.
+- Add contract tests, generated help and the age-categories vignette.
+- Validation at 0.1.0.9019: all 3,178 assertions passed with no failures or warnings and one optional mudnester skip. R CMD check completed with 0 errors, 0 warnings and 0 notes, including installed tests, examples and vignette rebuilds.
+
 # agecraft 0.1.0.9018
 
 - Show standalone age headers as `<age [year][6]>`, separating the class and unit with a space and square brackets. Tibble headers remain `<age-year>`; stored values and metadata are unchanged.

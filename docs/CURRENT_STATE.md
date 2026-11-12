@@ -1,3 +1,29 @@
+# Age-category implementation — 2026-11-11
+
+Development version: **0.1.0.9019**.
+
+- Added the ordered-factor subclass `age_category`, constructor, identifier and
+  `category_groups()` accessor. Definitions remain aligned with levels through
+  subset, explicit dropping of unused levels, safe relabeling and replacement.
+- Added strict compatible combination, cosmetic normalization and registered
+  vctrs proxy/restoration/common-type/cast methods. Definition units are separate
+  from original-observation units. Reordering and implicit merging are rejected.
+- `categorize_age()` now returns the subclass for factor output, preserving
+  readable labels and existing matching behavior. Interval output is unchanged.
+  See `age_category.md`, API policy and the new age-categories vignette for
+  compatibility implications and base-R coercion/binding limitations.
+- Generated roxygen help. All **3,178 assertions passed**, with no failures or
+  warnings and one optional `mudnester` skip. This includes 73 focused category
+  assertions. `devtools::check(document = FALSE)` (R CMD check, --as-cran,
+  --no-manual) completed with **0 errors, 0 warnings, 0 notes**, including installed
+  tests, examples and vignette rebuilds.
+- Validated a clean index export in `/tmp/age-category-final-source`, excluding
+  unrelated existing local edits and untracked artifacts. Final release prose
+  records the validation afterward; executable sources are unchanged.
+  Log: `/tmp/age-category-final-validation.log`.
+
+---
+
 ## Standalone age unit delimiter — 2026-11-11
 
 - Full age type labels now use `age [year]` (and corresponding units), producing

@@ -379,3 +379,21 @@ validated, unverified scheme; `mudnester_catalogue()` exposes upstream provenanc
 package snapshot version and known issues. Imports warn about applicability and
 preserve numeric boundaries and labels faithfully. The eight legacy schemes
 and numeric presets are unchanged. See the age-schemes vignette for caveats.
+
+## Age-category assignments
+
+`categorize_age()` returns an `age_category` ordered factor with readable labels
+and retained interval definitions.
+
+```r
+groups <- age_group(c(0, 5, 10), c(5, 10, Inf), sep = " to ")
+categories <- categorize_age(c(2, 7, NA), by = groups)
+category_groups(categories)
+category_groups(droplevels(categories[1]))
+```
+
+Subsetting retains unused categories. Combining requires matching definitions,
+labels and units. Use `vctrs::vec_rbind()` for binding with metadata validation,
+and `generics::as.factor()` for an ordinary factor. Base coercers retain factor
+subclasses, while base data-frame binding may discard their metadata. See the
+[age-categories guide](vignettes/age-categories.Rmd) for the full contracts.
