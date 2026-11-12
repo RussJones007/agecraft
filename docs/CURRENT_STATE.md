@@ -1,3 +1,64 @@
+# Phase-two class naming refactor — 2026-11-12
+
+Branch: `refactor/age-class-names`. Started from the clean phase-one commit
+`e25155c`. Phase one is committed; older blocked-commit statements below are
+historical. Version remains 0.1.0.9020 pending release/version selection.
+Phase-two Git staging was attempted but blocked by read-only `.git/index.lock`
+access in this session; the validated changes remain uncommitted. A prepared
+commit message is at `/tmp/agecraft-phase2-commit-message.txt`.
+
+## Implemented
+
+- The assignment class, constructor, predicate, validators and complete method
+  family use `age_group` instead of `age_category`. `group_intervals()` replaces
+  `category_intervals()`. No old assignment function/class aliases are retained.
+- `categorize_age(output = "factor")` returns
+  `c("age_group", "ordered", "factor")`. Values, labels, unused levels, names,
+  units and matching rules are preserved. Interval output and scheme definitions
+  remain `age_interval`; no interval engine or scientific provenance code changed.
+- The group predicate distinguishes integer ordered-factor assignments from
+  legacy ivs interval records carrying the reused `age_group` tag. Dispatched
+  group methods reject those old records with reconstruction guidance. Checks
+  cover slicing, replacement, coercion, formatting, comparison, concatenation,
+  proxies, prototypes and casts. Valid coercion/format paths delegate to factor
+  methods. No new methods are registered on bare ivs intervals.
+- Source, test, contract and guide files use age-group names. Roxygen help and
+  NAMESPACE were regenerated; README, pkgdown, design/API contracts and migration
+  guidance reflect the final terminology. Historical plans, export manifests,
+  fixtures and validation logs retain their original names as evidence.
+- Captured phase-one assignments, primitive results, memberships, intervals and
+  exports in a new fixture before production edits. Regression tests compare
+  both old interval-era and phase-one results with phase-two behavior.
+
+## Executed validation
+
+| Check | Outcome |
+| --- | --- |
+| Phase-one baseline `devtools::test()` | 3,324 pass; 0 failures/warnings; 1 optional mudnester skip |
+| Focused group/migration/naming tests | 185 pass; 0 failures/warnings/skips |
+| Full phase-two `devtools::test()` | 3,389 pass; 0 failures/warnings; 1 optional mudnester skip |
+| `devtools::document()` | Completed; generated registrations/help updated |
+| `devtools::check(document = FALSE)` | 0 errors, 0 warnings, 1 remote-clock-verification note; examples, installed tests and seven rebuilt vignettes passed |
+| Independent installed-package check | New names, dispatch, both baseline fixtures, legacy rejection, eight registry schemes and three dataset names passed |
+| pkgdown topic-reference check | All configured topics resolve to generated help |
+| `git diff --check` and new text whitespace checks | Passed |
+
+The optional mudnester catalogue is not installed. Offline fixture imports,
+mocked public interfaces and missing-dependency tests passed; real installed
+catalogue parity remains the one skipped test. The complete pkgdown website
+was not built. No automatic saved-object upgrader, merge, push or publication
+was performed. Arbitrary base/inherited operations cannot all be intercepted;
+users must reconstruct old saved objects before use.
+
+Validation scripts, export manifest and check transcript are under
+`scripts/validation/age-class-naming/`. Temporary logs are
+`/tmp/agecraft-phase2-baseline-tests.log`, `/tmp/agecraft-phase2-focused.log`,
+`/tmp/agecraft-phase2-tests.log`, `/tmp/agecraft-phase2-check.log`, and
+`/tmp/agecraft-phase2-installed.log`. The phase-one fixture capture script targets
+commit e25155c and must not be rerun against phase-two source.
+
+---
+
 # Phase-one class naming refactor — 2026-11-12
 
 Branch: `refactor/age-class-names`. Git staging/commit is blocked by read-only

@@ -1,6 +1,7 @@
 # Age class naming implementation plan
 
-Status: phase one implemented; phase two not started. Prepared 2026-11-12.
+Status: both naming phases implemented; phase-two validation is recorded in
+CURRENT_STATE.md. Prepared 2026-11-12.
 See CURRENT_STATE.md for the executed validation record.
 Companion: [naming inventory](age_class_naming_inventory.md).
 Baseline: main at e7cf2a27eea6a5439f3610259cd242401e3139e5,
@@ -154,12 +155,17 @@ The phase-1 category accessor is category_intervals(); phase 2 renames it to
 group_intervals(). Neither intermediate API is published independently.
 
 The user approved these recommendations for phase one. Baseline validation and
-old-object capture preceded implementation. Phase two remains out of scope.
+old-object capture preceded implementation. Phase two was subsequently authorized by the user.
 See CURRENT_STATE.md for phase-one validation and any checkpoint limitations.
 
-## Phase-one checkpoint status
+## Checkpoint status
 
-Implementation and validation are complete; see CURRENT_STATE.md. Git staging
-was attempted but blocked by read-only `.git` metadata, so no checkpoint commit
-could be created in this session. Do not begin phase two until the user has
-reviewed this working-tree checkpoint and its commit can be recorded.
+Phase one was committed as e25155c on refactor/age-class-names. Phase two was
+started from that clean checkpoint after explicit user authorization. Both
+phases' behavior and validation are recorded in CURRENT_STATE.md. No merge,
+push or publication is authorized for this task.
+
+Phase-two validation is complete. Staging the checkpoint was blocked by the
+current session's read-only Git metadata; phase two remains in the working tree.
+The phase-one commit e25155c is intact. Record the phase-two commit from a session
+with Git write permission before integration or release work.

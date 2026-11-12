@@ -1,14 +1,22 @@
-# Phase-one naming transition — 2026-11-12
+# Completed class naming transition — 2026-11-12
 
-This branch intentionally breaks the old interval API: `age_group` is replaced
-by `age_interval`, with snake_case coercion/predicate names. Schemes take/store
-`intervals` and expose `scheme_intervals()`; `age_category` takes/stores
-`intervals` and exposes `category_intervals()`. The assignment class remains
-`age_category`; no new factor `age_group` class exists in phase one.
-`age_interval_presets` is canonical; `age_group_presets` and `age.groups` remain
-identical data aliases through the existing compatibility window. Old interval
-constructor/class aliases are not retained. See `age_class_naming_migration.md`
-for the function map and saved-object reconstruction requirements.
+The interval class is `age_interval`. The assignment class is `age_group`, an
+integer ordered-factor subclass, replacing `age_category`. Its constructor is
+`age_group(x, intervals)`, its predicate is `is_age_group()` and its definitions
+are accessed with `group_intervals()`. The phase-one category names are not kept
+as aliases. Factor codes, levels, names, units and matching rules are retained.
+Schemes still contain age intervals and expose `scheme_intervals()`.
+
+Before phase one, `age_group` meant an ivs interval record. That representation
+is not a valid assignment object: `is_age_group()` returns FALSE and dispatched
+assignment methods reject it with instructions to rebuild using `age_interval()`.
+A class tag alone does not establish the new representation. Arbitrary base or
+inherited operations cannot all be intercepted; old objects must be reconstructed
+before use. See `age_class_naming_migration.md`.
+
+`age_interval_presets` remains canonical. `age_group_presets` and `age.groups`
+remain identical data aliases under the existing compatibility policy. No
+interval algorithms, numerical defaults or scheme provenance rules change.
 
 # Public interface and compatibility
 
@@ -16,7 +24,8 @@ for the function map and saved-object reconstruction requirements.
 
 The main workflow uses `calculate_age()`, `age()`, `as_age()`, `is_age()`,
 `categorize_age()`, `age_interval()`, `as_age_interval()`, `is_age_interval()`,
-`age_auto_unit()`, and `compare_age_intervals()`. Registered S3 methods remain
+`age_auto_unit()`, `compare_age_intervals()`, `age_group()`, `is_age_group()`
+and `group_intervals()`. Registered S3 methods remain
 infrastructure. `age_interval_to_char()` and `valid_age_interval_symbol()` are exported
 formatting/parsing helpers; use `as.character()` and `as_age_interval()` in new code.
 
@@ -41,9 +50,9 @@ Conversions between month and year, or between either calendar unit and finer
 units, require `allow_approx = TRUE`
 and do not reconstruct exact elapsed time from the original dates.
 
-## Age-group bounds and names
+## Age-interval bounds and names
 
-Age-group bounds may be nonnegative whole numbers or fractions. Fractional
+Age-interval bounds may be nonnegative whole numbers or fractions. Fractional
 bounds are preserved without rounding in direct construction, numeric cut points,
 and supported interval conversions. Only upper bounds may be `Inf`. Missing
 intervals require both bounds to be missing; reversed bounds are rejected.
@@ -212,8 +221,8 @@ Age-group standalone printing shows class, common unit and vector length in a
 header. `format.age_interval()` returns interval labels without unit suffixes;
 this intentionally changes previously unit-suffixed formatted strings.
 
-`categorize_age(output = "factor")` now returns `age_category`, an ordered-factor
-subclass with level-aligned `age_interval` definitions accessed by `category_intervals()`.
+`categorize_age(output = "factor")` now returns `age_group`, an ordered-factor
+subclass with level-aligned `age_interval` definitions accessed by `group_intervals()`.
 Readable labels, codes, unused categories, missing assignments and matching rules
 are retained. This intentionally changes exact class and attribute comparisons.
 Interval output and `age_cat_iv()` are unchanged. Original ages and scheme
@@ -229,7 +238,7 @@ Use `vctrs::vec_rbind()` for validated binding. Base `rbind.data.frame()` can
 rebuild factor columns and discard metadata. Use `generics::as.factor()` or
 `generics::as.ordered()` for ordinary factors; base coercers retain existing
 factor subclasses. Differing legacy observation-unit attributes are dropped on
-combination; category definition units must always match. See `age_category.md`.
+combination; category definition units must always match. See `age_group.md`.
 
 
 ## Scheme summaries and BibTeX export

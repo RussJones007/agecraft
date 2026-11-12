@@ -1,4 +1,4 @@
-test_that("phase one reproduces captured classification and interval definitions", {
+test_that("renamed classes reproduce captured classification and interval definitions", {
   old <- readRDS(test_path("fixtures", "age-class-naming", "baseline.rds"))
   # Read primitive components without dispatching methods on old class tags.
   bounds <- unclass(old$intervals)
@@ -9,11 +9,11 @@ test_that("phase one reproduces captured classification and interval definitions
   x <- categorize_age(old$ages, by = s)
   expect_identical(class(g), c("age_interval", "ivs_iv", "vctrs_rcrd", "vctrs_vctr"))
   expect_false(inherits(g, "age_group"))
-  expect_identical(class(x), c("age_category", "ordered", "factor"))
+  expect_identical(class(x), c("age_group", "ordered", "factor"))
   expect_identical(as.character(x), old$labels)
   expect_identical(as.integer(x), old$codes)
   expect_identical(levels(x), levels(old$assignments))
-  expect_identical(category_intervals(x), g)
+  expect_identical(group_intervals(x), g)
   expect_identical(scheme_intervals(s), g)
   expect_identical(unclass(categorize_age(old$ages, by = s, output = "interval")),
                    unclass(old$matched))
@@ -33,26 +33,26 @@ test_that("phase one reproduces captured classification and interval definitions
   }
 })
 
-test_that("phase one exposes interval names and keeps factor assignments separate", {
+test_that("final API exposes interval names and keeps factor assignments separate", {
   exports <- getNamespaceExports("agecraft")
   expect_true(all(c("age_interval", "as_age_interval", "is_age_interval",
-                    "compare_age_intervals", "scheme_intervals", "category_intervals",
-                    "age_category", "is_age_category") %in% exports))
-  expect_false(any(c("age_group", "as.age_group", "is.age_group", "compare_age_groups",
+                    "compare_age_intervals", "scheme_intervals", "group_intervals",
+                    "age_group", "is_age_group") %in% exports))
+  expect_false(any(c("age_category", "category_intervals", "as.age_group", "is.age_group", "compare_age_groups",
                      "category_groups", "scheme_groups") %in% exports))
   expect_identical(names(formals(age_scheme))[1], "intervals")
-  expect_identical(names(formals(age_category))[2], "intervals")
+  expect_identical(names(formals(age_group))[2], "intervals")
   expect_identical(names(formals(age_cat_iv))[2], "intervals")
   expect_s3_class(age_cat_iv(age(c(0, 5)), intervals = age_interval(c(0, 5), c(5, Inf))),
                   "ordered")
   expect_s3_class(as_age_interval(c("0-4", "5+")), "age_interval")
   expect_true(is_age_interval(age_interval(0, 5)))
-  expect_false(is_age_interval(age_category("0-4", age_interval(0, 5))))
+  expect_false(is_age_interval(age_group("0-4", age_interval(0, 5))))
 })
 
 test_that("old stored schemas require explicit reconstruction", {
   old <- readRDS(test_path("fixtures", "age-class-naming", "baseline.rds"))
   expect_false(is_age_interval(old$intervals))
   expect_error(scheme_intervals(old$scheme), "required fields")
-  expect_error(category_intervals(old$assignments), "age_interval structure")
+  expect_error(group_intervals(old$assignments), "age_interval structure")
 })

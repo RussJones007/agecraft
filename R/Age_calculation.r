@@ -214,7 +214,7 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' @param output For calculate_age(): "age" (default) retains fractions in an age
 #'   vector; "numeric" returns completed ages as plain doubles; "units" returns
 #'   completed ages with units, preserving the previous format.
-#'   For categorize_age(): "factor" (default) returns an `age_category` ordered factor; "interval" returns
+#'   For categorize_age(): "factor" (default) returns an `age_group` ordered factor; "interval" returns
 #'   the matched age_interval per observation, in the original group units. Both
 #'   preserve input order, repeats and missing/unmatched observations. Interval
 #'   inputs match only when completely contained in a group. Named groups use
@@ -230,14 +230,14 @@ age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
 #' 'to'.
 #' @param above.char is the character used for the upper summary group.  It can be '>', '+', 'plus' and 'above'
 #' @rdname calculate_age
-#' @return For `categorize_age()`, an [age_category()] ordered factor by default,
-#'   retaining defining intervals through [category_intervals()]. Its `units`
+#' @return For `categorize_age()`, an [age_group()] ordered factor by default,
+#'   retaining defining intervals through [group_intervals()]. Its `units`
 #'   attribute records the original observation unit, normalized to a supported
 #'   unit name, when present. It does not specify the category boundaries' units
 #'   or necessarily the internal comparison unit. Factor integer codes identify
 #'   categories, not numerical ages. This attribute is not a complete or durable
 #'   provenance record; ordinary factor operations may discard it. Retain the
-#'   grouping definition or use `category_intervals()` for boundaries and units, or request
+#'   grouping definition or use `group_intervals()` for boundaries and units, or request
 #'   `output = "interval"` to return matched `age_interval` intervals in that
 #'   definition's units. Comparisons use group units with `"age_to_group"` and
 #'   observation units with `"group_to_age"`; the factor attribute always describes
@@ -298,7 +298,7 @@ categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
   if (output == "interval") return(groups[idx])
   ret <- factor(idx, levels = seq_along(groups), labels = age_interval_labels(groups), ordered = TRUE)
   definitions <- aligned$intervals[match(levels(ret), age_interval_labels(groups))]
-  ret <- age_category(as.character(ret), definitions)
+  ret <- age_group(as.character(ret), definitions)
   names(ret) <- names(ages)
   unit <- age_cat_iv_age_unit(ages)
   if (!is.null(unit)) attr(ret, "units") <- unit

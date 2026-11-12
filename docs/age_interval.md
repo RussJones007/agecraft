@@ -1,12 +1,12 @@
 # `age_interval` architecture and behavioral contract
 
-> Phase-one naming refactor (2026-11-12): interval vectors use `age_interval`;
-> categorical assignments remain `age_category`. See
+> Completed naming refactor (2026-11-12): interval vectors use `age_interval`;
+> categorical assignments use `age_group`. See
 > [the migration guide](age_class_naming_migration.md) for compatibility changes.
 
 
 **Package:** `agecraft`\
-**Status:** Phase-one interval contract on `refactor/age-class-names`, reviewed 2026-11-12. The former interval class name was `age_group`.\
+**Status:** Interval contract after phase two on `refactor/age-class-names`, reviewed 2026-11-12. The former interval class name was `age_group`.\
 **Primary sources:** `R/age-interval-class.R`, `R/age-interval-coerce.R`, `R/age-interval-classify.R`, `R/age-interval-print.R`, `R/age-interval-compare.R`, `R/Age_calculation.r`, `API_POLICY.md`, and `CURRENT_STATE.md`.
 
 ## 1. Purpose and position in the architecture
@@ -202,8 +202,8 @@ The roxygen text in `R/age-interval-coerce.R` still contains some older explanat
 
 ## Age-category assignments — 2026-11-11
 
-`categorize_age(output = "factor")` now returns `age_category`, an ordered-factor
-subclass with level-aligned `age_interval` definitions accessed by `category_intervals()`.
+`categorize_age(output = "factor")` now returns `age_group`, an ordered-factor
+subclass with level-aligned `age_interval` definitions accessed by `group_intervals()`.
 Readable labels, codes, unused categories, missing assignments and matching rules
 are retained. This intentionally changes exact class and attribute comparisons.
 Interval output and `age_cat_iv()` are unchanged. Original ages and scheme
@@ -219,4 +219,4 @@ Use `vctrs::vec_rbind()` for validated binding. Base `rbind.data.frame()` can
 rebuild factor columns and discard metadata. Use `generics::as.factor()` or
 `generics::as.ordered()` for ordinary factors; base coercers retain existing
 factor subclasses. Differing legacy observation-unit attributes are dropped on
-combination; category definition units must always match. See `age_category.md`.
+combination; category definition units must always match. See `age_group.md`.

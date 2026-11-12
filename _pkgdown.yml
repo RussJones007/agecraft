@@ -20,7 +20,7 @@ reference:
       - new_age_interval
   - title: Assigned age categories
     contents:
-      - age_category
+      - age_group
   - title: Reusable age schemes
     contents:
       - age_scheme

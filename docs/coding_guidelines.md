@@ -1,7 +1,7 @@
 # Agecraft coding guidelines
 
-> Phase-one naming refactor (2026-11-12): interval vectors use `age_interval`;
-> categorical assignments remain `age_category`. See
+> Completed naming refactor (2026-11-12): interval vectors use `age_interval`;
+> categorical assignments use `age_group`. See
 > [the migration guide](age_class_naming_migration.md) for compatibility changes.
 
 
@@ -35,7 +35,8 @@ If documents disagree, **do not silently choose a new behavior**. Preserve the c
 
 ## 3. S3, vctrs, and class design
 
-- Preserve the existing S3 `age` and `age_interval` classes and their contracts. `age_interval` is an `ivs`-based interval vector; do not replace it with a plain data frame or lower/upper cut-point list.
+- Preserve the S3 `age`, `age_interval` and ordered-factor `age_group` classes
+  and their contracts. `age_interval` is an `ivs`-based interval vector; do not replace it with a plain data frame or lower/upper cut-point list.
 - Follow the established `vctrs` proxy, prototype, casting, restoration, slicing, and concatenation behavior. Test class and metadata retention after vector operations.
 - Use established S3 generics and register methods correctly. Do not add methods to bare `ivs_iv` beyond existing compatibility registrations without an explicit design decision.
 - Use validated constructors rather than setting class or internal record fields ad hoc. Keep internal helpers private unless a public use case justifies export.

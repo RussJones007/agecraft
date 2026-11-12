@@ -1,7 +1,6 @@
 # Age class naming inventory
 
-Status: phase-one mappings implemented on the development branch; phase two
-remains planned. Prepared 2026-11-12. Baseline tables below retain old names
+Status: both naming phases implemented on the development branch. Prepared 2026-11-12. Baseline tables below retain old names
 for migration review. See CURRENT_STATE.md for validation results.
 Baseline: main, e7cf2a27eea6a5439f3610259cd242401e3139e5, version 0.1.0.9020.
 Active branch: refactor/age-class-names, verified 2026-11-12 after the user

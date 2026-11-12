@@ -273,27 +273,31 @@ With `mudnester` installed, `import_mudnester_scheme("abs_5yr")` imports a valid
 
 ## Age-category assignments
 
-`categorize_age()` returns an `age_category` ordered factor with readable labels
+`categorize_age()` returns an `age_group` ordered factor with readable labels
 and retained interval definitions.
 
 ```r
 groups <- age_interval(c(0, 5, 10), c(5, 10, Inf), sep = " to ")
 categories <- categorize_age(c(2, 7, NA), by = groups)
-category_intervals(categories)
-category_intervals(droplevels(categories[1]))
+group_intervals(categories)
+group_intervals(droplevels(categories[1]))
 ```
 
 Subsetting retains unused categories. Combining requires matching definitions,
 labels and units. Use `vctrs::vec_rbind()` for binding with metadata validation,
 and `generics::as.factor()` for an ordinary factor. Base coercers retain factor
 subclasses, while base data-frame binding may discard their metadata. See the
-[age-categories guide](vignettes/age-categories.Rmd) for the full contracts.
+[age-groups guide](vignettes/age-groups.Rmd) for the full contracts.
 
 ### Interval naming transition
 
 On this development branch, use `age_interval()` to define age ranges and
-`age_category` for assigned categories. Schemes and categories expose definitions
-through `scheme_intervals()` and `category_intervals()`. The canonical cut-point
+`age_group` for assigned categories. Schemes and categories expose definitions
+through `scheme_intervals()` and `group_intervals()`. The canonical cut-point
 list is `age_interval_presets`; its two earlier names remain data aliases.
-See the [phase-one migration guide](docs/age_class_naming_migration.md) for renamed
+See the [class-naming migration guide](docs/age_class_naming_migration.md) for renamed
 functions, arguments and saved-object handling.
+
+The name `age_group` formerly described interval records. Old saved objects need
+reconstruction before use; `is_age_group()` identifies ordered-factor assignments,
+and group methods reject legacy interval records. See the migration guide above.

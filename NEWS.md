@@ -1,3 +1,17 @@
+# Development: assignment naming refactor, phase 2
+
+* **Breaking:** `age_category`, `age_category()` and `is_age_category()` become
+  `age_group`, `age_group()` and `is_age_group()`. `category_intervals()` becomes
+  `group_intervals()`. The earlier names are not retained as aliases.
+* `categorize_age(output = "factor")` returns an `age_group` ordered factor.
+  Labels, codes, interval definitions, units and classification rules retain
+  their meaning. Interval output remains `age_interval`.
+* Group methods reject legacy ivs interval records carrying the old `age_group`
+  tag with migration guidance. The group predicate distinguishes those records
+  from categorical assignments. Saved objects require reconstruction before use.
+* The group guide, reference help, registrations and tests use the final names.
+  No new dependency, matching algorithm or scheme provenance change is introduced.
+
 # Development: interval naming refactor, phase 1
 
 * **Breaking:** interval vectors and `age_group()` are renamed to `age_interval`

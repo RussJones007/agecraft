@@ -11,6 +11,7 @@ Before modifying relevant code, consult:
 
 - `docs/architecture.md`
 - `docs/age_interval.md`
+- `docs/age_group.md`
 - `docs/age_scheme.md`
 - `docs/coding_guidelines.md`
 - `docs/API_POLICY.md`

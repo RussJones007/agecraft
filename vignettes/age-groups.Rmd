@@ -1,8 +1,8 @@
 ---
-title: "Age categories: assignments with interval definitions"
+title: "Age groups: assignments with interval definitions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Age categories: assignments with interval definitions}
+  %\VignetteIndexEntry{Age groups: assignments with interval definitions}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-An `age_interval` defines intervals; an `age_category` stores assignments to those
+An `age_interval` defines intervals; an `age_group` stores assignments to those
 intervals. An `age_scheme` adds identity and provenance to a definition. Category
 vectors retain neither original exact ages nor scheme provenance.
 
@@ -23,7 +23,7 @@ groups <- age_interval(c(0, 5, 10), c(5, 10, Inf), sep = " to ")
 categories <- categorize_age(c(2, 5, 8, NA), by = groups)
 categories
 class(categories)
-category_intervals(categories)
+group_intervals(categories)
 ```
 
 These are ordered factors with integer category codes. Codes are identifiers,
@@ -35,8 +35,8 @@ not numerical ages. Bounds retain their half-open meaning: age 5 belongs to
 ```{r}
 subset <- categories[1]
 levels(subset)
-category_intervals(subset)
-category_intervals(droplevels(subset))
+group_intervals(subset)
+group_intervals(droplevels(subset))
 ```
 
 `droplevels()` removes unused levels and their intervals together. Missing ages
@@ -47,7 +47,7 @@ and ages outside the definition both produce `NA`; missingness is not a level.
 ```{r}
 renamed <- categories
 levels(renamed) <- c("Under 5", "5 through 9", "10 and older")
-category_intervals(renamed)
+group_intervals(renamed)
 combined <- c(categories, categories[1])
 combined
 vctrs::vec_rbind(data.frame(category = categories),
@@ -80,7 +80,7 @@ For custom plot ordering, convert to an ordinary factor first.
 ```{r}
 weekly <- age_interval(c(0, 1), c(1, Inf), unit = "week")
 result <- categorize_age(age(c(3, 8), unit = "day"), by = weekly)
-category_intervals(result)
+group_intervals(result)
 attr(result, "units")
 ```
 
@@ -89,3 +89,11 @@ observation unit, days. Combining categories with different observation units
 drops that attribute; definition units must still match. Unitless groups inherit
 observation units. `output = "interval"` continues to return matched intervals
 per observation, while `age_cat_iv()` retains its existing output behavior.
+
+## Saved objects from earlier versions
+
+`age_group` represents assigned categories. Older versions used that name for
+interval records. Do not pass those records to group methods: rebuild their
+bounds with `age_interval()` first. Saved `age_category` assignments also need
+reconstruction using `age_group(labels, intervals)`; changing a class attribute
+alone does not validate the definitions or factor codes.
