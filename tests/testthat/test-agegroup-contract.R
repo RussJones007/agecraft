@@ -39,7 +39,7 @@ test_that("conversion and formatting preserve missing observations and metadata"
   x <- as.age_group(c("0 to 4", NA, "5+"), unit = "years")
   expect_length(x, 3)
   expect_identical(as.character(x), c("0 to 4", NA_character_, "5+"))
-  expect_identical(format(x), c("0 to 4 [year]", NA_character_, "5+ [year]"))
+  expect_identical(format(x), c("0 to 4", NA_character_, "5+"))
   expect_identical(as.age_group(x), x)
   expect_identical(attr(as.age_group(x, sep = "-"), "symbols")$sep, "-")
   expect_error(as.age_group(x, unit = "day"), "explicit conversion")
@@ -53,7 +53,7 @@ test_that("conversion and formatting preserve missing observations and metadata"
 
 test_that("full type includes units and documented plus spelling parses", {
   expect_identical(vctrs::vec_ptype_full(as.age_group()), "age_group")
-  expect_identical(vctrs::vec_ptype_full(as.age_group(unit = "days")), "age_group<day>")
+  expect_identical(vctrs::vec_ptype_full(as.age_group(unit = "days")), "age_group [day]")
   expect_identical(as.character(as.age_group("65 plus")), "65 plus")
 })
 

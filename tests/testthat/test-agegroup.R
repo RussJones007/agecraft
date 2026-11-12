@@ -152,7 +152,7 @@ test_that(
   {
     grp <- as.age_group(c(0, 5, 10, Inf), unit = "year")
     expect_identical(attr(grp, "unit"), "year")
-    expect_true(all(grepl("\\[year\\]$", format(grp))))
+    expect_identical(format(grp), c("0-4", "5-9", "10+"))
   }
 )
 

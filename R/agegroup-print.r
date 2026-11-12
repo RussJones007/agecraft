@@ -6,14 +6,14 @@
 # Changes the interval to print out as typical age groups
 #' @exportS3Method
 format.age_group <- function(x, ...){
-  ch <- as.character.age_group(x)
-  unit <- get_unit(x)
-  if(!is.null(unit)) ch[!is.na(ch)] <- paste0(ch[!is.na(ch)], " [", unit, "]")
-  ch
+  as.character.age_group(x)
 }
 
 #' @exportS3Method
 print.age_group <- function(x, ...){
+  unit <- get_unit(x)
+  if (is.null(unit)) unit <- "unknown"
+  cat(sprintf("<age_group (%s) [%d]>\n", unit, length(x)))
   out <- format.age_group(x, ...)
   print(out, quote = FALSE)
   invisible(x)

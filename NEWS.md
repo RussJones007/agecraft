@@ -1,5 +1,6 @@
 # agecraft 0.1.0.9019
 
+- Print age-group class, common unit and vector length in a header, without repeating units on each interval. `format()` now returns interval labels without unit suffixes.
 - Scheme summaries now print provenance and coverage clearly while retaining existing list fields (with a new `summary_age_scheme` class). The standard `utils::toBibtex()` generic exports scheme metadata and derivative ancestry without inferring authors or publication years.
 
 ## Age-category assignments

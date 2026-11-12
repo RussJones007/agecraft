@@ -196,6 +196,10 @@ remain unsupported. Age-group and scheme arithmetic are outside this contract.
 
 ## Age-category assignments — 2026-11-11
 
+Age-group standalone printing shows class, common unit and vector length in a
+header. `format.age_group()` returns interval labels without unit suffixes;
+this intentionally changes previously unit-suffixed formatted strings.
+
 `categorize_age(output = "factor")` now returns `age_category`, an ordered-factor
 subclass with level-aligned `age_group` definitions accessed by `category_groups()`.
 Readable labels, codes, unused categories, missing assignments and matching rules

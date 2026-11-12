@@ -102,6 +102,10 @@ Calendar ages and elapsed durations are not interchangeable. A scheme that needs
 
 `format.age_group()`, `print.age_group()`, `as.character.age_group()`, and factor coercion methods provide display and label behavior. `age_group_to_char()` remains exported for compatibility, but `as.character()` is preferred in new code.
 
+Standalone printing shows `<age_group (year) [10]>`, for example, with the common
+unit once in the header and no unit suffix on individual intervals. Unitless
+vectors show `unknown`. `format()` returns interval labels without unit suffixes.
+
 ## 6. Vector behavior and metadata
 
 The class implements `vctrs` prototype, restoration, cast, common-type, proxy, equality, and comparison methods, as well as `ivs` restoration. The design intent and documented behavior are:

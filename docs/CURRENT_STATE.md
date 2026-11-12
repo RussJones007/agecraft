@@ -1,3 +1,16 @@
+# Age-group display — 2026-11-12
+
+- Standalone headers show `<age_group (year) [length]>`; unitless vectors show
+  `unknown`. `format()` returns interval labels without repeated unit suffixes.
+  Each vector still has one optional scalar unit; storage and matching are unchanged.
+- Added print regression tests for common units, empty/missing/fractional intervals
+  and invisible returns. Full tests: 3,288 passing assertions, one optional
+  mudnester skip, and the existing age_group full-type expectation failure
+  (`age_group<day>` versus `age_group [day]`). `git diff --check` passed.
+- Updated the stale full-type expectation to `age_group [day]`; the subsequent
+  focused age-group run passed all 164 assertions with no failures, warnings or
+  skips. The full suite was not rerun after this expectation-only correction.
+
 # Age-category display methods — 2026-11-12
 
 - Standalone printing includes class, length and category-definition unit.
