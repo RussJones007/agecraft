@@ -28,8 +28,11 @@ stores definition units. Combining drops differing observation-unit attributes;
 it never changes definition coordinates. Unitless input groups inherit the
 observation unit. Interval output remains unchanged.
 
-Base and vctrs slicing, repetition, concatenation, replacement and binding must
-preserve the mapping. Explicit as.factor/as.ordered conversion drops metadata.
+Base and vctrs slicing, repetition, concatenation and replacement preserve the
+mapping. Use vctrs::vec_rbind for binding: base rbind.data.frame reconstructs
+factors internally and may discard the subclass and metadata.
+Explicit generics::as.factor/as.ordered conversion drops metadata; base
+as.factor/as.ordered return existing factor subclasses unchanged.
 Arbitrary attr/class mutation bypasses S3 validation and is unsupported.
 
 ## Compatibility
