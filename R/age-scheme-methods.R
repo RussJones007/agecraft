@@ -1,10 +1,12 @@
 #' Inspect an age scheme
 #'
-#' @param x,object An `age_scheme`. Inspection first validates the complete stored
+#' @param x,object An `age_scheme`, or for printing a summary, the result of
+#'   `summary()` on a scheme. Inspection first validates the complete stored
 #'   interval representation, including display metadata; malformed objects error
 #'   without repair. This does not independently verify external provenance.
 #' @param ... Additional arguments, currently unused.
 #' @return `print()` invisibly returns its input. `summary()` returns a list
+#'   of class `summary_age_scheme`, with a readable print method,
 #'   containing identity, unit, group count, declared completeness, observed
 #'   coverage, overlap flag, uncovered domain intervals, and provenance.
 #'   `as.data.frame()` returns one row per group, with labels, numeric bounds,
@@ -45,10 +47,34 @@ print.age_scheme <- function(x, ...) {
 #' @export
 summary.age_scheme <- function(object, ...) {
   coverage <- age_scheme_assess(object)
-  c(object[setdiff(names(object), "groups")],
+  out <- c(object[setdiff(names(object), "groups")],
     list(unit = get_unit(object$groups), n_groups = length(object$groups),
          overlaps = coverage$overlaps, gaps = coverage$gaps,
          covered = coverage$covered))
+  class(out) <- "summary_age_scheme"
+  out
+}
+
+#' @rdname age_scheme_methods
+#' @export
+print.summary_age_scheme <- function(x, ...) {
+  cat("<age_scheme summary:", x$id, ">", x$name, "\n")
+  fields <- c("type", "unit", "n_groups", "domain", "complete", "covered",
+              "overlaps", "purpose", "organization", "source", "reference",
+              "version", "verified", "notes")
+  for (field in fields) {
+    value <- x[[field]]
+    text <- if (is.null(value) || anyNA(value)) "unknown" else
+      paste(value, collapse = ", ")
+    cat(field, ": ", text, "\n", sep = "")
+  }
+  cat("Uncovered domain intervals:\n")
+  if (is.null(x$gaps)) cat("unknown\n") else print(x$gaps)
+  if (!is.null(x$derived_from)) {
+    cat("Derived from:\n")
+    print(x$derived_from)
+  }
+  invisible(x)
 }
 
 #' @rdname age_scheme_methods

@@ -214,3 +214,22 @@ rebuild factor columns and discard metadata. Use `generics::as.factor()` or
 `generics::as.ordered()` for ordinary factors; base coercers retain existing
 factor subclasses. Differing legacy observation-unit attributes are dropped on
 combination; category definition units must always match. See `age_category.md`.
+
+
+## Scheme summaries and BibTeX export
+
+Use `summary(scheme)` to inspect source, organization, reference, version,
+verification claim, notes and derivative ancestry alongside interval coverage.
+The result remains a field-accessible list, now of class `summary_age_scheme`
+with a readable print method. Existing field names and values are preserved;
+exact class comparisons and printed output intentionally change.
+
+`utils::toBibtex(scheme)` exports one `@Misc` entry identifying the current
+scheme by ID and name. Recorded organization/source appear in `howpublished`;
+reference, version, verification claim, purpose, notes and ancestor metadata
+appear in `note`. HTTP(S) references also populate `url`. Authors and publication
+years are not inferred, including from version strings. Unknown source,
+reference and version remain explicit. Derivatives say "Adapted from" and retain
+current identity separately from ancestor metadata. Export validates the object
+but does not verify external sources or fetch references. No new dependency,
+metadata field, generic or change to interval/classification semantics is added.

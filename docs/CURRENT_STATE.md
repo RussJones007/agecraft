@@ -1,3 +1,24 @@
+# Scheme provenance inspection and BibTeX — 2026-11-11
+
+- `summary(age_scheme)` retains all existing metadata/coverage fields and now
+  returns a `summary_age_scheme` list with a readable print method. Exact class
+  comparisons and printed output intentionally change; field access is preserved.
+- Registered `utils::toBibtex()` S3 dispatch exports one Misc entry for the current
+  scheme, including source/reference/version, verification claim and derivative
+  ancestry. Unknown bibliographic dates/authors are not invented. No new generic,
+  dependency, scheme field or interval/classification behavior is introduced.
+- Added 72 focused regression assertions; full `devtools::test()` passed 3,250
+  assertions with no failures or warnings and one optional mudnester skip.
+  Roxygen help, API policy, scheme guide, vignette and NEWS were updated.
+  Full suite log: `/tmp/agecraft-scheme-inspection-tests.log`.
+- `devtools::check(document = FALSE)` completed with 0 errors, 0 warnings
+  and 2 notes, both from pre-existing untracked workspace files: top-level
+  `examples.md` and `vignettes/age_math_examples.Rmd` without a recognized engine.
+  Installed tests, examples and vignette rebuilds passed. Check log:
+  `/tmp/agecraft-scheme-inspection-check.log`. `git diff --check` passed.
+
+---
+
 # Age-category implementation — 2026-11-11
 
 Development version: **0.1.0.9019**.

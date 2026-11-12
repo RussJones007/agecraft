@@ -1,5 +1,10 @@
 # agecraft 0.1.0.9019
 
+- Scheme summaries now print provenance and coverage clearly while retaining
+  existing list fields (with a new `summary_age_scheme` class). The standard
+  `utils::toBibtex()` generic exports scheme metadata and derivative ancestry
+  without inferring authors or publication years.
+
 ## Age-category assignments
 
 - Return `age_category`, an ordered-factor subclass, from `categorize_age()` factor output. Retain readable labels and a level-aligned `age_group` definition available through `category_groups()`; matching policies and interval output are unchanged.

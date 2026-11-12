@@ -4,6 +4,7 @@
 \alias{age_scheme_methods}
 \alias{print.age_scheme}
 \alias{summary.age_scheme}
+\alias{print.summary_age_scheme}
 \alias{as.data.frame.age_scheme}
 \title{Inspect an age scheme}
 \usage{
@@ -11,10 +12,13 @@
 
 \method{summary}{age_scheme}(object, ...)
 
+\method{print}{summary_age_scheme}(x, ...)
+
 \method{as.data.frame}{age_scheme}(x, row.names = NULL, optional = FALSE, ...)
 }
 \arguments{
-\item{x, object}{An \code{age_scheme}. Inspection first validates the complete stored
+\item{x, object}{An \code{age_scheme}, or for printing a summary, the result of
+\code{summary()} on a scheme. Inspection first validates the complete stored
 interval representation, including display metadata; malformed objects error
 without repair. This does not independently verify external provenance.}
 
@@ -26,6 +30,7 @@ without repair. This does not independently verify external provenance.}
 }
 \value{
 \code{print()} invisibly returns its input. \code{summary()} returns a list
+of class \code{summary_age_scheme}, with a readable print method,
 containing identity, unit, group count, declared completeness, observed
 coverage, overlap flag, uncovered domain intervals, and provenance.
 \code{as.data.frame()} returns one row per group, with labels, numeric bounds,

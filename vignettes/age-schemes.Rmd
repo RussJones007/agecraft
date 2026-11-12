@@ -371,3 +371,21 @@ Numerical completeness over `[0, Inf)` does not establish clinical applicability
 or eligibility. Review the actual guidance before applying it. Any correction
 belongs in a separately identified local derivative, using ordinary scheme edits
 and their existing ancestry tracking.
+
+## Inspect and reference the scheme used
+
+Use the standard generics to retrieve provenance for an analysis plan and export
+its reference. Summary fields remain directly accessible.
+
+```{r scheme-reference}
+s <- get_age_scheme("legacy_ili")
+summary(s)
+summary(s)$source
+utils::toBibtex(s)
+```
+
+BibTeX export identifies the current scheme and records its source, edition,
+verification claim and any ancestor. Unknown publication years are omitted;
+version strings are not treated as publication dates. A local derivative is
+labelled as adapted from its recorded ancestor. Neither summary nor export
+independently verifies the source.

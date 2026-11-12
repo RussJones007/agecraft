@@ -300,3 +300,22 @@ Numerical completeness cannot establish clinical applicability or eligibility.
 Ordinary edits retain existing derivative tracking; no extra scheme fields or
 undocumented attributes are introduced. This is optional interoperability,
 not an independently authoritative built-in catalogue.
+
+
+## Scheme summaries and BibTeX export
+
+Use `summary(scheme)` to inspect source, organization, reference, version,
+verification claim, notes and derivative ancestry alongside interval coverage.
+The result remains a field-accessible list, now of class `summary_age_scheme`
+with a readable print method. Existing field names and values are preserved;
+exact class comparisons and printed output intentionally change.
+
+`utils::toBibtex(scheme)` exports one `@Misc` entry identifying the current
+scheme by ID and name. Recorded organization/source appear in `howpublished`;
+reference, version, verification claim, purpose, notes and ancestor metadata
+appear in `note`. HTTP(S) references also populate `url`. Authors and publication
+years are not inferred, including from version strings. Unknown source,
+reference and version remain explicit. Derivatives say "Adapted from" and retain
+current identity separately from ancestor metadata. Export validates the object
+but does not verify external sources or fetch references. No new dependency,
+metadata field, generic or change to interval/classification semantics is added.
