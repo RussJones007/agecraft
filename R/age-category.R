@@ -256,7 +256,7 @@ print.age_category <- function(x, ...) {
   validate_age_category(x)
   unit <- attr(attr(x, "groups", exact = TRUE), "unit", exact = TRUE)
   if (is.null(unit)) unit <- "unknown"
-  cat(sprintf("<age_category[%d]; unit: %s>\n", length(x), unit))
+  cat(sprintf("<age_category (%s) [%d]>\n", unit, length(x)))
   print(as.ordered.age_category(x), ...)
   invisible(x)
 }
