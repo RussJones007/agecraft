@@ -190,3 +190,24 @@ Run `devtools::test()` and `devtools::check()` after implementation changes. The
 In case of disagreement, follow `API_POLICY.md` for public behavior and compatibility; inspect implementation and tests to establish what currently happens. `CURRENT_STATE.md` is a dated status snapshot, not a substitute for source inspection.
 
 The roxygen text in `R/agegroup-coerce.r` still contains some older explanatory wording for character ranges and numeric cut points. In particular, do not infer from older examples that displayed `"5-10"` is always a stored `[5,11)` interval: **numeric cut points and character completed-age labels have different conversion rules**. Also, the general `age_group` class allows overlaps and gaps even though numeric cut-point conversion produces contiguous groups.
+
+## Age-category assignments — 2026-11-11
+
+`categorize_age(output = "factor")` now returns `age_category`, an ordered-factor
+subclass with level-aligned `age_group` definitions accessed by `category_groups()`.
+Readable labels, codes, unused categories, missing assignments and matching rules
+are retained. This intentionally changes exact class and attribute comparisons.
+Interval output and `age_cat_iv()` are unchanged. Original ages and scheme
+provenance are not stored. Unitless definitions inherit observation units.
+
+Subsetting preserves definitions; explicit `droplevels()` removes unused levels
+and intervals together. Combining requires matching ordered bounds, labels and
+definition units. Conflicting display symbols normalize to package defaults.
+Unique nonblank relabeling updates group names; implicit merging or reordering
+is rejected. Structural changes require a new definition and reclassification.
+
+Use `vctrs::vec_rbind()` for validated binding. Base `rbind.data.frame()` can
+rebuild factor columns and discard metadata. Use `generics::as.factor()` or
+`generics::as.ordered()` for ordinary factors; base coercers retain existing
+factor subclasses. Differing legacy observation-unit attributes are dropped on
+combination; category definition units must always match. See `age_category.md`.

@@ -193,3 +193,24 @@ class and units, with vctrs size/recycling rules and missing-value propagation.
 Mean, median, extrema, absolute values and rounding retain the class. Invalid
 infinite extrema error; sums, multiplication, division, logs and exponentials
 remain unsupported. Age-group and scheme arithmetic are outside this contract.
+
+## Age-category assignments — 2026-11-11
+
+`categorize_age(output = "factor")` now returns `age_category`, an ordered-factor
+subclass with level-aligned `age_group` definitions accessed by `category_groups()`.
+Readable labels, codes, unused categories, missing assignments and matching rules
+are retained. This intentionally changes exact class and attribute comparisons.
+Interval output and `age_cat_iv()` are unchanged. Original ages and scheme
+provenance are not stored. Unitless definitions inherit observation units.
+
+Subsetting preserves definitions; explicit `droplevels()` removes unused levels
+and intervals together. Combining requires matching ordered bounds, labels and
+definition units. Conflicting display symbols normalize to package defaults.
+Unique nonblank relabeling updates group names; implicit merging or reordering
+is rejected. Structural changes require a new definition and reclassification.
+
+Use `vctrs::vec_rbind()` for validated binding. Base `rbind.data.frame()` can
+rebuild factor columns and discard metadata. Use `generics::as.factor()` or
+`generics::as.ordered()` for ordinary factors; base coercers retain existing
+factor subclasses. Differing legacy observation-unit attributes are dropped on
+combination; category definition units must always match. See `age_category.md`.

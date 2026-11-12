@@ -43,6 +43,7 @@ validate_age_category <- function(x) {
   if (!identical(class(x), c("age_category", "ordered", "factor")) ||
       !is.integer(codes) || length(labels) != length(g) || anyNA(g) ||
       anyNA(labels) || anyDuplicated(labels) || any(!nzchar(trimws(labels))) ||
+      !identical(labels, age_group_labels(g)) ||
       !identical(order(g), seq_along(g)) ||
       any(!is.na(codes) & (codes < 1L | codes > length(labels)))) {
     stop("Invalid age_category level-to-interval mapping", call. = FALSE)
@@ -92,8 +93,8 @@ droplevels.age_category <- function(x, exclude = NA, ...) {
       (!identical(value, levels(x)) && setequal(value, levels(x)))) {
     stop("Use unique nonblank labels without reordering or merging categories", call. = FALSE)
   }
-  attr(x, "levels") <- value
   g <- category_groups(x)
+  attr(x, "levels") <- value
   names(g) <- value
   attr(x, "groups") <- g
   x
@@ -159,10 +160,13 @@ c.age_category <- function(..., recursive = FALSE) {
     stop("Convert explicitly before mixing age_category with other types", call. = FALSE)
   }
   ptype <- Reduce(age_category_common, xs)
-  codes <- do.call(c, lapply(xs, as.integer))
+  codes <- do.call(c, lapply(xs, function(x) {
+    out <- as.integer(x)
+    names(out) <- names(x)
+    out
+  }))
   out <- new_age_category(codes, category_groups(ptype), levels(ptype), attr(ptype, "units"))
-  nms <- do.call(c, lapply(xs, names))
-  if (!is.null(nms) && length(nms) == length(out)) names(out) <- nms
+  names(out) <- names(codes)
   out
 }
 

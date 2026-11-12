@@ -38,7 +38,7 @@ second.}
 \item{output}{For calculate_age(): "age" (default) retains fractions in an age
 vector; "numeric" returns completed ages as plain doubles; "units" returns
 completed ages with units, preserving the previous format.
-For categorize_age(): "factor" (default) returns an ordered factor; "interval" returns
+For categorize_age(): "factor" (default) returns an \code{age_category} ordered factor; "interval" returns
 the matched age_group per observation, in the original group units. Both
 preserve input order, repeats and missing/unmatched observations. Interval
 inputs match only when completely contained in a group. Named groups use
@@ -88,13 +88,14 @@ calculate age from the original dates in the grouping definition's unit.}
 For calculate_age(), an age vector by default. With output = "units",
 a completed-age units vector; with output = "numeric", completed ages as doubles.
 
-For \code{categorize_age()}, an ordered factor by default. Its \code{units}
+For \code{categorize_age()}, an \code{\link[=age_category]{age_category()}} ordered factor by default,
+retaining defining intervals through \code{\link[=category_groups]{category_groups()}}. Its \code{units}
 attribute records the original observation unit, normalized to a supported
 unit name, when present. It does not specify the category boundaries' units
 or necessarily the internal comparison unit. Factor integer codes identify
 categories, not numerical ages. This attribute is not a complete or durable
 provenance record; ordinary factor operations may discard it. Retain the
-grouping definition for category boundaries and units, or request
+grouping definition or use \code{category_groups()} for boundaries and units, or request
 \code{output = "interval"} to return matched \code{age_group} intervals in that
 definition's units. Comparisons use group units with \code{"age_to_group"} and
 observation units with \code{"group_to_age"}; the factor attribute always describes
