@@ -123,12 +123,12 @@ test_that("vctrs type descriptions use category-definition units", {
 test_that("printing identifies the class and category-definition unit", {
   x <- categorize_age(age(c(1, 2), unit = "day"),
                       by = age_group(0, Inf, unit = "week"))
-  expect_identical(capture.output(print(x))[1], "<age_category[2]; unit: week>")
-  expect_identical(capture.output(print(x[FALSE]))[1], "<age_category[0]; unit: week>")
-  expect_identical(capture.output(print(x[NA_integer_]))[1], "<age_category[1]; unit: week>")
+  expect_identical(capture.output(print(x))[1], "<age_category (week) [2]>")
+  expect_identical(capture.output(print(x[FALSE]))[1], "<age_category (week) [0]>")
+  expect_identical(capture.output(print(x[NA_integer_]))[1], "<age_category (week) [1]>")
   unitless <- age_category("0-4", age_group(0, 5))
   expect_identical(capture.output(print(unitless))[1],
-                   "<age_category[1]; unit: unknown>")
+                   "<age_category (unknown) [1]>")
   result <- withVisible(print(x))
   expect_identical(result$value, x)
   expect_false(result$visible)
