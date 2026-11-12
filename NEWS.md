@@ -18,370 +18,167 @@
 
 - Show standalone age headers as `<age [year][6]>`, separating the class and unit with a space and square brackets. Tibble headers remain `<age-year>`; stored values and metadata are unchanged.
 
-- Abbreviate age tibble column headers as `<age-year>`, `<age-month>`, etc.
-  Standalone printing and stored class/unit metadata are unchanged.
+- Abbreviate age tibble column headers as `<age-year>`, `<age-month>`, etc. Standalone printing and stored class/unit metadata are unchanged.
 
 ## Age arithmetic
 
-- Support addition and subtraction of plain numeric offsets in an age vector's
-  unit, and numeric plus age. Preserve fractional precision, names, class and
-  unit metadata; reject negative or infinite age results rather than clamping.
-- Support age plus age by converting the right operand to the left operand's
-  unit. Exact elapsed-unit conversions are automatic. Calendar conversions,
-  including month/year, still require explicit `as_age(..., allow_approx = TRUE)`
-  before addition. Result units depend on operand order; existing common-type,
-  concatenation and comparison rules remain unchanged.
-- Leave age minus age, numeric minus age, multiplication, division, sums,
-  logarithms and exponentials unsupported. Age-group and scheme arithmetic
-  remain outside the contract.
-- Add unit-preserving medians and verify existing rounding, absolute values,
-  means and extrema. Preserve missing values and vctrs recycling rules; reject
-  invalid infinite extrema from empty or all-missing inputs with removal.
-- Complete the arithmetic implementation plan with regression tests for central
-  validation, conversion safeguards, vector sizes and half-open classification
-  boundaries after arithmetic. Update help, README, vignette and API policy.
-- Validation before this version increment: 3,091 assertions passed with no
-  failures or warnings and one optional mudnester skip. Package check completed
-  with 0 errors, 0 warnings and 0 notes, including installed tests, examples and
-  vignette rebuilds. Tests and package check were not rerun for this version bump.
+- Support addition and subtraction of plain numeric offsets in an age vector's unit, and numeric plus age. Preserve fractional precision, names, class and unit metadata; reject negative or infinite age results rather than clamping.
+- Support age plus age by converting the right operand to the left operand's unit. Exact elapsed-unit conversions are automatic. Calendar conversions, including month/year, still require explicit `as_age(..., allow_approx = TRUE)` before addition. Result units depend on operand order; existing common-type, concatenation and comparison rules remain unchanged.
+- Leave age minus age, numeric minus age, multiplication, division, sums, logarithms and exponentials unsupported. Age-group and scheme arithmetic remain outside the contract.
+- Add unit-preserving medians and verify existing rounding, absolute values, means and extrema. Preserve missing values and vctrs recycling rules; reject invalid infinite extrema from empty or all-missing inputs with removal.
+- Complete the arithmetic implementation plan with regression tests for central validation, conversion safeguards, vector sizes and half-open classification boundaries after arithmetic. Update help, README, vignette and API policy.
+- Validation before this version increment: 3,091 assertions passed with no failures or warnings and one optional mudnester skip. Package check completed with 0 errors, 0 warnings and 0 notes, including installed tests, examples and vignette rebuilds. Tests and package check were not rerun for this version bump.
 
 # agecraft 0.1.0.9017
 
-- Print `age` units once in the class or tibble column header. `format(age)`
-  now returns numeric strings without unit suffixes, including when
-  `fractional = TRUE`; stored precision and units are unchanged.
+- Print `age` units once in the class or tibble column header. `format(age)` now returns numeric strings without unit suffixes, including when `fractional = TRUE`; stored precision and units are unchanged.
 
 ## Optional mudnester catalogue interoperability
 
-- Add `import_mudnester_scheme(id)` to convert exact upstream catalogue IDs into
-  validated Agecraft schemes with `mudnester_` identifiers. Preserve numeric
-  boundaries, fractional precision, category order, labels and year/day units.
-  Validate catalogue schema, breaks, labels and band counts; report missing
-  dependencies, unknown IDs and malformed definitions with actionable errors.
-- Add `mudnester_catalogue()` for structured upstream provenance, installed
-  package snapshot versions and known issues. Imports remain unverified;
-  package snapshots are distinct from unknown external guidance editions.
-  Preserve missing source information without inferring organizations or authority.
-- Warn about known label/boundary inconsistencies, approximate neonatal year
-  coordinates, illustrative definitions, missing source URLs and applicability.
-  Import faithfully without corrections: numerical completeness does not
-  establish clinical applicability or eligibility. Ordinary edits retain
-  existing derivative tracking.
-- Keep `mudnester` in Suggests only and load its public dataset in a private
-  environment. The eight legacy registry schemes, numeric presets, S3 classes,
-  interval engine and classification behavior are unchanged.
-- Add attributed offline fixtures, optional installed-catalogue parity tests,
-  generated help, vignette examples and provenance/policy documentation.
-  Feature validation passed the full suite and package check before this
-  version-only update; tests and package checks were not rerun for the bump.
+- Add `import_mudnester_scheme(id)` to convert exact upstream catalogue IDs into validated Agecraft schemes with `mudnester_` identifiers. Preserve numeric boundaries, fractional precision, category order, labels and year/day units. Validate catalogue schema, breaks, labels and band counts; report missing dependencies, unknown IDs and malformed definitions with actionable errors.
+- Add `mudnester_catalogue()` for structured upstream provenance, installed package snapshot versions and known issues. Imports remain unverified; package snapshots are distinct from unknown external guidance editions. Preserve missing source information without inferring organizations or authority.
+- Warn about known label/boundary inconsistencies, approximate neonatal year coordinates, illustrative definitions, missing source URLs and applicability. Import faithfully without corrections: numerical completeness does not establish clinical applicability or eligibility. Ordinary edits retain existing derivative tracking.
+- Keep `mudnester` in Suggests only and load its public dataset in a private environment. The eight legacy registry schemes, numeric presets, S3 classes, interval engine and classification behavior are unchanged.
+- Add attributed offline fixtures, optional installed-catalogue parity tests, generated help, vignette examples and provenance/policy documentation. Feature validation passed the full suite and package check before this version-only update; tests and package checks were not rerun for the bump.
 
 # agecraft 0.1.0.9016
 
 ## Classification documentation and regression coverage
 
-- Clarify that identical intervals overlap and are invalid in partitions, while
-  classifications permit them as separate categories with distinct labels.
-  All schemes require unique, nonblank labels; bare age-group naming rules are
-  unchanged. Explain all-membership output, explicit first/last selection,
-  interval ordering, half-open boundaries and coverage with runnable examples.
-- Clarify that the `units` attribute on classification factors records the
-  original observation unit, not the category boundaries or a physical unit for
-  factor codes. Explain comparison units, the limits of factor metadata, and how
-  to retain scheme-unit intervals. Add a day-based scheme/hour-based age example.
-- Regenerate function help and add 124 focused regression assertions covering
-  duplicate memberships, labels, exact ties, coverage gaps, factor-unit metadata,
-  equivalent inputs, missing/empty observations and scheme-unit interval outputs.
-  Targeted tests passed 1,830 assertions with no failures, warnings or skips;
-  the age-schemes vignette rendered successfully. Production behavior and public
-  APIs are unchanged.
+- Clarify that identical intervals overlap and are invalid in partitions, while classifications permit them as separate categories with distinct labels. All schemes require unique, nonblank labels; bare age-group naming rules are unchanged. Explain all-membership output, explicit first/last selection, interval ordering, half-open boundaries and coverage with runnable examples.
+- Clarify that the `units` attribute on classification factors records the original observation unit, not the category boundaries or a physical unit for factor codes. Explain comparison units, the limits of factor metadata, and how to retain scheme-unit intervals. Add a day-based scheme/hour-based age example.
+- Regenerate function help and add 124 focused regression assertions covering duplicate memberships, labels, exact ties, coverage gaps, factor-unit metadata, equivalent inputs, missing/empty observations and scheme-unit interval outputs. Targeted tests passed 1,830 assertions with no failures, warnings or skips; the age-schemes vignette rendered successfully. Production behavior and public APIs are unchanged.
 
 # agecraft 0.1.0.9015
 
 ## Validation performance
 
-- Detect Boolean scheme overlap by sorting temporary start coordinates and
-  comparing each with the maximum preceding end, avoiding quadratic-size overlap
-  enumeration. Exact half-open comparisons, category order and `ivs` domain-gap
-  detection are unchanged.
-- Reuse the validation assessment in scheme summaries instead of computing
-  coverage twice. Public validation still returns its input invisibly. No public
-  APIs, representations, dependencies or development version changed.
+- Detect Boolean scheme overlap by sorting temporary start coordinates and comparing each with the maximum preceding end, avoiding quadratic-size overlap enumeration. Exact half-open comparisons, category order and `ivs` domain-gap detection are unchanged.
+- Reuse the validation assessment in scheme summaries instead of computing coverage twice. Public validation still returns its input invisibly. No public APIs, representations, dependencies or development version changed.
 
 ## Lightweight derivative provenance
 
-- Track ordinary scheme edits through `$<-`, `[[<-` and atomic `[<-` replacement.
-  Exact substantive comparisons include ordered labels; title, notes and cosmetic
-  formatting preserve status. First changes record protected `derived_from`
-  identity/source metadata and a local `_derived` ID; verification and inherited
-  version are cleared. Later edits retain ancestry. Source/identity edits also
-  clear verification. Recursive replacement is explicitly rejected.
-- Keep catalog/original copies independent and accept older serialized schemes
-  without invented ancestry. No snapshots, full histories, dependencies or
-  development-version increment are introduced. Invalid edits now fail on
-  assignment; use batch edits when policies and groups must change together.
+- Track ordinary scheme edits through `$<-`, `[[<-` and atomic `[<-` replacement. Exact substantive comparisons include ordered labels; title, notes and cosmetic formatting preserve status. First changes record protected `derived_from` identity/source metadata and a local `_derived` ID; verification and inherited version are cleared. Later edits retain ancestry. Source/identity edits also clear verification. Recursive replacement is explicitly rejected.
+- Keep catalog/original copies independent and accept older serialized schemes without invented ancestry. No snapshots, full histories, dependencies or development-version increment are introduced. Invalid edits now fail on assignment; use batch edits when policies and groups must change together.
 
 ## Floating-point precision documentation
 
-- Document retained double-precision conversion and classification behavior:
-  near-boundary results can depend on conversion direction. Recommend consistent
-  units and explain that `convert_units = "none"` avoids additional conversion
-  but cannot recover earlier precision loss. Add the 11-second example and
-  focused regression tests; half-open semantics have no implicit tolerance.
-  No numerical algorithms, public APIs, dependencies or version changed.
+- Document retained double-precision conversion and classification behavior: near-boundary results can depend on conversion direction. Recommend consistent units and explain that `convert_units = "none"` avoids additional conversion but cannot recover earlier precision loss. Add the 11-second example and focused regression tests; half-open semantics have no implicit tolerance. No numerical algorithms, public APIs, dependencies or version changed.
 
 ## Complete scheme interval validation
 
-- Validate the actual stored `age_group` record inside schemes, including its
-  display symbols, field layout, endpoints, units and category metadata. Missing
-  or malformed display metadata now errors during construction or revalidation,
-  rather than failing later during classification or slicing.
-- Reuse constructor checks with actual metadata instead of defaults. Valid custom
-  display strings, fractional intervals, legacy schemes, coverage policies and
-  the existing S3/ivs representation are unchanged. Structural validation does
-  not independently verify source provenance.
+- Validate the actual stored `age_group` record inside schemes, including its display symbols, field layout, endpoints, units and category metadata. Missing or malformed display metadata now errors during construction or revalidation, rather than failing later during classification or slicing.
+- Reuse constructor checks with actual metadata instead of defaults. Valid custom display strings, fractional intervals, legacy schemes, coverage policies and the existing S3/ivs representation are unchanged. Structural validation does not independently verify source provenance.
 
 ## Dimensional validation
 
-- Validate the full unit expression before converting or classifying ages in
-  `as_age()`, `categorize_age()`, `age_cat_iv()`, and `classify_age_scheme()`.
-  Compound, squared, inverse, dimensionless, non-time and unsupported expressions
-  now fail with an informative error, including empty or missing quantities.
-  Matching a numerator to the group unit no longer bypasses validation.
-- Share the supported simple time-unit and alias contract with the `age()`
-  constructor. Valid time quantities, precision, missingness, explicit conversion
-  options and calendar approximation safeguards retain their behavior.
+- Validate the full unit expression before converting or classifying ages in `as_age()`, `categorize_age()`, `age_cat_iv()`, and `classify_age_scheme()`. Compound, squared, inverse, dimensionless, non-time and unsupported expressions now fail with an informative error, including empty or missing quantities. Matching a numerator to the group unit no longer bypasses validation.
+- Share the supported simple time-unit and alias contract with the `age()` constructor. Valid time quantities, precision, missingness, explicit conversion options and calendar approximation safeguards retain their behavior.
 
 ## Calendar conversion safeguard
 
-- Month/year conversion in either direction now requires `allow_approx = TRUE`
-  in `as_age()`, `categorize_age()`, `age_cat_iv()`, and `classify_age_scheme()`.
-  This intentional compatibility change prevents silent boundary changes between
-  calendar age coordinates. Opting in preserves numerical conversion behavior;
-  exact calendar classification requires age calculation from the original dates
-  directly in the scheme's unit. Matching units and elapsed-time conversion
-  behavior are preserved.
+- Month/year conversion in either direction now requires `allow_approx = TRUE` in `as_age()`, `categorize_age()`, `age_cat_iv()`, and `classify_age_scheme()`. This intentional compatibility change prevents silent boundary changes between calendar age coordinates. Opting in preserves numerical conversion behavior; exact calendar classification requires age calculation from the original dates directly in the scheme's unit. Matching units and elapsed-time conversion behavior are preserved.
 
 ## Reusable age schemes
 
-- Add the S3 `age_scheme` metadata object containing existing `age_group`
-  intervals, with validated category names, time units, provenance, partitions,
-  domain coverage and completeness claims. Add identification, validation,
-  group access, printing, summary, and data-frame inspection interfaces.
-- Allow schemes in `categorize_age(..., by = scheme)` while preserving existing
-  factor/interval outputs, overlap policies, conversion rules, and legacy inputs.
-- Add `classify_age_scheme()` for every membership in overlapping classifications,
-  preserving original observation/category indices and distinct missing/unmatched
-  statuses. Unit-bearing schemes require unit-bearing observations.
-- Add `list_age_schemes()` and `get_age_scheme()` for eight historical presets,
-  preserving original cut points and recording uncertain source editions. The
-  numeric presets and compatibility alias remain unchanged.
-- Add an age-schemes vignette with user-defined partitions, illustrative overlaps,
-  and legacy reporting definitions. No newly verified WHO/CDC definitions or
-  downstream population-array integration are included in this increment.
+- Add the S3 `age_scheme` metadata object containing existing `age_group` intervals, with validated category names, time units, provenance, partitions, domain coverage and completeness claims. Add identification, validation, group access, printing, summary, and data-frame inspection interfaces.
+- Allow schemes in `categorize_age(..., by = scheme)` while preserving existing factor/interval outputs, overlap policies, conversion rules, and legacy inputs.
+- Add `classify_age_scheme()` for every membership in overlapping classifications, preserving original observation/category indices and distinct missing/unmatched statuses. Unit-bearing schemes require unit-bearing observations.
+- Add `list_age_schemes()` and `get_age_scheme()` for eight historical presets, preserving original cut points and recording uncertain source editions. The numeric presets and compatibility alias remain unchanged.
+- Add an age-schemes vignette with user-defined partitions, illustrative overlaps, and legacy reporting definitions. No newly verified WHO/CDC definitions or downstream population-array integration are included in this increment.
 
 # agecraft 0.1.0.9014
 
 ## Documentation and examples
 
-- Update the package Description to summarize fractional age calculation,
-  explicit units, named interval groups, classification, and range comparisons.
+- Update the package Description to summarize fractional age calculation, explicit units, named interval groups, classification, and range comparisons.
 
-- Refresh README around the current date-to-age-to-named-category workflow,
-  documenting fractional ages, output choices, both classes, conversion rules,
-  presets, interval analysis, automatic reporting units, and migration paths.
-- Add a beginner-friendly introductory vignette covering the age class,
-  calculation from birth and reference/event dates, selectable units, all three
-  output formats, supplied group definitions, named and fractional groups,
-  frequency tables, and explicit unit conversion. Link the guide from README.
-- Add a companion class guide using a shared fictional visit data frame to
-  explain age construction and calculation, precision versus display, extraction,
-  unit conversions, vector operations, interval definitions, names, classification,
-  factor and interval outputs, and interval comparison functions.
+- Refresh README around the current date-to-age-to-named-category workflow, documenting fractional ages, output choices, both classes, conversion rules, presets, interval analysis, automatic reporting units, and migration paths.
 
-- Verify both new vignettes render and are included in the built source package.
-  Execute all 10 README workflow example blocks and verify local documentation
-  links. This increment updates documentation and package metadata; calculation
-  and class behavior remain as introduced in 0.1.0.9013.
+- Add a beginner-friendly introductory vignette covering the age class, calculation from birth and reference/event dates, selectable units, all three output formats, supplied group definitions, named and fractional groups, frequency tables, and explicit unit conversion. Link the guide from README.
+
+- Add a companion class guide using a shared fictional visit data frame to explain age construction and calculation, precision versus display, extraction, unit conversions, vector operations, interval definitions, names, classification, factor and interval outputs, and interval comparison functions.
+
+- Verify both new vignettes render and are included in the built source package. Execute all 10 README workflow example blocks and verify local documentation links. This increment updates documentation and package metadata; calculation and class behavior remain as introduced in 0.1.0.9013.
 
 # agecraft 0.1.0.9013
 
 ## Date calculation returns age vectors
 
-- Change `calculate_age()` to return the fractional `age` class by default.
-  Add `output = c("age", "units", "numeric")`: `units` preserves the previous
-  completed-age units output and `numeric` returns completed ages as doubles.
-  `as.numeric()` on the default result now extracts fractions; `as.integer()`
-  extracts completed units. This is an intentional development API change.
-- Calculate fractional years using completed birthdays plus elapsed civil days
-  between consecutive birthdays, and fractional months using calendar month
-  anniversaries. Anchor both anniversaries to the original birth date. Preserve
-  March 1 for leap birthdays in non-leap years and end-of-month rollback for
-  shorter months. Calendar calculations use the start time zone and ignore time
-  of day; finer units retain fractional elapsed time, including daylight saving.
-- Preserve the completed-unit output formats of `calc_age()` and `age_auto_unit()`.
-  Document migration choices and end-to-end fractional named-group classification.
+- Change `calculate_age()` to return the fractional `age` class by default. Add `output = c("age", "units", "numeric")`: `units` preserves the previous completed-age units output and `numeric` returns completed ages as doubles. `as.numeric()` on the default result now extracts fractions; `as.integer()` extracts completed units. This is an intentional development API change.
+- Calculate fractional years using completed birthdays plus elapsed civil days between consecutive birthdays, and fractional months using calendar month anniversaries. Anchor both anniversaries to the original birth date. Preserve March 1 for leap birthdays in non-leap years and end-of-month rollback for shorter months. Calendar calculations use the start time zone and ignore time of day; finer units retain fractional elapsed time, including daylight saving.
+- Preserve the completed-unit output formats of `calc_age()` and `age_auto_unit()`. Document migration choices and end-to-end fractional named-group classification.
 
 ## Fractional age vectors
 
-- Add the numeric S3 `age` class using vctrs, with fractional precision and one
-  explicit time unit per vector. Export `age()`, `as_age()`, and `is_age()`.
-  Normalize common time-unit aliases; reject negative, infinite, nonnumeric,
-  multidimensional, and unsupported-unit inputs while retaining missing ages.
-- Display completed whole units by default without truncating stored values.
-  Use `format(x, fractional = TRUE)` for fractional display, `as.numeric()` for
-  full-precision extraction, and `as.integer()` for completed units.
-- Preserve units, names and precision through vector slicing, sorting, repetition,
-  concatenation, casts, and data-frame binding. Combining and comparing age
-  vectors requires matching units; bare numbers are not implicitly combined.
-- Convert numeric ages and time-units vectors with `as_age()`. Require explicit
-  unit conversion and guard approximate month/year-to-finer-unit conversions
-  with `allow_approx`. Means, extrema and rounding retain the class; unsupported
-  arithmetic and mathematical transformations require explicit numeric extraction.
-- Integrate `age` vectors with `categorize_age()` and `age_cat_iv()`, including
-  fractional named groups, unit alignment, missing and unmatched observations,
-  and interval output. Classification always uses the stored fractional values.
-- Document numeric construction, date-based calculation, display, extraction,
-  and the distinction between calendar fractions and approximate unit conversions.
-- Add regression coverage for class validation, precision, display, metadata,
-  conversions, calendar fractions, elapsed time, output options, compatibility,
-  missing and empty inputs, and named-group classification. All 416 assertions
-  pass. The 0.1.0.9013 built-package check, examples and vignettes pass with zero
-  errors and warnings; remote clock verification produces one environment note.
+- Add the numeric S3 `age` class using vctrs, with fractional precision and one explicit time unit per vector. Export `age()`, `as_age()`, and `is_age()`. Normalize common time-unit aliases; reject negative, infinite, nonnumeric, multidimensional, and unsupported-unit inputs while retaining missing ages.
+- Display completed whole units by default without truncating stored values. Use `format(x, fractional = TRUE)` for fractional display, `as.numeric()` for full-precision extraction, and `as.integer()` for completed units.
+- Preserve units, names and precision through vector slicing, sorting, repetition, concatenation, casts, and data-frame binding. Combining and comparing age vectors requires matching units; bare numbers are not implicitly combined.
+- Convert numeric ages and time-units vectors with `as_age()`. Require explicit unit conversion and guard approximate month/year-to-finer-unit conversions with `allow_approx`. Means, extrema and rounding retain the class; unsupported arithmetic and mathematical transformations require explicit numeric extraction.
+- Integrate `age` vectors with `categorize_age()` and `age_cat_iv()`, including fractional named groups, unit alignment, missing and unmatched observations, and interval output. Classification always uses the stored fractional values.
+- Document numeric construction, date-based calculation, display, extraction, and the distinction between calendar fractions and approximate unit conversions.
+- Add regression coverage for class validation, precision, display, metadata, conversions, calendar fractions, elapsed time, output options, compatibility, missing and empty inputs, and named-group classification. All 416 assertions pass. The 0.1.0.9013 built-package check, examples and vignettes pass with zero errors and warnings; remote clock verification produces one environment note.
 
 # agecraft 0.1.0.9012
 
 ## Fractional age groups
 
-- Allow fractional nonnegative endpoints in `age_group()`, internal construction,
-  numeric `as.age_group()` cut points, interval conversion, and casts. Preserve
-  bounds without rounding; retain validation of negative, reversed, infinite,
-  and incompletely missing bounds.
-- Display intervals with fractional endpoints using explicit right-open notation,
-  such as `[0, 0.077)`, while preserving existing whole-number age labels.
-  Fractional numeric widths and cut points also work in `categorize_age()`.
-  Legacy character input continues to describe whole completed ages.
+- Allow fractional nonnegative endpoints in `age_group()`, internal construction, numeric `as.age_group()` cut points, interval conversion, and casts. Preserve bounds without rounding; retain validation of negative, reversed, infinite, and incompletely missing bounds.
+- Display intervals with fractional endpoints using explicit right-open notation, such as `[0, 0.077)`, while preserving existing whole-number age labels. Fractional numeric widths and cut points also work in `categorize_age()`. Legacy character input continues to describe whole completed ages.
 
 ## Named categories
 
-- Support reading, assigning, and clearing category names with `names()`.
-  Preserve names through slicing, sorting, repetition, concatenation, data-frame
-  binding, casts, and conversion of existing age groups. Names do not affect
-  interval equality or ordering; interval set operations discard names because
-  they may create different intervals.
-- Use nonblank category names as ordered-factor labels in `categorize_age()`
-  and `age_cat_iv()`, and as labels in `generics::as.factor()` and
-  `generics::as.ordered()`. Missing or blank names fall back to interval labels.
-  Reject label collisions between distinct intervals to prevent silent merging
-  of factor levels. Preserve chronological level ordering and existing handling
-  of missing, unmatched, and multiply matched observations.
-- Preserve matched category names in `categorize_age(output = "interval")`.
-  Character conversion continues to describe interval boundaries.
-- Add examples for approximate neonatal, infant, toddler, and young-child groups.
-  Explain that sub-year classification requires fractional input ages;
-  `calculate_age()` and `age_auto_unit()` still return completed units. No new
-  calendar-year convention or mixed-unit representation is introduced.
+- Support reading, assigning, and clearing category names with `names()`. Preserve names through slicing, sorting, repetition, concatenation, data-frame binding, casts, and conversion of existing age groups. Names do not affect interval equality or ordering; interval set operations discard names because they may create different intervals.
+- Use nonblank category names as ordered-factor labels in `categorize_age()` and `age_cat_iv()`, and as labels in `generics::as.factor()` and `generics::as.ordered()`. Missing or blank names fall back to interval labels. Reject label collisions between distinct intervals to prevent silent merging of factor levels. Preserve chronological level ordering and existing handling of missing, unmatched, and multiply matched observations.
+- Preserve matched category names in `categorize_age(output = "interval")`. Character conversion continues to describe interval boundaries.
+- Add examples for approximate neonatal, infant, toddler, and young-child groups. Explain that sub-year classification requires fractional input ages; `calculate_age()` and `age_auto_unit()` still return completed units. No new calendar-year convention or mixed-unit representation is introduced.
 
 ## Validation
 
-- Add regression coverage for exact fractional boundaries, half-open matching,
-  missing and unmatched ages, interval operations, named factor labels, label
-  collisions, metadata preservation, and unchanged whole-number behavior.
-- Full suite: 307 passing assertions. Built-package check, examples, and vignettes
-  pass with zero errors and zero warnings; remote clock verification is unavailable
-  in the restricted environment and produces one check note.
+- Add regression coverage for exact fractional boundaries, half-open matching, missing and unmatched ages, interval operations, named factor labels, label collisions, metadata preservation, and unchanged whole-number behavior.
+- Full suite: 307 passing assertions. Built-package check, examples, and vignettes pass with zero errors and zero warnings; remote clock verification is unavailable in the restricted environment and produces one check note.
 
 # agecraft 0.1.0.9011
 
 ## Public interface
 
-- Add exported `age_group(start, end, unit = NULL, below = "0-", sep = "-",
-  above = "+")` for direct construction from whole-number bounds. Gaps and
-  overlaps are retained. Intervals include the lower bound and exclude the upper:
-  `[1,5)` prints `1-4`. Only upper bounds may be infinite; fractions are rejected
-  without rounding. A scalar end is recycled to the length of start.
-- Add `output = c("factor", "interval")` to `categorize_age()`. The default
-  remains an ordered factor. Interval output returns a matched `age_group` for
-  each observation, preserving input order, repeated assignments, missing and
-  unmatched observations, and the grouping definition's units.
-- Expose `multiple`, `convert_units`, and `allow_approx` through
-  `categorize_age()`, and support interval inputs with complete-containment
-  matching. Numeric cut points inherit input age units. Overlap resolution uses
-  sorted group order. `age_cat_iv()` remains available with its existing API.
-- Retain `age_cat()` with a real once-per-session deprecation warning.
-  `calc_age()` and `age.cat()` retain once-per-session messages; all legacy
-  guidance now directs users to `calculate_age()` or `categorize_age()`.
-  Wrappers remain available through the next non-development release; removal
-  requires a later announced breaking release.
+- Add exported `age_group(start, end, unit = NULL, below = "0-", sep = "-", above = "+")` for direct construction from whole-number bounds. Gaps and overlaps are retained. Intervals include the lower bound and exclude the upper: `[1,5)` prints `1-4`. Only upper bounds may be infinite; fractions are rejected without rounding. A scalar end is recycled to the length of start.
+- Add `output = c("factor", "interval")` to `categorize_age()`. The default remains an ordered factor. Interval output returns a matched `age_group` for each observation, preserving input order, repeated assignments, missing and unmatched observations, and the grouping definition's units.
+- Expose `multiple`, `convert_units`, and `allow_approx` through `categorize_age()`, and support interval inputs with complete-containment matching. Numeric cut points inherit input age units. Overlap resolution uses sorted group order. `age_cat_iv()` remains available with its existing API.
+- Retain `age_cat()` with a real once-per-session deprecation warning. `calc_age()` and `age.cat()` retain once-per-session messages; all legacy guidance now directs users to `calculate_age()` or `categorize_age()`. Wrappers remain available through the next non-development release; removal requires a later announced breaking release.
 
 ## Presets and script migration
 
-- Introduce `age_group_presets` as the preferred name for `age.groups`, retaining
-  identical entry names and numeric cut points. `age.groups` remains a
-  compatibility alias through the next non-development release; removal requires
-  a later announced breaking release.
-- Include the targeted `tools/migrate-age-groups.R` helper in the installed
-  package. Preview replacements of code references before writing; writes keep
-  `.bak` backups and refuse to overwrite existing backups. Preserve comments,
-  strings, tabs, and Windows line endings. Flag strings, local bindings, member
-  names and other package namespaces for manual review. This helper operates on
-  R scripts and does not perform a general rage migration.
+- Introduce `age_group_presets` as the preferred name for `age.groups`, retaining identical entry names and numeric cut points. `age.groups` remains a compatibility alias through the next non-development release; removal requires a later announced breaking release.
+- Include the targeted `tools/migrate-age-groups.R` helper in the installed package. Preview replacements of code references before writing; writes keep `.bak` backups and refuse to overwrite existing backups. Preserve comments, strings, tabs, and Windows line endings. Flag strings, local bindings, member names and other package namespaces for manual review. This helper operates on R scripts and does not perform a general rage migration.
 
 ## Automatic age units
 
-- Add `allowed_units` to `age_auto_unit()` to opt into weeks while preserving
-  the existing day/month/year default and named numeric return structure.
-  With weeks enabled, select completed years, then completed calendar months,
-  then completed weeks, otherwise days. Missing ages retain blank unit names.
-- Explain the surveillance value/unit use case and add a `tibble::enframe()`
-  example with `age_unit` and `age` columns. Automatic hours remain unsupported.
+- Add `allowed_units` to `age_auto_unit()` to opt into weeks while preserving the existing day/month/year default and named numeric return structure. With weeks enabled, select completed years, then completed calendar months, then completed weeks, otherwise days. Missing ages retain blank unit names.
+- Explain the surveillance value/unit use case and add a `tibble::enframe()` example with `age_unit` and `age` columns. Automatic hours remain unsupported.
 
 ## Interval analysis
 
-- Add `compare_age_groups()` with operations for source-labelled crosswalks,
-  definite/possible membership, definite ordering, possible age-gap bounds,
-  coverage intersection/union/difference, and interval widths.
-- Crosswalks retain both source row identifiers and labels and nonempty
-  intersections. Optionally retain empty/missing pairs with explicit status.
-  Coverage set operations may merge touching groups while preserving gaps.
-- Definite membership requires containment; possible membership requires
-  nonempty overlap. Optional warnings or errors flag multiple memberships and
-  unresolved ordering. Touching right-open intervals do not overlap.
-- Age-gap bounds describe the second age minus the first, with exclusive
-  endpoints and explicit units. Widths use the age-coordinate unit rather than
-  inferring elapsed calendar durations. Comparisons require matching units.
-- Explain that crosswalks cannot allocate aggregate counts without additional
-  data or assumptions. Calendar shifting remains deferred pending explicit
-  reference-date semantics.
+- Add `compare_age_groups()` with operations for source-labelled crosswalks, definite/possible membership, definite ordering, possible age-gap bounds, coverage intersection/union/difference, and interval widths.
+- Crosswalks retain both source row identifiers and labels and nonempty intersections. Optionally retain empty/missing pairs with explicit status. Coverage set operations may merge touching groups while preserving gaps.
+- Definite membership requires containment; possible membership requires nonempty overlap. Optional warnings or errors flag multiple memberships and unresolved ordering. Touching right-open intervals do not overlap.
+- Age-gap bounds describe the second age minus the first, with exclusive endpoints and explicit units. Widths use the age-coordinate unit rather than inferring elapsed calendar durations. Comparisons require matching units.
+- Explain that crosswalks cannot allocate aggregate counts without additional data or assumptions. Calendar shifting remains deferred pending explicit reference-date semantics.
 
 ## Validation and documentation
 
-- Validate nonnegative whole-number endpoints and metadata, reject malformed
-  and fractional labels/cuts, and require both endpoints of missing intervals
-  to be missing. Handle empty and scalar conversions; reject unordered,
-  duplicate and missing numeric cut points.
-- Preserve missing character, factor, and interval observations and existing
-  display metadata. Missing formatted ages do not acquire unit text. Include
-  units in full vector type names and accept the documented `plus` suffix.
-- Keep temporary fractional unit-conversion boundaries separate from stored
-  age groups, preserving original labels without rounding.
-- Expand the README migration guide, retain S3 infrastructure and compatibility
-  exports, update preset references, and add genealogy, sociology and economics
-  worked examples with explicit units, endpoints, uncertainty and reference dates.
-- Add regression tests covering constructor contracts, both categorization
-  outputs, unit negotiation, migration edits, automatic weeks and comparisons.
+- Validate nonnegative whole-number endpoints and metadata, reject malformed and fractional labels/cuts, and require both endpoints of missing intervals to be missing. Handle empty and scalar conversions; reject unordered, duplicate and missing numeric cut points.
+- Preserve missing character, factor, and interval observations and existing display metadata. Missing formatted ages do not acquire unit text. Include units in full vector type names and accept the documented `plus` suffix.
+- Keep temporary fractional unit-conversion boundaries separate from stored age groups, preserving original labels without rounding.
+- Expand the README migration guide, retain S3 infrastructure and compatibility exports, update preset references, and add genealogy, sociology and economics worked examples with explicit units, endpoints, uncertainty and reference dates.
+- Add regression tests covering constructor contracts, both categorization outputs, unit negotiation, migration edits, automatic weeks and comparisons.
 
 # agecraft 0.1.0.9010
 
-* Rename the original rage package to agecraft; require R >= 4.1.0.
-* Retain age_group class, units, and display metadata through vector operations.
-  Incompatible units and implicit mixing with bare intervals/numbers now fail.
-* Preserve observation order during factor conversion; order only factor levels.
-* Reject end dates before start dates. Calendar years use March 1 for leap
-  birthdays in non-leap years; month anniversaries use the last day of shorter
-  months. Document time-zone and daylight-saving behavior.
-* Select automatic units with non-overlapping rules: days through day 30,
-  then completed calendar years, completed calendar months, or days.
-* Fix runnable examples, dependency declarations, partial argument matching,
-  and once-per-session deprecation messages. Keep legacy wrappers documented.
-* Add regression tests, a public-health vignette, data provenance, portable
-  build/release instructions, and an R CMD check CI matrix.
+- Rename the original rage package to agecraft; require R \>= 4.1.0.
+- Retain age_group class, units, and display metadata through vector operations. Incompatible units and implicit mixing with bare intervals/numbers now fail.
+- Preserve observation order during factor conversion; order only factor levels.
+- Reject end dates before start dates. Calendar years use March 1 for leap birthdays in non-leap years; month anniversaries use the last day of shorter months. Document time-zone and daylight-saving behavior.
+- Select automatic units with non-overlapping rules: days through day 30, then completed calendar years, completed calendar months, or days.
+- Fix runnable examples, dependency declarations, partial argument matching, and once-per-session deprecation messages. Keep legacy wrappers documented.
+- Add regression tests, a public-health vignette, data provenance, portable build/release instructions, and an R CMD check CI matrix.
