@@ -4,7 +4,7 @@ Calculate ages, keep their units and precision, and turn them into useful named 
 
 <!-- badges: start -->
 
-agecraft <img src="man/figures/craft_badge_2.png" alt="agecraft logo" align="right" height="140"/>
+agecraft <img src="man/figures/agecraft_archtect_blue.png" alt="agecraft logo" align="right" height="140"/>
 
 ![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)
 
@@ -211,10 +211,10 @@ By default, allowed units are day/month/year: ages through 30 days remain in day
 
 The package was renamed from `rage`. Replace `library(rage)` with `library(agecraft)` and update package-qualified calls.
 
-| Previous interface           | Current recommendation   |
-|:-----------------------------|:-------------------------|
-| `calc_age()`                 | `calculate_age()`        |
-| `age.cat()`, `age_cat()`     | `categorize_age()`       |
+| Previous interface           | Current recommendation      |
+|:-----------------------------|:----------------------------|
+| `calc_age()`                 | `calculate_age()`           |
+| `age.cat()`, `age_cat()`     | `categorize_age()`          |
 | `age.groups$Yr.5`            | `age_interval_presets$Yr.5` |
 | Label or interval conversion | `as_age_interval()`         |
 | Direct start/end bounds      | `age_interval()`            |
@@ -273,31 +273,19 @@ With `mudnester` installed, `import_mudnester_scheme("abs_5yr")` imports a valid
 
 ## Age-category assignments
 
-`categorize_age()` returns an `age_group` ordered factor with readable labels
-and retained interval definitions.
+`categorize_age()` returns an `age_group` ordered factor with readable labels and retained interval definitions.
 
-```r
+``` r
 groups <- age_interval(c(0, 5, 10), c(5, 10, Inf), sep = " to ")
 categories <- categorize_age(c(2, 7, NA), by = groups)
 group_intervals(categories)
 group_intervals(droplevels(categories[1]))
 ```
 
-Subsetting retains unused categories. Combining requires matching definitions,
-labels and units. Use `vctrs::vec_rbind()` for binding with metadata validation,
-and `generics::as.factor()` for an ordinary factor. Base coercers retain factor
-subclasses, while base data-frame binding may discard their metadata. See the
-[age-groups guide](vignettes/age-groups.Rmd) for the full contracts.
+Subsetting retains unused categories. Combining requires matching definitions, labels and units. Use `vctrs::vec_rbind()` for binding with metadata validation, and `generics::as.factor()` for an ordinary factor. Base coercers retain factor subclasses, while base data-frame binding may discard their metadata. See the [age-groups guide](vignettes/age-groups.Rmd) for the full contracts.
 
 ### Interval naming transition
 
-On this development branch, use `age_interval()` to define age ranges and
-`age_group` for assigned categories. Schemes and categories expose definitions
-through `scheme_intervals()` and `group_intervals()`. The canonical cut-point
-list is `age_interval_presets`; its two earlier names remain data aliases.
-See the [class-naming migration guide](docs/age_class_naming_migration.md) for renamed
-functions, arguments and saved-object handling.
+On this development branch, use `age_interval()` to define age ranges and `age_group` for assigned categories. Schemes and categories expose definitions through `scheme_intervals()` and `group_intervals()`. The canonical cut-point list is `age_interval_presets`; its two earlier names remain data aliases. See the [class-naming migration guide](docs/age_class_naming_migration.md) for renamed functions, arguments and saved-object handling.
 
-The name `age_group` formerly described interval records. Old saved objects need
-reconstruction before use; `is_age_group()` identifies ordered-factor assignments,
-and group methods reject legacy interval records. See the migration guide above.
+The name `age_group` formerly described interval records. Old saved objects need reconstruction before use; `is_age_group()` identifies ordered-factor assignments, and group methods reject legacy interval records. See the migration guide above.

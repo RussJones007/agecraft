@@ -2,37 +2,15 @@
 
 ## Breaking changes: age intervals and assigned groups
 
-* Rename the interval class and constructor from `age_group` to `age_interval`.
-  Use `as_age_interval()`, `is_age_interval()` and `compare_age_intervals()`
-  instead of `as.age_group()`, `is.age_group()` and `compare_age_groups()`.
-  Formatting helpers use `age_interval_to_char()` and
-  `valid_age_interval_symbol()`.
-* Reuse `age_group` for categorical assignments, replacing `age_category`.
-  Construct assigned groups with `age_group(labels, intervals)` and identify
-  them with `is_age_group()`. `categorize_age()` returns this ordered-factor
-  subclass by default; `output = "interval"` still returns age intervals.
-* Retrieve assignment definitions with `group_intervals()` instead of
-  `category_groups()` or the phase-one `category_intervals()`. Use
-  `scheme_intervals()` instead of `scheme_groups()` for scheme definitions.
-  Schemes and assignments take and store `intervals`; `age_cat_iv()` also uses
-  `intervals` as its second argument.
-* Use `age_interval_presets` as the canonical numeric cut-point dataset.
-  `age_group_presets` and `age.groups` remain identical compatibility aliases.
-  The installed preset migration script handles both earlier dataset names.
-* Reconstruct saved objects from earlier versions before use. Old ivs interval
-  records carrying the `age_group` tag are rejected by assignment methods with
-  migration guidance. Removed function names are not retained as aliases;
-  the dataset aliases listed above remain available.
+- Rename the interval class and constructor from `age_group` to `age_interval`. Use `as_age_interval()`, `is_age_interval()` and `compare_age_intervals()` instead of `as.age_group()`, `is.age_group()` and `compare_age_groups()`. Formatting helpers use `age_interval_to_char()` and `valid_age_interval_symbol()`.
+- Reuse `age_group` for categorical assignments, replacing `age_category`. Construct assigned groups with `age_group(labels, intervals)` and identify them with `is_age_group()`. `categorize_age()` returns this ordered-factor subclass by default; `output = "interval"` still returns age intervals.
+- Retrieve assignment definitions with `group_intervals()` instead of `category_groups()` or the phase-one `category_intervals()`. Use `scheme_intervals()` instead of `scheme_groups()` for scheme definitions. Schemes and assignments take and store `intervals`; `age_cat_iv()` also uses `intervals` as its second argument.
+- Use `age_interval_presets` as the canonical numeric cut-point dataset. `age_group_presets` and `age.groups` remain identical compatibility aliases. The installed preset migration script handles both earlier dataset names.
+- Reconstruct saved objects from earlier versions before use. Old ivs interval records carrying the `age_group` tag are rejected by assignment methods with migration guidance. Removed function names are not retained as aliases; the dataset aliases listed above remain available.
 
-Interval boundaries, numerical calculations, classification rules, factor codes,
-labels, unit handling and scheme provenance retain their existing behavior.
-Reference help, vignettes, method registrations and tests use the final names.
-The migration guide documents script and saved-object changes; a separate
-`tarr.pop` migration plan identifies downstream call sites and safeguards.
+Interval boundaries, numerical calculations, classification rules, factor codes, labels, unit handling and scheme provenance retain their existing behavior. Reference help, vignettes, method registrations and tests use the final names. The migration guide documents script and saved-object changes; a separate `tarr.pop` migration plan identifies downstream call sites and safeguards.
 
-This version is the first distinct development version for the completed
-refactor. Downstream packages can require `agecraft (>= 0.1.0.9021)` rather than
-relying on 0.1.0.9020, which was also used before and during the transition.
+This version is the first distinct development version for the completed refactor. Downstream packages can require `agecraft (>= 0.1.0.9021)` rather than relying on 0.1.0.9020, which was also used before and during the transition.
 
 # agecraft 0.1.0.9019
 
