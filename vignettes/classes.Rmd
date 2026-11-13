@@ -15,35 +15,33 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-An age, an age range, and an assigned category describe different
-things. An age tells us how old someone is at a particular time. An
-interval defines a range of possible ages. A category records which
-range an observation belongs to. A scheme gives a reusable set of ranges
-an identity, purpose, and rules.
+This vignette introduces and discusses the different classes in the package, how they work, what they're made of, when
+you should use them, and what they can do for you ages and age groups. An age, an age range, and an assigned category
+describe different things. An age tells us how old someone is at a particular time. An interval defines a range of
+possible ages. A category records which range an observation belongs to. A scheme gives a reusable set of ranges with
+provenance, an identity, purpose, and rules.
 
 This guide explains the four main classes in agecraft so you can choose
-which objects to keep in an analysis and understand what information
-each preserves. It assumes familiarity with R vectors and data frames.
+objects to use in an analysis and understand what information
+each preserves. 
 
 | Class | What it represents | What it contains |
 |:-----------------------|:-----------------------|:-----------------------|
 | `age` | Age values for observations | Fractional numeric values and one time unit (e.g. year, month, week, etc) |
-| `age_interval` | Age ranges, including category definitions | Lower and upper bounds, one optional time unit, optional names, and display settings |
-| `age_group` | Category assignments for observations | Ordered-factor codes and labels, with one interval definition per level |
-| `age_scheme` | One reusable classification definition | Named intervals, identity, purpose, provenance, and validation rules |
+| `age_interval` | Age range definitions, including category definitions | Lower and upper bounds, one optional time unit, optional names, and display settings |
+| `age_group` | Age group or category assignments for ages | Ordered-factor codes and labels, with one age interval definition per level |
+| `age_scheme` | A reusable age interval classification definition | Named intervals, identity, purpose, provenance, and validation rules |
 
-These are S3 classes. A class tells R what an object represents and how
-to handle operations such as printing or subsetting. `age` and
-`age_interval` use the vctrs framework for vector behavior;
-`age_interval` also builds on ivs intervals. `age_group` is an
-ordered-factor subclass. An `age_scheme` is a list-based metadata object
-containing an interval vector.
+These are S3 classes. A class tells R what an object represents and how to handle operations such as printing or
+subsetting. `age` and `age_interval` use the [vctrs](https://vctrs.r-lib.org/) framework for vector behavior;
+`age_interval` builds on [ivs](https://davisvaughan.github.io/ivs/) intervals. `age_group` is an ordered-factor
+subclass. An `age_scheme` is a list-based metadata object containing an interval vector.
 
 ## Observations to follow through the classes
 
 The following fictional visit records include two infants, a child
 exactly five years old, an adult, and a missing birth date. Each row is
-one visit. Fixed dates make the example reproducible.
+one visit. 
 
 ```{r sample-data}
 visits <- data.frame(
@@ -56,44 +54,94 @@ visits
 ```
 
 The dates remain useful even after calculating ages. They let us
-calculate age directly in another unit when the analysis requires it.
+calculate age directly in another date/time unit when the analysis requires it.
 
 ## The age class: values with a unit
 
-Use an `age` vector when you need numeric ages with their fractional
-precision and unit attached. Each element represents an age value; the
-entire vector shares one unit, such as year or day. Present values must
-be finite and non-negative; missing values are allowed.
+An `age` vector has the numeric ages with fractional precision and unit attached. Each element represents an age value;
+the entire vector shares one unit, such as year or day. Values in the vector are finite and non-negative; missing values
+are allowed and denoted with the usual R `NA`.
 
 ```{r calculate-ages}
+# add ages to the data frame
 visits$age <- calculate_age(visits$birth_date, visits$visit_date, unit = "year")
 visits[c("id", "age")]
 is_age(visits$age)
 ```
 
+
 ### Stored values and printed ages
 
-The default display shows completed whole units. Both infants therefore
-print as zero years, although their stored ages differ:
+The default display expresses ages as completed whole units, much as people
+ordinarily report their age. Both infants therefore print as zero years,
+although their stored ages differ. You can display those fractions or extract
+the values explicitly:
 
 ```{r inspect-ages}
+# Default display: completed whole units.
+visits$age
+
+# Display fractional values without changing the age vector.
 format(visits$age, fractional = TRUE)
+
+# Extract full numeric values, including fractions.
 as.numeric(visits$age)
+
+# Extract completed whole units as integers.
 as.integer(visits$age)
 ```
 
-`as.numeric()` extracts the full values and removes their class and
-unit. `as.integer()` extracts completed units. `format()` changes the
-representation without changing the object. Classification uses stored
-fractions, so a printed zero does not mean that all information about
-the first year has been lost.
+`format()` returns a character representation while leaving the original object
+unchanged. `as.numeric()` returns the full stored values as an ordinary numeric
+vector; `as.integer()` returns completed whole units as integers. Both extraction
+methods remove the age class and its unit information.
 
-An `age` vector stores neither the original dates nor a separate unit
-for each observation. For years, `calculate_age()` measures completed
-birthdays plus the fraction of civil days between consecutive birthdays.
-Months use calendar month anniversaries. Smaller units measure elapsed
-time. The help for `calculate_age()` describes leap birthdays, month
-ends, and date-times.
+The stored fractions allow classification within a whole unit. Two infants who
+both print as zero years can still belong to different age groups. For example,
+you might distinguish ages below 28 days from ages beginning at 28 days. For an
+exact 28-day boundary, calculate ages and define the groups in days: a fraction
+of a calendar year does not correspond to the same number of days for every
+birth date.
+
+#### Calendar anniversaries and elapsed time
+
+When calculating an age from dates, the chosen unit determines how the
+calculation works. Years and months follow calendar anniversaries, such as
+birthdays or the same day in successive months. Their lengths vary: a year can
+contain 365 or 366 days, and a month can contain 28 to 31 days. Weeks, days,
+hours, minutes, and seconds have fixed relationships and can each be expressed
+as a known number of seconds. Agecraft therefore calculates years and months
+using calendar anniversaries and smaller units using elapsed time.
+
+For years, `calculate_age()` counts completed birthdays and adds the fraction
+of calendar days completed between the previous birthday and the next. For
+months, it counts completed monthly anniversaries and adds the corresponding
+fraction between consecutive anniversaries. These rules account for dates that
+do not occur in every year or month:
+
+- **Leap birthdays:** For someone born on February 29, the yearly anniversary
+  falls on March 1 in a non-leap year and February 29 in a leap year. Someone
+  born on February 29, 2020 therefore completes one year on March 1, 2021,
+  rather than February 28.
+- **Month ends:** If the original day does not exist in the target month,
+  the monthly anniversary falls on that month's last day. For someone born
+  on January 31, 2025, the first two monthly anniversaries are February 28
+  and March 31. Each anniversary is calculated from the original birth date,
+  so the February adjustment does not move later anniversaries to the 28th.
+
+For `POSIXct` date-times, calendar years and months use local dates in the
+starting date-time's time zone. The end is interpreted in that same time zone,
+and time of day is ignored. Someone born at 15:00 therefore completes a calendar
+year on their anniversary date even when the reference time that day is before
+15:00.
+
+Elapsed time measures the duration between the two points, including their
+times of day. This is useful when deciding, for example, whether a newborn is
+less than 48 hours old. An elapsed day is exactly 24 hours, and an elapsed week
+is seven such days. Consecutive local midnights can nevertheless be 23 or 25
+hours apart when clocks change for daylight saving, producing `23 / 24` or
+`25 / 24` elapsed days. Choose years or months for anniversary-based ages, and
+smaller units when the elapsed duration matters.
 
 ### Constructing and using age values
 
