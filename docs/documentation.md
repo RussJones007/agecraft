@@ -1,6 +1,6 @@
 # Instructions for writing R package documentation
 
-Use these instructions whenever you create or revise roxygen2 documentation in this package. Write for someone who knows R but has not read the function's source. Help that person decide whether the function fits their task, call it correctly, and understand the result.
+Use these instructions whenever you create or revise documentation in this package: roxygen2 help, class references, vignettes, README content, and other guides. Write for someone who knows R but has not read the source. Help that person choose an approach, use it correctly, and understand the result. Sections 1–8 retain the detailed function and roxygen guidance; sections 9–14 extend it to classes, longer narratives, and the documentation ecosystem.
 
 These instructions apply to help topics, argument descriptions, examples, and related package documentation. Follow established package terminology and genuine API contracts. Do not change function behavior merely to make a documentation example work.
 
@@ -311,7 +311,285 @@ Do not claim to have run a check that was unavailable. Report the specific unver
 - [ ] Roxygen tags, Markdown, inheritance, and links render correctly.
 - [ ] Generated documentation matches its source, and relevant checks have been reviewed.
 
-## 9. Style references
+## 9. Give each part of the documentation a clear job
+
+Documentation should work as a connected system. A reader should be able to move
+from discovering the package to learning a workflow, understanding its concepts,
+and checking an exact contract without encountering contradictory explanations.
+
+| Document | Main question it answers |
+| --- | --- |
+| README or package overview | What problem does this solve, and where should I start? |
+| Function or method reference | How do I call this operation, and what does it guarantee? |
+| Class reference | What does this object mean, and which properties and operations can I rely on? |
+| Tutorial vignette | How do I accomplish a first useful task with guidance? |
+| Conceptual vignette | How should I understand these ideas and their consequences? |
+| Workflow vignette | How do I make and justify decisions across a realistic task? |
+| NEWS and migration guide | What changed, and what must I adapt? |
+| Developer design documents | Why is the implementation organized this way, and what is proposed? |
+
+Keep the authoritative explanation of a contract in reference help. Vignettes
+should develop its meaning through use and link to the precise rules. A README
+should offer a manageable entry point rather than reproduce every vignette.
+Cross-links should describe why to follow them: “See the interval reference for
+boundary and missing-value rules” is more helpful than “See also.”
+
+Distinguish implemented behavior from proposals and historical descriptions.
+Resolve disagreements using the current API policy, implementation, and tests;
+do not copy a design proposal into user documentation as an available feature.
+When a contract changes, review every affected reference, vignette, README
+example, and migration note for consistency.
+
+## 10. Document classes separately from their constructors
+
+A constructor explains how to create an object. A class reference explains what
+the object represents and how it behaves throughout its use. A class vignette
+teaches the reasoning behind that model and follows objects through meaningful
+operations. These are distinct responsibilities even when a small API shares a
+help topic for its constructor and class.
+
+### Class reference and public invariants
+
+Provide a discoverable class topic for a substantive public S3 or S4 class. If it
+shares a constructor page, give class behavior explicit sections and suitable
+aliases so readers can find it without knowing the constructor's name. Use the
+package's roxygen conventions for class topics and verify the generated help
+aliases; a heading alone does not make a class searchable through help.
+
+Cover the following where they form part of the public contract:
+
+- Meaning: what one element or one object represents, and why the class exists.
+- Public invariants: valid values, lengths, dimensions, units, missingness,
+  boundary rules, and required relationships among components.
+- Creation and validation: supported constructors, coercions, predicates, and
+  validators, including what each actually checks. A class predicate need not
+  establish that an object is valid.
+- Inspection: supported accessors and the meaning of printed or summarized
+  output. Distinguish display from stored values when they differ.
+- Operations: subsetting, combining, comparison, arithmetic, replacement, and
+  coercion where supported. State what is preserved, changed, or rejected.
+- Relationships: inheritance, containment, conversion, and association with
+  related classes. Do not describe containment as inheritance or imply that
+  conversion is lossless without evidence.
+- Limits: unsupported operations and information lost on conversion or export,
+  where knowing this prevents misuse.
+
+For S3, explain supported generic behavior and accessors rather than teaching
+readers to construct arbitrary lists or alter attributes directly. For S4,
+document relevant formal inheritance, public slots if they are an intended
+interface, validity requirements, and supported accessors. Do not expose private
+storage merely because it is visible in source. Document subclass extension
+contracts only when extension is supported; distinguish instructions for class
+authors from ordinary use. General S4 guidance here does not imply that Agecraft
+has S4 classes or needs them.
+
+Describe important methods near the class overview and link to their detailed
+help. A method reference should explain how its behavior differs from the generic
+and which arguments, return properties, or restrictions are class-specific.
+Readers should be able to find the behavior through both the generic and class
+navigation without maintaining duplicate, diverging contracts.
+
+### Constructors and class vignettes
+
+Keep constructor reference focused on accepted inputs, defaults, validation,
+normalization, and the returned class. Link to the class contract for later
+operations. Explain any distinction between a public constructor and an internal
+low-level constructor; do not recommend bypassing validation for routine use.
+
+A class vignette should introduce the problem the representation solves, create
+an object, inspect it, use relevant operations, and explain consequences. It
+should not simply expand the constructor's argument list into prose or catalogue
+every method. Link to reference help for the full operation inventory.
+
+For Agecraft, distinguish age values, interval definitions, categorical
+assignments, and schemes. An `age_scheme` contains `age_interval` definitions;
+an `age_group` represents categorical assignments with associated interval
+definitions. Explain how these roles connect without suggesting they are
+interchangeable. Check current class contracts before supplying detailed examples,
+particularly after naming migrations. A useful class explanation might contrast
+printed completed ages with stored fractional values, then show why the stored
+value matters for classification.
+
+## 11. Choose a vignette's teaching purpose
+
+Choose the primary audience, starting knowledge, and learning outcome before
+writing code. A vignette needs a reason to exist beyond demonstrating functions.
+State the reader's task or question early, identify necessary prerequisites, and
+make the intended result clear without a long administrative preamble.
+
+| Type | Teaching purpose | Appropriate progression |
+| --- | --- | --- |
+| Tutorial | Guide a reader through a first successful task | Establish a small problem, supply data, guide essential steps, inspect the result, and suggest a next task. |
+| Conceptual | Develop a mental model and explain consequential distinctions | Pose a question, introduce ideas in dependency order, use focused examples, and explain implications and limits. |
+| Workflow | Show decisions and connected operations in a realistic setting | Establish the analytical objective, inspect inputs, justify choices, carry results forward, and assess the final result. |
+| Hybrid | Combine conceptual understanding with a guided task or workflow | Keep one primary purpose and introduce supporting concepts where the task makes them necessary. |
+
+These are editorial choices, not mandatory labels or rigid templates. A tutorial
+can explain concepts; a workflow can pause to teach a new operation. A hybrid
+needs a coherent path rather than alternating unrelated mini-tutorials. Split a
+vignette when audiences or prerequisites diverge enough that one group must read
+substantial material unrelated to its task.
+
+A useful learning outcome names what the reader can decide or accomplish:
+“Choose age boundaries and explain how boundary observations are classified” is
+more informative than “Learn about age intervals.” Keep reference-level edge
+cases in linked help unless they are central to that outcome.
+
+## 12. Build a narrative that advances the reader's reasoning
+
+Plan the progression of ideas before arranging code chunks. Each section should
+answer a question raised by the preceding material or prepare a decision needed
+later. Introduce concepts before relying on them, then deepen the explanation
+when the reader has a concrete reason to care.
+
+For example, a reporting workflow could develop from “What age does each record
+represent?” to “Which boundaries match the reporting purpose?”, then “How are
+records assigned?” and finally “What do these counts support?” This connects age
+calculation, units, interval definitions, classification, and interpretation
+through a single analytical objective. It is an editorial outline, not a promise
+that every possible reporting operation is provided by Agecraft.
+
+### Use transitions to connect decisions
+
+Explain why the next step follows. Prefer a sentence tied to the result or an
+unresolved choice over “Next, we use another function.” For example:
+
+> The counts depend on where the boundaries fall. Before summarizing the
+> records, we need to decide which interval includes an observation exactly at
+> a boundary.
+
+A transition can introduce a limitation, compare alternatives, or carry a result
+into a new question. It need not recap everything the reader has just seen.
+Headings should express meaningful questions, tasks, or concepts rather than
+repeat function names unless the function itself is the subject.
+
+### Vary the form to match the explanation
+
+Do not repeat an introduction–code–explanation pattern mechanically for every
+chunk. Sometimes a short question and a result are enough; sometimes several
+chunks belong inside one developing argument. Use prose without code for a
+conceptual distinction, a compact table for alternatives, or an annotated result
+when the reader needs help interpreting it. Place explanation before code when
+it establishes a necessary choice, and after code when it interprets evidence.
+
+Keep code subordinate to the learning purpose. Remove chunks that merely prove a
+function exists or repeat an already established pattern. Do not add filler,
+forced anecdotes, artificial suspense, or conversational questions solely to vary
+the rhythm. Read adjacent sections together: each should leave the reader better
+prepared for the next, without an identical opening and closing formula.
+
+End with what the example established, the limits of that result, and a useful
+next destination. Avoid a generic list of every function mentioned.
+
+## 13. Use connected examples and interpret their results
+
+Use a realistic, manageable scenario whose objects and decisions persist across
+sections. Establish what each row represents, where values come from, relevant
+units and dates, and the question being answered. Synthetic data are welcome;
+label them as such and give them plausible relationships. Do not imply that a
+teaching dataset is representative or an externally validated standard.
+
+Carry intermediate objects forward with stable, meaningful names. Avoid
+recreating unrelated datasets for each function or silently changing assumptions
+midway through the narrative. Introduce one meaningful complication at a time,
+such as a missing birth date, a boundary age, or incomplete interval coverage.
+Show why it matters to the task rather than collecting edge cases for their own
+sake. A small independent example is appropriate when it makes a difficult rule
+clearer; explain its connection to the main scenario before returning to it.
+
+For an Agecraft reporting example, use synthetic birth and reference dates,
+choose an explicit age unit, define reporting intervals for a stated purpose,
+and retain the assignments when examining counts. Include a boundary observation
+if the lesson concerns interval membership. If a missing assignment appears,
+explain whether it reflects missing input or an unmatched value according to the
+actual API; do not assume these cases are interchangeable. Describe reporting
+bands as illustrative unless their source and edition have been verified.
+
+### Explain meaning, not just output syntax
+
+After a consequential result, explain what the reader should notice and how it
+affects the next decision. “The result is a data frame” identifies a structure;
+it does not explain what a row means or what the result establishes. Select the
+output needed for the lesson and make important columns, units, levels, or
+boundary cases visible without printing pages of incidental output.
+
+Distinguish the following when relevant:
+
+- A displayed value from the underlying stored value.
+- A valid object from a definition appropriate for a particular analysis.
+- Missing observations from observations outside the chosen coverage.
+- A computational match from evidence supporting an analytical conclusion.
+- Observed counts from rates that require compatible population denominators.
+
+For example, interval overlap can establish possible membership without
+justifying allocation of aggregate counts to finer bands. A successful validation
+can establish structural or coverage properties without certifying the clinical
+or institutional authority of a reporting scheme. Explain such limits at the
+point where a reader might otherwise draw the unsupported conclusion.
+
+Vignette examples should run in order from a clean session using only declared
+packages and available data. Apply section 4's reproducibility and side-effect
+rules to the whole narrative. Do not rely on hidden interactive objects or let
+cached output conceal stale results. Keep reference examples short and
+independent; connected vignette examples serve a different teaching purpose.
+
+## 14. Make craftsmanship visible through editorial care
+
+Agecraft's identity should come through in accurate boundaries, explicit choices,
+well-chosen examples, and explanations that respect the reader's reasoning.
+Ages and classifications involve decisions about measurement, representation,
+and purpose. Show the consequences of those decisions rather than making broad
+claims about the package's elegance or care.
+
+Use the idea of craftsmanship as an editorial standard, not a recurring metaphor.
+Avoid workshop imagery, craft-themed headings, slogans, and decorative stories
+that compete with the subject. A brief framing sentence can be useful when it
+introduces a real analytical choice; it should earn its place by helping the
+reader understand the work. Precision, restraint, and a coherent progression
+should carry the voice across help topics and vignettes.
+
+### Review the document and the ecosystem
+
+Review in separate passes so local sentence polishing does not conceal a weak
+structure or an incorrect claim:
+
+1. **Contract and scope:** Check claims, terminology, class relationships, and
+   implemented versus proposed behavior against their authoritative sources.
+2. **Learning path:** Read headings and transitions without code. Check that
+   prerequisites arrive before use, questions develop naturally, and the ending
+   delivers the promised learning outcome.
+3. **Examples and interpretation:** Follow the connected scenario from a clean
+   session. Check that every consequential output is explained and that limits
+   appear before a misleading conclusion becomes likely.
+4. **Voice and economy:** Read the prose aloud. Remove mechanical scaffolding,
+   repeated definitions, promotional language, and metaphors that do no work.
+   Retain explanation needed to understand a decision.
+5. **Navigation and consistency:** Follow links between overview, vignettes,
+   class topics, constructors, and methods. Check that shared concepts use the
+   same names and that no page contradicts or needlessly duplicates another.
+6. **Rendered result:** Inspect the applicable rendered help or article for
+   broken links, heading structure, tables, code, and readable output. Report
+   what was actually run and inspected.
+
+For a policy-only Markdown edit, inspect its structure and diff; regenerating
+roxygen help or running the package test suite is unnecessary unless executable
+examples, roxygen sources, or behavior also change. For actual help or vignette
+changes, use section 7 and render the affected documents. Scale checks to the
+changed material and do not present a prose review as executable validation.
+
+### Reuse the guidance across packages
+
+The general rules here apply beyond Agecraft: establish public contracts,
+distinguish reference from teaching, choose a vignette's purpose, connect
+examples, interpret results, and review the documentation as a system. When
+adapting this guide, replace Agecraft-specific concepts, examples, source-of-truth
+paths, and workflows with the receiving package's actual domain and tooling.
+Do not transplant interval semantics, class relationships, provenance claims,
+lifecycle status, or validation guarantees into a package where they do not
+apply. Keep a stable shared editorial core and clearly identified package-specific
+rules, so improvements can be reused without erasing local contracts.
+
+## 15. Style references
 
 Use these primary references for conventions and representative help structure. The rules above combine those conventions with this package owner's preference for fuller explanations directed at readers; they are not a verbatim reproduction of a tidyverse policy.
 
