@@ -1,0 +1,332 @@
+---
+title: "Understanding agecraft classes"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Understanding agecraft classes}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(agecraft)
+```
+
+An age, an age range, and an assigned category describe different
+things. An age tells us how old someone is at a particular time. An
+interval defines a range of possible ages. A category records which
+range an observation belongs to. A scheme gives a reusable set of ranges
+an identity, purpose, and rules.
+
+This guide explains the four main classes in agecraft so you can choose
+which objects to keep in an analysis and understand what information
+each preserves. It assumes familiarity with R vectors and data frames.
+
+| Class | What it represents | What it contains |
+|:-----------------------|:-----------------------|:-----------------------|
+| `age` | Age values for observations | Fractional numeric values and one time unit (e.g. year, month, week, etc) |
+| `age_interval` | Age ranges, including category definitions | Lower and upper bounds, one optional time unit, optional names, and display settings |
+| `age_group` | Category assignments for observations | Ordered-factor codes and labels, with one interval definition per level |
+| `age_scheme` | One reusable classification definition | Named intervals, identity, purpose, provenance, and validation rules |
+
+These are S3 classes. A class tells R what an object represents and how
+to handle operations such as printing or subsetting. `age` and
+`age_interval` use the vctrs framework for vector behavior;
+`age_interval` also builds on ivs intervals. `age_group` is an
+ordered-factor subclass. An `age_scheme` is a list-based metadata object
+containing an interval vector.
+
+## Observations to follow through the classes
+
+The following fictional visit records include two infants, a child
+exactly five years old, an adult, and a missing birth date. Each row is
+one visit. Fixed dates make the example reproducible.
+
+```{r sample-data}
+visits <- data.frame(
+  id = c("A", "B", "C", "D", "E"),
+  birth_date = as.Date(c("2025-06-20", "2025-01-01", "2020-07-01",
+                         "1980-01-01", NA)),
+  visit_date = rep(as.Date("2025-07-01"), 5)
+)
+visits
+```
+
+The dates remain useful even after calculating ages. They let us
+calculate age directly in another unit when the analysis requires it.
+
+## The age class: values with a unit
+
+Use an `age` vector when you need numeric ages with their fractional
+precision and unit attached. Each element represents an age value; the
+entire vector shares one unit, such as year or day. Present values must
+be finite and non-negative; missing values are allowed.
+
+```{r calculate-ages}
+visits$age <- calculate_age(visits$birth_date, visits$visit_date, unit = "year")
+visits[c("id", "age")]
+is_age(visits$age)
+```
+
+### Stored values and printed ages
+
+The default display shows completed whole units. Both infants therefore
+print as zero years, although their stored ages differ:
+
+```{r inspect-ages}
+format(visits$age, fractional = TRUE)
+as.numeric(visits$age)
+as.integer(visits$age)
+```
+
+`as.numeric()` extracts the full values and removes their class and
+unit. `as.integer()` extracts completed units. `format()` changes the
+representation without changing the object. Classification uses stored
+fractions, so a printed zero does not mean that all information about
+the first year has been lost.
+
+An `age` vector stores neither the original dates nor a separate unit
+for each observation. For years, `calculate_age()` measures completed
+birthdays plus the fraction of civil days between consecutive birthdays.
+Months use calendar month anniversaries. Smaller units measure elapsed
+time. The help for `calculate_age()` describes leap birthdays, month
+ends, and date-times.
+
+### Constructing and using age values
+
+If ages are already available as numbers, give them their known unit:
+
+```{r construct-age}
+known_ages <- age(c(0.5, 5, 45), unit = "year")
+known_ages
+visits$age[1:3]
+mean(visits$age, na.rm = TRUE)
+```
+
+Subsetting, sorting, and supported summaries retain the age class and
+unit. Numeric addition and subtraction use that unit: `known_ages + 1`
+adds one year. Negative results are rejected. Constructing an age from a
+completed-year number cannot recover fractions that were discarded
+earlier.
+
+Use `as_age()` for explicit unit conversion. Days convert to weeks by a
+fixed ratio. Conversions involving calendar months or years require
+`allow_approx = TRUE`, including month-to-year conversion. Numerical
+conversion does not recover the original dates. When exact day-based
+classification matters, calculate ages in days directly from those
+dates.
+
+## The age_interval class: ranges with boundaries
+
+An `age_interval` vector represents ranges. It can define reporting
+categories or describe uncertain ages when only a range is known. Each
+element contains a lower and upper bound. The vector also carries an
+optional common unit, optional interval names, and settings for
+displaying interval labels.
+
+For our visit records, define three illustrative reporting bands:
+
+```{r define-intervals}
+bands <- age_interval(
+  start = c(0, 1, 5), end = c(1, 5, Inf), unit = "year"
+)
+names(bands) <- c("Under 1", "1 to under 5", "5 and older")
+bands
+
+data.frame(
+  label = names(bands),
+  lower = ivs::iv_start(bands),
+  upper = ivs::iv_end(bands)
+)
+```
+
+These boundaries are teaching examples, rather than an official
+reporting standard. An interval includes its lower bound and excludes
+its upper bound: `[1, 5)` includes the first birthday and stops just
+before the fifth. Its completed-age display is `1-4`. Exactly five
+belongs to `[5, Inf)`. Fractional bounds are preserved; only upper
+bounds may be infinite. A missing interval has both bounds missing.
+
+### Definitions exist independently of observations
+
+There are three intervals here regardless of how many visit records we
+have. Naming a range makes its meaning readable without changing its
+boundaries. Names do not change interval equality or chronological
+ordering.
+
+```{r select-intervals}
+bands[1:2]
+compare_age_intervals(bands[1:2], operation = "width")
+```
+
+Widths use the interval's coordinate unit, years here. A width in years
+is not an exact elapsed-day duration. Selection and supported
+concatenation retain names and units; coverage set operations may merge
+or split intervals and therefore discard names.
+
+An interval vector may have gaps or overlaps. Its class alone does not
+promise that every age belongs to exactly one range. A unit of `NULL`
+means the unit is unspecified. For this guide, both observations and
+definitions explicitly use years so their coordinates are directly
+comparable.
+
+## The age_group class: assignments with their definitions
+
+We have age observations and interval definitions. Classifying the
+observations connects them:
+
+```{r assign-groups}
+visits$group <- categorize_age(visits$age, by = bands)
+visits[c("id", "age", "group")]
+class(visits$group)
+table(visits$group, useNA = "ifany")
+```
+
+The result is an `age_group`, with classes `age_group`, `ordered`, and
+`factor`. Each element is one observation's category assignment. Both
+infants belong to "Under 1"; the child exactly five belongs to "5 and
+older". The missing birth date produces a missing age and assignment. An
+age outside every interval would also receive `NA`; that assignment
+alone does not distinguish the causes.
+
+### What an assignment retains
+
+Like an ordered factor, an `age_group` contains integer category codes
+and readable levels. It also retains one interval definition per level,
+available through `group_intervals()`:
+
+```{r inspect-groups}
+levels(visits$group)
+as.integer(visits$group)
+group_intervals(visits$group)
+```
+
+The codes identify categories; they are not ages. The definitions have
+three elements, while the assignment vector has five, one per visit.
+Category levels follow interval order. The original exact ages and
+scheme provenance are not stored in an `age_group`. Keep the age column
+when later calculations or new boundaries may require it.
+
+Subsetting preserves unused categories and their definitions. Remove
+them explicitly when a reduced set is wanted:
+
+```{r subset-groups}
+infants <- visits$group[1:2]
+levels(infants)
+levels(droplevels(infants))
+```
+
+Combining assignments requires matching ordered bounds, labels, and
+definition units. Matching label text alone is insufficient. Use
+`vctrs::vec_rbind()` when binding data frames containing these objects;
+base data-frame binding can reconstruct factors and discard their
+definitions. To obtain an ordinary factor, use `generics::as.factor()`
+or `generics::as.ordered()` explicitly.
+
+If you need a matched interval for each observation instead, request
+interval output:
+
+```{r matched-intervals}
+matched <- categorize_age(visits$age, by = bands, output = "interval")
+matched
+length(matched)
+```
+
+This is an `age_interval` vector with one element per visit, including
+repeated and missing intervals. It represents the matched ranges rather
+than factor codes with a shared level definition.
+
+## The age_scheme class: a reusable definition with context
+
+An interval vector tells us where boundaries fall. A scheme also records
+what the definition is for, how it is identified, and which validation
+rules apply. Use an `age_scheme` when the same definition must be reused
+across reports or retained with its source and purpose.
+
+```{r define-scheme}
+visit_scheme <- age_scheme(
+  intervals = bands,
+  id = "example_visit_bands",
+  name = "Illustrative visit reporting bands",
+  type = "partition",
+  domain = c(0, Inf),
+  complete = TRUE,
+  purpose = "Demonstrate age classes using fictional visits"
+)
+visit_scheme
+scheme_intervals(visit_scheme)
+```
+
+This object contains the named `age_interval` vector. It also contains
+its ID, name, purpose, partition/classification type, optional domain,
+completeness claim, and provenance fields such as source, reference,
+organization, version, and verification status. Information that is
+unknown can remain unspecified. The scheme does not contain the visit
+records or their assignments.
+
+A scheme contains intervals; it does not inherit from `age_interval`.
+Its intervals supply boundaries, labels, and units, while the scheme
+supplies context and rules. `scheme_intervals()` retrieves the
+definitions, and `summary()` reports coverage and provenance.
+
+### Validation expresses the intended classification
+
+A `partition` prohibits overlapping categories. With
+`domain = c(0, Inf)` and `complete = TRUE`, construction also checks
+that these bands cover the declared all-age domain. Completeness is a
+separate property from nonoverlap. A `classification` may permit
+overlapping memberships, and `complete = NA` makes no completeness
+claim.
+
+These checks establish properties of the definition. They do not
+establish that its categories are appropriate for a reporting system or
+independently verify an external source.
+
+```{r use-scheme}
+from_scheme <- categorize_age(visits$age, by = visit_scheme)
+identical(from_scheme, visits$group)
+```
+
+Using this scheme produces the same assignments as its interval vector.
+The assignments retain category definitions, while the scheme's identity
+and provenance remain with the separate scheme object. Save the scheme
+alongside the analysis when that context matters. Ordinary substantive
+edits to a scheme are validated and track derivative ancestry; see the
+schemes guide for details.
+
+By default, `categorize_age()` rejects multiple matches. If a scheme
+intentionally overlaps, `classify_age_scheme()` provides a table of all
+memberships. Such a table is an ordinary data frame; overlapping
+memberships cannot be summed as mutually exclusive population groups.
+
+## Choosing what to retain
+
+In the visit example, the dates allow recalculation, the `age` column
+preserves precise values with units, and the `age_group` column supports
+category tables while keeping the category bounds retrievable. The
+separate `age_scheme` records the reusable definition and its context.
+
+| Your next task | Object to retain |
+|:-----------------------------------|:-----------------------------------|
+| Calculate or compare individual ages | Original dates and an `age` vector |
+| Inspect or compare age ranges | An `age_interval` vector |
+| Tabulate assigned categories and retrieve their bounds | An `age_group` vector |
+| Reuse or document a classification definition | An `age_scheme` object |
+
+Other familiar R classes appear at the boundaries: `Date` and `POSIXct`
+supply dates and times; `units` vectors carry time quantities; ordinary
+factors carry labels; and data frames hold observations or membership
+tables. A scheme summary uses the supporting `summary_age_scheme` class
+for readable printing. These support the four roles above without
+replacing them.
+
+For detailed assignment operations, see [Age groups: assignments with
+interval definitions](age-groups.html). For overlapping classifications,
+provenance, and editing definitions, see [Reusable age
+schemes](age-schemes.html). For individual arithmetic tasks, see [Age
+arithmetic and classification examples](age_math_examples.html). The
+help topics `?age`, `?age_interval`, `?age_group`, and `?age_scheme`
+provide their full construction and behavior contracts.
