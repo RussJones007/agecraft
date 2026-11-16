@@ -12,21 +12,31 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-Sometimes a whole-number age is all you need. For example, a report might
-ask only for completed years at enrollment. Other analyses need more: distinguishing
-a newborn from an older infant, carrying units through a workflow, or applying
-the same named groups consistently across several tables.
+Age is commonly expressed in whole numbers. For example, we might describe a person as 20 years old, while an infant's
+age is more often expressed in months or weeks. More generally, age represents the elapsed time between a starting
+point, such as birth, and a particular event. That event might be the onset of puberty, graduation from high school, a
+first office visit, or the onset of an illness.
 
-agecraft provides two complementary S3 classes for these tasks:
+Age is an important characteristic in many types of analysis. Although we often work with individual ages, we also
+frequently organize them into defined intervals or groups to summarize data, compare populations, and examine patterns
+across different stages of life.
 
-| Class | What one element represents | Example |
-|:--|:--|:--|
-| `age` | A numeric age in a specified unit | 2.75 years |
-| `age_interval` | A right-open interval in a specified unit | From 1 up to 3 years |
+The **agecraft** package provides four S3 classes for representing ages and organizing them for analysis:
 
-Both classes use the vctrs framework to support vector operations. `age_interval`
-also builds on the ivs interval framework. You can use them as columns in an
-ordinary data frame without learning their internal implementation.
+- **`age`** — Represents individual ages, expressed in units such as years, months, weeks, or days.
+- **`age_interval`** — Represents a collection of defined age intervals used to classify observations. Each interval 
+specifies a range of ages, and together the intervals establish the boundaries used to organize ages into groups. 
+- **`age_scheme`** — Contains a collection of age intervals together with information about their source,
+provenance, and intended use. This allows established age-grouping schemes to be documented, shared, and applied
+consistently across analyses.
+- **`age_group`** — Represents the classified age groups assigned to observations after their ages have been placed into 
+the defined intervals. The resulting values identify the age group to which each observation belongs.
+
+Together, these classes provide a structured approach to working with ages, from representing individual observations
+and defining age intervals to classifying ages and applying documented age-grouping schemes. Sometimes a whole-number
+age is all you need. For example, a report might ask only for completed years at enrollment. Other analyses need more:
+distinguishing a newborn from an older infant, carrying units through a workflow, or applying the same named groups
+consistently across several tables.
 
 ## One sample data frame
 
@@ -44,9 +54,6 @@ visits <- data.frame(
 visits
 ```
 
-These fixed dates make the examples reproducible. Keep the original dates when
-you can: they let you recalculate ages in another unit without approximating a
-conversion from years or months.
 
 ## The age class
 
@@ -76,7 +83,7 @@ attr(visits$age_years, "unit")
 ```
 
 The two columns may look similar when printed, but only `age_years` retains
-fractions and its unit. Missing birth dates produce missing ages without
+fractions and its time unit. Notice that th observation with a  missing birth date produced a missing age without
 removing the corresponding row.
 
 ### Stored values versus displayed values

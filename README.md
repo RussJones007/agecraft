@@ -1,6 +1,4 @@
-# agecraft
-
-Calculate ages, keep their units and precision, and turn them into useful named categories. **agecraft** brings these common steps together for public health, education, population research, and other work with age data.
+# agecraft <img src="man/figures/agecraft_archtect_lifestage.png" alt="agecraft logo" align="right" height="140"/>
 
 <!-- badges: start -->
 
@@ -9,6 +7,8 @@ agecraft <img src="man/figures/agecraft_archtect_blue.png" alt="agecraft logo" a
 ![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)
 
 <!-- badges: end -->
+
+Calculate ages, keep their units and precision, and turn them into useful named categories. **agecraft** brings these common steps together for public health, education, population research, and other work with age data.
 
 The package provides:
 
