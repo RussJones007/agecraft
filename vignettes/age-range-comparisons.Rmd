@@ -1,8 +1,8 @@
 ---
-title: "Compare age ranges across records, surveys, and studies"
+title: "Comparing age intervals"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Compare age ranges across records, surveys, and studies}
+  %\VignetteIndexEntry{Comparing age intervals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,100 +12,201 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-Bounds may be nonnegative whole numbers or fractions; fractional bounds are
-preserved without rounding. Only upper bounds may be infinite. An interval
-`[1,5)` includes 1 and excludes 5, and prints `1-4`; fractional bounds use
-explicit right-open notation such as `[0, 0.5)`. Units describe the age
-coordinates. Missing ranges have both bounds missing.
+Age information is not always available as an exact value. A historical record
+may place someone within a range of ages, while a survey or published report may
+summarize people using age groups. When those ranges differ, we need to
+understand how they relate before comparing or combining the information.
 
-## Genealogy: reconcile records at the same reference date
+Age interval comparisons help identify ages shared by two ranges, determine
+whether records are consistent, and show how one set of reporting groups
+overlaps another. They can also distinguish a definite category assignment from
+a possible one, identify gaps in coverage, and describe the possible age
+difference between people whose exact ages are unknown.
 
-Suppose two records imply that a person was aged `[20,25)` and `[23,28)` years
-on January 1, 1900. These bounds must already refer to that shared date. The
-package does not infer a birth-date range or advance a record's age to another
-date automatically.
+This vignette uses examples from historical records, surveys, and published
+studies to demonstrate these comparisons. The examples show both what the
+comparisons establish and what remains uncertain. In particular, overlapping
+age groups reveal shared coverage; they do not tell us how to divide a group's
+population count among narrower groups. All reporting bands here are
+illustrative.
+
+We use agecraft's usual completed-age labels throughout. For example, `20-24`
+means ages beginning at the twentieth birthday and ending just before the
+twenty-fifth, including fractional ages such as 24.8 years. In code that supplies
+paired boundaries, this range is constructed with a start of 20 and an end of
+25. All comparisons below use years, and comparisons between people or records
+assume that their ages refer to the same date.
+
+## Find the ages shared by two records
+
+Suppose two historical records place someone in the age ranges `20-24` and
+`23-27` on January 1, 1900. Comparing them identifies the ages consistent with
+both records. The shared range is called their **intersection**.
 
 ```{r genealogy}
 record_a <- age_interval(20, 25, unit = "year")
 record_b <- age_interval(23, 28, unit = "year")
-compare_age_intervals(record_a, record_b) # [23,25), printed 23-24
-contradiction <- compare_age_intervals(record_a, age_interval(30, 35, unit = "year"),
-                                    keep_empty = TRUE)
-contradiction # status empty, missing intersection bounds
+compare_age_intervals(record_a, record_b)
 ```
 
-An empty intersection indicates contradictory ranges under these assumptions.
-A `missing` status instead indicates unavailable evidence. The default crosswalk
-omits both empty and missing pairs; `keep_empty = TRUE` distinguishes them.
+The intersection is `23-24`. This narrows the possible age, but does not establish
+an exact age within that range. Both records must already refer to the same
+date: agecraft does not automatically adjust an age range from one record date
+to another or infer a birth-date range.
 
-For relatives whose possible ages are `[20,25)` and `[40,45)` at the same date,
-the second person's age minus the first's is strictly between 15 and 25 years.
-Those are exclusive bounds on real-valued ages, not completed-age differences.
+A third record gives an age range of `30-34`. This shares no ages with `20-24`,
+so the records are inconsistent under the shared-date assumption.
 
-```{r genealogy-gap}
-compare_age_intervals(record_a, age_interval(40, 45, unit = "year"), "age_gap")
+```{r conflicting-records}
+record_c <- age_interval(30, 35, unit = "year")
+compare_age_intervals(record_a, record_c, keep_empty = TRUE)
 ```
 
-## Sociology: compare survey definitions and uncertain assignment
+The `empty` status means that the available ranges have no overlap. A `missing`
+status instead means that the evidence needed for comparison is unavailable.
+By default, comparisons omit both empty and missing pairs; `keep_empty = TRUE`
+keeps them so you can distinguish these cases. A missing interval has both its
+start and end missing.
 
-Survey A uses `[0,18)` and `[18,65)` years; survey B uses `[0,5)`, `[5,25)`,
-and `[25,65)`. The expected nonempty crosswalk contains `[0,5)`, `[5,18)`,
-`[18,25)`, and `[25,65)`, retaining the source row identifiers and labels.
+## Compare different reporting groups
+
+The same comparison can connect whole sets of reporting groups. Suppose Survey A
+reports ages as `0-17` and `18-64`, while Survey B uses `0-4`, `5-24`, and
+`25-64`. Comparing the definitions produces a **crosswalk**: a table identifying
+the shared ages for each overlapping pair of source groups.
 
 ```{r surveys}
-a <- age_interval(c(0, 18), c(18, 65), unit = "year")
-b <- age_interval(c(0, 5, 25), c(5, 25, 65), unit = "year")
-compare_age_intervals(a, b)
+survey_a <- age_interval(c(0, 18), c(18, 65), unit = "year")
+survey_b <- age_interval(c(0, 5, 25), c(5, 25, 65), unit = "year")
+compare_age_intervals(survey_a, survey_b)
 ```
 
-A reported age range `[17,19)` crosses A's boundary at 18: neither assignment
-is definite, while both are possible. Definite membership means containment;
-possible membership means nonempty overlap. Touching endpoints do not overlap.
+The shared ranges are `0-4`, `5-17`, `18-24`, and `25-64`. Each row retains the
+source-group identifiers and labels, so you can see which two groups produced
+that overlap. Crosswalks are the default operation of `compare_age_intervals()`;
+you can also request them explicitly with `operation = "crosswalk"`.
+
+The groups `0-17` and `18-64` meet at the eighteenth birthday but do not overlap.
+Exactly 18 belongs to the second group. This boundary rule avoids assigning an
+observation to both groups merely because the groups are adjacent.
+
+## Distinguish definite and possible membership
+
+Now suppose an observation gives only an age range of `17-18`. That range
+crosses Survey A's boundary at the eighteenth birthday. The person could belong
+to either category, but neither assignment is certain.
+
+**Definite membership** requires the entire reported range to fit within a
+category. **Possible membership** requires only some overlap.
 
 ```{r uncertain-membership}
 reported <- age_interval(17, 19, unit = "year")
-compare_age_intervals(reported, a, "membership")
-compare_age_intervals(reported, a, "membership", membership = "possible")
-# Request ambiguous = "warn" or "error" to flag multiple possible matches.
-categorize_age(reported, by = a, output = "interval") # Missing assignment
+compare_age_intervals(reported, survey_a, operation = "membership")
+compare_age_intervals(reported, survey_a, operation = "membership",
+                      membership = "possible")
 ```
 
-Age bands are not birth cohorts. A birth cohort requires a reference date and
-calendar assumptions; labelling a band alone does not establish cohort membership.
+Neither group definitely contains the reported range, while both are possible
+matches. If multiple possible matches require attention in your analysis, use
+`ambiguous = "warn"` or `ambiguous = "error"` with possible-membership comparisons.
 
-## Economics: study coverage and household age gaps
+Classification into one category requires a definite match for an interval-valued
+observation. The same reported range therefore receives a missing assignment:
 
-A study defines working age as `[18,65)` years. Published data use `[15,25)`,
-`[25,55)`, and `[55,75)`. Intersections are `[18,25)`, `[25,55)`, and `[55,65)`.
-The crosswalk does not determine what share of a published band's count belongs
-to the study: that requires finer observations or explicit allocation assumptions.
+```{r uncertain-classification}
+categorize_age(reported, by = survey_a, output = "interval")
+```
 
-```{r economics}
+That result reflects insufficient precision for these categories, rather than
+an absent age report. Also, an age group alone does not identify a birth cohort:
+cohort membership requires a reference date and calendar assumptions.
+
+## Check which ages a study covers
+
+Suppose a study includes ages `18-64`, while published data use `15-24`,
+`25-54`, and `55-74`. A crosswalk identifies the parts of the published groups
+that fall within the study's intended ages.
+
+```{r study-coverage}
 study <- age_interval(18, 65, unit = "year")
 published <- age_interval(c(15, 25, 55), c(25, 55, 75), unit = "year")
 compare_age_intervals(study, published)
-# Excluding [25,55) leaves disjoint [18,25) and [55,65) coverage:
-compare_age_intervals(study, published[2], "difference")
-compare_age_intervals(study, operation = "width") # 47 years of age coordinates
 ```
 
-Household ages `[30,35)` and `[32,37)` measured at a common survey date permit
-a second-minus-first age gap strictly between -3 and 7 years. The order is
-unresolved because the ranges overlap. Missing evidence yields missing bounds.
+The shared ranges are `18-24`, `25-54`, and `55-64`. These comparisons identify
+relevant coverage, but they cannot determine how many people in the published
+`15-24` group are aged `18-24`. That requires more detailed data or an explicit
+allocation assumption.
+
+To examine the study ages left after excluding the middle published group,
+request a **difference**:
+
+```{r study-difference}
+compare_age_intervals(study, published[2], operation = "difference")
+compare_age_intervals(study, operation = "width")
+```
+
+Removing ages `25-54` leaves two separate ranges, `18-24` and `55-64`, with a
+gap between them. The width of the original study interval is 47 years: the
+upper boundary of 65 minus the lower boundary of 18. This measures the span of
+the age range, rather than a population count or an exact elapsed-day duration.
+
+## Describe possible age differences
+
+Uncertain ages also limit what we can say about differences between people.
+If one person is aged `20-24` and another is aged `40-44` on the same date,
+the second person is more than 15 but less than 25 years older.
+
+```{r genealogy-gap}
+older_relative <- age_interval(40, 45, unit = "year")
+compare_age_intervals(record_a, older_relative, operation = "age_gap")
+```
+
+The returned limits describe the second person's age minus the first person's
+age. Neither limit is attainable: the first person's age is below 25 and the
+second person's age is below 45. These are differences between possible
+fractional ages, rather than differences between the printed whole-year labels.
+
+Overlapping ranges can leave even the order uncertain. Suppose two household
+members have reported ages of `30-34` and `32-36` at a common survey date:
 
 ```{r household}
 person_a <- age_interval(c(30, NA), c(35, NA), unit = "year")
 person_b <- age_interval(32, 37, unit = "year")
-compare_age_intervals(person_a, person_b, "age_gap")
-compare_age_intervals(person_a, person_b, "ordering")
+compare_age_intervals(person_a, person_b, operation = "age_gap")
+compare_age_intervals(person_a, person_b, operation = "ordering")
 ```
 
-## Set coverage versus crosswalks
+For the present pair, the second-minus-first difference is more than -3 and
+less than 7 years. A negative difference means the second person is younger;
+a positive difference means they are older. Because both are possible, the
+ranges do not establish which person is older. The additional missing range in
+`person_a` illustrates unavailable evidence, which yields missing gap bounds.
 
-`operation = "intersection"`, `"union"`, and `"difference"` operate on overall
-coverage using ivs set semantics; they can merge adjacent source groups and
-preserve gaps. Use `"crosswalk"` when the source-group identities matter.
-Comparisons require matching units, including on empty vectors. Convert inputs
-explicitly before comparison. Calendar shifting and automatic conversion of
-record ages to a shared date are intentionally deferred until their reference-date
-semantics are specified.
+## Choose between group comparisons and overall coverage
+
+Use a crosswalk when you need to know how individual source groups relate.
+Use `operation = "intersection"`, `"union"`, or `"difference"` when your question
+concerns the combined ages covered, regardless of the original group boundaries.
+An intersection keeps shared ages, a union includes ages covered by either
+input, and a difference keeps ages in the first input that are outside the second.
+
+```{r combined-coverage}
+compare_age_intervals(survey_a, survey_b, operation = "intersection")
+```
+
+Both surveys cover ages `0-64`, so their overall intersection is one range,
+`0-64`. The crosswalk earlier retained four shared ranges because it kept their
+source-group identities. Overall coverage operations can merge adjacent ranges
+while preserving genuine gaps.
+
+Comparisons require matching units; they do not automatically convert one
+input to the other's unit. Bounds can include fractions without rounding, and
+an infinite upper bound represents an open-ended range. Fractional ranges may
+print in mathematical notation when a completed-age label would be misleading.
+The lower boundary is included and the upper boundary excluded in every case.
+
+Choose the comparison according to the conclusion you need: shared ages,
+possible membership, remaining coverage, or limits on an age difference. Keep
+the source definitions and reference dates with the results so those conclusions
+can be interpreted in their original context.
