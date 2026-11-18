@@ -3,4 +3,4 @@
 
 document()
 source_pkg <- build(vignettes = TRUE, binary = FALSE)
-binary_pkg <- build(pkg = src_pkg, binary = TRUE)
+binary_pkg <- build(pkg = source_pkg, binary = TRUE)
