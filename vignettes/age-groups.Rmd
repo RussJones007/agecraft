@@ -12,94 +12,220 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-An `age_interval` defines intervals; an `age_group` stores assignments to those
-intervals. An `age_scheme` adds identity and provenance to a definition. Category
-vectors retain neither original exact ages nor scheme provenance.
+Assigning ages to reporting bands creates categories that you can count, compare,
+and carry into an analysis. To interpret those categories correctly, you also
+need to know the boundaries behind their labels. A label such as “5 through 9”
+is useful for display, but the interval definition establishes exactly which
+ages belong.
 
-## Readable labels and retrievable bounds
+In Agecraft, an `age_interval` defines the bands, and an `age_group` stores each
+observation's assignment together with those definitions. This vignette follows
+a small set of observations through classification, subsetting, relabeling, and
+combination. Along the way, you will see how interval boundaries determine
+membership, why unused categories remain after subsetting, and what makes two
+sets of assignments compatible.
 
-```{r}
-groups <- age_interval(breaks = c(0, 5, 10, Inf), sep = " to ")
-categories <- categorize_age(c(2, 5, 8, NA), by = groups)
-categories
-class(categories)
-group_intervals(categories)
+By the end, you should be able to work with assigned age groups while keeping
+their labels and definitions aligned, and recognize when a change requires
+classification again from the original ages. Assignments do not retain the
+original exact ages or the provenance of an age scheme, so keep that information
+separately when your analysis needs it.
+
+## Assign observations to age bands
+
+Suppose you need counts by age band for a small set of records. Each row below
+represents one synthetic observation with an identifier and an age in years.
+These bands are illustrative reporting choices, not an external standard.
+
+```{r observations}
+records <- data.frame(
+  id = paste0("A", 1:5),
+  age = age(c(2, 5, 8, 12, NA), unit = "year")
+)
+bands <- age_interval(breaks = c(0, 5, 10, Inf), unit = "year")
+records$group <- categorize_age(records$age, by = bands)
+records
 ```
 
-These are ordered factors with integer category codes. Codes are identifiers,
-not numerical ages. Bounds retain their half-open meaning: age 5 belongs to
-`[5, 10)`. Optional group names supply labels instead of formatted intervals.
+Each assignment corresponds to the age in the same row. Keeping both columns
+lets you check the assignment and classify the observations again if the bands
+change. The missing age in record A5 has a missing assignment.
 
-`breaks` uses consecutive cut points, so four boundaries define three intervals.
-The final `Inf` includes all ages from 10 onward. A finite final boundary stays
-exclusive: `age_interval(breaks = c(0, 5, 10))` defines only `[0, 5)` and `[5, 10)`.
-You can pass the same cuts directly to `categorize_age(ages, by = cuts)`.
-For gaps or overlaps, supply paired `start` and `end` vectors instead.
+## Inspect labels and their boundaries
 
-## Subsets keep unused categories
-
-```{r}
-subset <- categories[1]
-levels(subset)
-group_intervals(subset)
-group_intervals(droplevels(subset))
+```{r definitions}
+class(records$group)
+group_intervals(records$group)
 ```
 
-`droplevels()` removes unused levels and their intervals together. Missing ages
-and ages outside the definition both produce `NA`; missingness is not a level.
+An `age_group` is an ordered factor with one interval definition per level.
+Its integer codes identify categories; they are not numerical ages. The levels
+follow chronological interval order.
 
-## Safe relabeling and combination
+The first band is `[0, 5)` and the second is `[5, 10)`: a lower bound is included
+and an upper bound is excluded. Record A2, aged exactly 5 years, therefore
+belongs to the second band. The final `Inf` extends the third band from age 10
+onward. For more on constructing bands, see `help("age_interval")`.
 
-```{r}
-renamed <- categories
+Missing assignments can also mean that the chosen bands do not cover an
+observed age. To see the difference, temporarily restrict coverage to ages
+below 10:
+
+```{r incomplete-coverage}
+under_ten <- age_interval(breaks = c(0, 5, 10), unit = "year")
+data.frame(
+  id = records$id,
+  age = records$age,
+  group = categorize_age(records$age, by = under_ten)
+)
+```
+
+A4 has an observed age of 12 and falls outside this definition; A5 has no
+observed age. Both assignments are `NA`, so the assigned groups alone cannot
+distinguish these causes. Missingness is not a category level.
+
+## Subset records and retain reporting categories
+
+Return to the original three bands. If a report includes only the first three
+records, no observation is in the oldest band:
+
+```{r subset-records}
+selected <- records[1:3, ]
+table(selected$group)
+group_intervals(selected$group)
+```
+
+The oldest band remains in the definition and appears with a count of zero.
+Retaining unused categories lets reports for different subsets use the same
+bands, even when some bands have no observations.
+
+If you want only the categories observed in this subset, drop the unused levels
+explicitly:
+
+```{r drop-unused}
+observed_groups <- droplevels(selected$group)
+levels(observed_groups)
+group_intervals(observed_groups)
+```
+
+`droplevels()` removes unused levels and their interval definitions together.
+Use it when the reduced set is useful, remembering that it changes the categories
+available for subsequent reporting and combination.
+
+## Relabel categories without changing membership
+
+The original assignments can use descriptive labels while retaining their
+boundaries:
+
+```{r relabel}
+renamed <- records$group
 levels(renamed) <- c("Under 5", "5 through 9", "10 and older")
+renamed
+names(group_intervals(renamed))
 group_intervals(renamed)
-combined <- c(categories, categories[1])
-combined
-vctrs::vec_rbind(data.frame(category = categories),
-                data.frame(category = categories[1]))
 ```
 
-Combining requires matching chronological bounds, labels and definition units.
-Labels alone cannot establish compatibility. Conflicting cosmetic symbols
-normalize to package defaults. Relabeling updates interval names without changing
-bounds; duplicate labels and level reordering are rejected. Merging or changing
-boundaries requires explicit reconstruction, usually from original ages.
+The interval names follow the new labels, but the bounds and each observation's
+membership stay the same. Labels must be unique and nonblank; implicit merging
+and level reordering are rejected. Changing a label does not change a boundary.
+To use different boundaries, define new intervals and classify `records$age`
+again. The original ages are needed because assignments do not preserve the
+position of an observation within its band.
 
-Use `vctrs::vec_rbind()` for binding. Base `rbind.data.frame()` reconstructs
-factor columns and can discard the subclass and definitions. Base concatenation
-can also discard subclasses when an ordinary factor is the first argument;
-convert all inputs explicitly when mixing representations.
+## Combine batches with compatible definitions
 
-## Ordinary factors and unit metadata
+Suppose two more observations arrive. Classify them using the same definition
+before combining the batches:
 
-```{r}
-ordinary <- generics::as.factor(categories)
-class(ordinary)
-is.null(attr(ordinary, "intervals"))
+```{r combine-batches}
+new_records <- data.frame(
+  id = c("B1", "B2"),
+  age = age(c(4, 10), unit = "year")
+)
+new_records$group <- categorize_age(new_records$age, by = bands)
+all_records <- vctrs::vec_rbind(records, new_records)
+all_records
+table(all_records$group, useNA = "ifany")
 ```
 
-`generics::as.ordered()` similarly produces an ordinary ordered factor. Base
-`as.factor()` and `as.ordered()` return existing factor subclasses unchanged.
-For custom plot ordering, convert to an ordinary factor first.
+The combined counts include both batches and show the missing assignment
+separately. Combining groups requires matching chronological bounds, labels,
+and definition units. Identical labels alone do not establish compatibility.
+For example, the relabeled vector above cannot be combined directly with the
+original assignments, and the definition reduced by `droplevels()` no longer
+matches the full definition.
 
-```{r}
-weekly <- age_interval(breaks = c(0, 1, Inf), unit = "week")
-result <- categorize_age(age(c(3, 8), unit = "day"), by = weekly)
-group_intervals(result)
-attr(result, "units")
+Use `vctrs::vec_rbind()` to bind records while preserving their group definitions.
+Base `rbind.data.frame()` can reconstruct factor columns and discard the
+subclass and definitions. To concatenate group vectors alone, use
+`c(records$group, new_records$group)` with compatible definitions.
+
+## Convert to ordinary factors when needed
+
+Some display tasks require a different category order. Convert a copy to an
+ordinary factor before changing its levels:
+
+```{r ordinary-factor}
+plot_groups <- generics::as.factor(all_records$group)
+plot_groups <- factor(plot_groups, levels = rev(levels(plot_groups)))
+levels(plot_groups)
+class(plot_groups)
 ```
 
-The intervals use weeks. The legacy `units` attribute records the original
-observation unit, days. Combining categories with different observation units
-drops that attribute; definition units must still match. Unitless groups inherit
-observation units. `output = "interval"` continues to return matched intervals
-per observation, while `age_cat_iv()` retains its existing output behavior.
+This copy no longer carries interval definitions. Keep `all_records$group` for
+operations that need the mapping between labels and bounds.
+`generics::as.ordered()` also removes the group metadata, producing an ordinary
+ordered factor. Base `as.factor()` and `as.ordered()` return existing factor
+subclasses unchanged; use the explicit `generics` conversions when you need to
+remove the subclass. Convert all inputs explicitly before combining groups with
+ordinary factors or character vectors.
 
-## Saved objects from earlier versions
+## Understand the units of the definition
 
-`age_group` represents assigned categories. Older versions used that name for
-interval records. Do not pass those records to group methods: rebuild their
-bounds with `age_interval()` first. Saved `age_category` assignments also need
-reconstruction using `age_group(labels, intervals)`; changing a class attribute
-alone does not validate the definitions or factor codes.
+The reporting bands above and their observations both use years. When the units
+differ, classification can convert the observations to the definition's unit.
+For example, a separate infant report might use weeks for ages recorded in days:
+
+```{r definition-units}
+weekly_bands <- age_interval(breaks = c(0, 1, Inf), unit = "week")
+infant_groups <- categorize_age(age(c(3, 8), unit = "day"), by = weekly_bands)
+infant_groups
+group_intervals(infant_groups)
+```
+
+Three days falls below one week; eight days falls in the second interval,
+`[1, Inf)` weeks. The retrieved definitions use weeks. When definition units are
+unspecified, they inherit the observation unit. Explicit units make the intended
+scale clear when a definition is reused.
+
+Day-to-week conversion uses elapsed-time units. Conversions involving calendar
+months or years require `allow_approx = TRUE`; for exact calendar classification,
+calculate ages from the original dates in the definition's unit. See
+`help("categorize_age")` for conversion controls and output choices.
+
+The legacy `units` attribute on an assignment records the original observation
+unit, which is days in this example. It does not identify the unit of the
+boundaries. Combining compatible groups with different observation units drops
+that attribute; the definition units must still match.
+
+## Reconstruct saved objects from earlier versions
+
+Older versions used `age_group` for interval records. Rebuild those definitions
+with `age_interval()` before using them. Saved `age_category` assignments need
+reconstruction with `age_group(labels, intervals)` using their labels and rebuilt
+interval definitions. Changing a class attribute alone does not validate an
+object. See the [class naming migration guide](https://github.com/RussJones007/agecraft/blob/main/docs/age_class_naming_migration.md)
+for reconstruction examples.
+
+## Carry definitions forward
+
+The examples retained the meaning of the reporting bands through subsetting,
+relabeling, and combination. Keep the original ages for reclassification and
+retain a scheme separately when its identity and provenance matter. Assigned
+groups provide counts for the observed records; rates also require compatible
+population denominators.
+
+For a broader view of the representations, see [Understanding ages, intervals, groups, and schemes](classes.html).
+To attach purpose and provenance to reusable definitions, continue with
+[Creating and using reusable age schemes](age-schemes.html). The full assignment
+interface is documented in `help("age_group")` and `help("categorize_age")`.
