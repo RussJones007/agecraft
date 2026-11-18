@@ -32,7 +32,7 @@ displaying completed whole years. Use `as.numeric(age)` to extract the
 fractions or `as.integer(age)` for completed years. Request
 `output = "numeric"` for plain completed ages or `output = "units"` for
 the previous completed-age units output. Fractional years measure the
-fraction of civil days between consecutive birthdays. Reversed dates
+fraction of calendar days between consecutive birthdays. Reversed dates
 raise an error. Missing observations remain missing. Months use calendar
 anniversaries, including the last day of short months; elapsed-day
 conversion with the units package is an approximation of calendar months

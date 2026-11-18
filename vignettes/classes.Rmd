@@ -25,10 +25,11 @@ frequently organize them into defined intervals or groups to summarize data, com
 across different stages of life.
 
 The agecraft package provides four S3 classes for representing ages and organizing them for analysis:
+
 - age — Represents individual ages, expressed in units such as years, months, weeks, or days.
 - age_interval — Represents a collection of defined age intervals used to classify observations. Each interval specifies 
 a range of ages, and together the intervals establish the boundaries used to organize ages into groups.
-- age_scheme — Contains a collection of age intervals together with information about their source, provenance, and 
+- age_scheme — Contains an age_interval together with information about their source, provenance, and 
 intended use. This allows established age-grouping schemes to be documented, shared, and applied consistently across 
 analyses.
 - age_group — Represents the classified age groups assigned to observations after their ages have been placed into the 
@@ -65,6 +66,7 @@ values are allowed and denoted with the usual R `<NA>`.
 visits$age <- calculate_age(visits$birth_date, visits$visit_date, unit = "year")
 visits[c("id", "age")]
 is_age(visits$age)
+
 ```
 
 
@@ -76,7 +78,8 @@ although their stored ages differ. You can display those fractions or extract
 the values explicitly:
 
 ```{r inspect-ages}
-# Default display: completed whole units.
+# Default display: completed whole units.  
+# Note that the class name `age`,  unit 'year', and the length  are shown above the values.
 visits$age
 
 # Display fractional values without changing the age vector.
@@ -148,8 +151,6 @@ If ages are already available as numbers, give them their known unit:
 ```{r construct-age}
 known_ages <- age(c(0.5, 5, 45), unit = "year")
 known_ages
-visits$age[1:3]
-mean(visits$age, na.rm = TRUE)
 ```
 
 Subsetting, sorting, and supported summaries retain the age class and
@@ -158,10 +159,21 @@ adds one year. Negative results are rejected. Constructing an age from a
 completed-year number cannot recover fractions that were discarded
 earlier.
 
+```{r subsetting-age}
+
+# subset the first three.  The class 'age' is retained
+visits$age[1:3]
+
+# Many math and statistical functions can be used with an age vector.
+mean(visits$age, na.rm = TRUE)
+range(visits$age, na.rm = TRUE)
+
+```
+
+
 Use `as_age()` for explicit unit conversion. Days convert to weeks by a
 fixed ratio. Conversions involving calendar months or years require
-`allow_approx = TRUE`, including month-to-year conversion. Numerical
-conversion does not recover the original dates. When exact day-based
+`allow_approx = TRUE`, including month-to-year conversion. When exact day-based
 classification matters, calculate ages in days directly from those
 dates.
 
