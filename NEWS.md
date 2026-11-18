@@ -1,10 +1,27 @@
-# agecraft 0.1.0.9021
+# agecraft 0.1.0.9022
 
 - Add `age_interval(breaks = cuts)` for adjacent age bands. Each consecutive pair
   defines one right-open interval, with no appended boundary. Include `Inf` for
   an open-ended final band. Existing paired-bound calls and legacy numeric
   `as_age_interval()` conversion remain unchanged. Help, README and vignettes
   introduce the cut-point form and explain the finite-final-cut distinction.
+
+- Add a conceptual guide to age values, interval definitions, assigned groups
+  and schemes, including fractional precision and calendar-age semantics.
+- Add a worked guide to selecting age intervals or schemes for an analysis.
+  Expand interval-comparison examples to explain containment, overlap,
+  crosswalks, coverage and the limits of allocating aggregate counts.
+- Revise vignette titles, examples and explanations for the current class names
+  and cut-point constructor; remove the superseded age-and-age-interval guide.
+- Clarify that `age_interval` is an S3 subclass of `ivs_iv`, and that classification
+  accepts supported `units` objects and performs explicit unit conversion.
+  Describe default classification results as `age_group` ordered factors with
+  definitions available through `group_intervals()`. Give deprecated wrappers
+  accurate return documentation without unsupported output options.
+- Refresh the README, package badges and example script. Expand contributor
+  guidance for class references, connected examples and reader-focused vignettes.
+
+# agecraft 0.1.0.9021
 
 ## Breaking changes: age intervals and assigned groups
 
