@@ -130,28 +130,20 @@ export(scheme_intervals)
 export(valid_age_interval_symbol)
 export(validate_age_scheme)
 importFrom(assertthat,assert_that)
-importFrom(generics,
-  as.factor,
-  as.ordered
-)
-importFrom(ivs,
-  iv,
-  iv_end,
-  iv_start
-)
-importFrom(purrr,
-  attr_getter,
-  compose,
-  pluck
-)
+importFrom(generics,as.factor)
+importFrom(generics,as.ordered)
+importFrom(ivs,iv)
+importFrom(ivs,iv_end)
+importFrom(ivs,iv_start)
+importFrom(purrr,attr_getter)
+importFrom(purrr,compose)
+importFrom(purrr,pluck)
 importFrom(rlang,"%||%")
-importFrom(stringr,
-  regex,
-  str_detect,
-  str_extract,
-  str_replace,
-  str_to_lower,
-  str_trim
-)
+importFrom(stringr,regex)
+importFrom(stringr,str_detect)
+importFrom(stringr,str_extract)
+importFrom(stringr,str_replace)
+importFrom(stringr,str_to_lower)
+importFrom(stringr,str_trim)
 importFrom(utils,toBibtex)
 importFrom(vctrs,field)
