@@ -15,11 +15,11 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-This vignette introduces and discusses the different classes in the package, how they work, what they're made of, when
-you should use them, and what they can do for you ages and age groups. An age, an age range, and an assigned category
-describe different things. An age tells us how old someone is at a particular time. An interval defines a range of
-possible ages. A category records which range an observation belongs to. A scheme gives a reusable set of ranges with
-provenance, an identity, purpose, and rules.
+This vignette introduces the different classes in the package, how they work, information they contain, and when you
+should use them.  An age, an age range, and an assigned category describe different things. An age tells us how old
+someone or something is at a particular time. An age interval defines a range of possible ages. An age group has
+categorized the ages into intervals and records which range an observation belongs to. A scheme gives a reusable set of
+ranges with provenance, an identity, purpose, and rules.
 
 This guide explains the four main classes in agecraft so you can choose
 objects to use in an analysis and understand what information
@@ -28,7 +28,7 @@ each preserves.
 | Class | What it represents | What it contains |
 |:-----------------------|:-----------------------|:-----------------------|
 | `age` | Age values for observations | Fractional numeric values and one time unit (e.g. year, month, week, etc) |
-| `age_interval` | Age range definitions, including category definitions | Lower and upper bounds, one optional time unit, optional names, and display settings |
+| `age_interval` | Age range definitions, including category definitions | Lower and upper bounds, an optional time unit, optional names, and display settings |
 | `age_group` | Age group or category assignments for ages | Ordered-factor codes and labels, with one age interval definition per level |
 | `age_scheme` | A reusable age interval classification definition | Named intervals, identity, purpose, provenance, and validation rules |
 
@@ -53,14 +53,11 @@ visits <- data.frame(
 visits
 ```
 
-The dates remain useful even after calculating ages. They let us
-calculate age directly in another date/time unit when the analysis requires it.
-
 ## The age class: values with a unit
 
-An `age` vector has the numeric ages with fractional precision and unit attached. Each element represents an age value;
-the entire vector shares one unit, such as year or day. Values in the vector are finite and non-negative; missing values
-are allowed and denoted with the usual R `NA`.
+An `age` vector has the numeric ages with fractional precision and a time unit attached. Each element represents an age
+value; the entire vector shares one unit, such as year, week, or day. Values in the vector are non-negative; missing
+values are allowed and denoted with the usual R `<NA>`.
 
 ```{r calculate-ages}
 # add ages to the data frame
@@ -169,19 +166,27 @@ dates.
 
 ## The age_interval class: ranges with boundaries
 
-An `age_interval` vector represents ranges. It can define reporting
-categories or describe uncertain ages when only a range is known. Each
-element contains a lower and upper bound. The vector also carries an
-optional common unit, optional interval names, and settings for
-displaying interval labels.
+An age_interval vector represents age ranges that can be used to group observed ages. You can use it to define reporting
+categories or describe an uncertain age when only a range is known. Each element has a lower and an upper bound. All
+intervals are **left-closed and right-open**: they include the lower bound but exclude the upper bound. An age belongs
+to an interval when:
+
+`lower bound <= age < upper bound`
+
+Mathematically, this is written as [lower, upper). The square bracket means “include this endpoint,” and the parenthesis
+means “exclude this endpoint.”  This is the common understanding  of how we treat age groups.  
+
+For example, the reporting category 1–4 years is represented by [1, 5). It includes ages from the first birthday up to, but not including, the fifth birthday. Ages 1, 3.5, and 4.9 belong to this interval; age 5 does not.
+
+The vector also carries an optional time unit, optional interval names, and settings for displaying interval labels.
+The ability to name an interval can be useful when you want to be more descriptive than just showing the ages.  For
+example, the 0-1 year interval could be named `infant`.
 
 For our visit records, define three illustrative reporting bands:
 
 ```{r define-intervals}
-bands <- age_interval(
-  start = c(0, 1, 5), end = c(1, 5, Inf), unit = "year"
-)
-names(bands) <- c("Under 1", "1 to under 5", "5 and older")
+bands <- age_interval(start = c(0, 1, 5), end = c(1, 5, Inf), unit = "year")
+names(bands) <- c("infant", "1 to under 5", "5 and older")
 bands
 
 data.frame(
@@ -191,39 +196,31 @@ data.frame(
 )
 ```
 
-These boundaries are teaching examples, rather than an official
-reporting standard. An interval includes its lower bound and excludes
-its upper bound: `[1, 5)` includes the first birthday and stops just
-before the fifth. Its completed-age display is `1-4`. Exactly five
-belongs to `[5, Inf)`. Fractional bounds are preserved; only upper
-bounds may be infinite. A missing interval has both bounds missing.
+An interval includes its lower bound and excludes its upper bound: `[1, 5)` includes the first birthday and stops just
+before the fifth. Its completed-age display is `1-4`. Exactly five belongs to `[5, Inf)`. Fractional bounds are
+preserved; only upper bounds may be infinite. A missing interval has both bounds missing.
 
 ### Definitions exist independently of observations
 
-There are three intervals here regardless of how many visit records we
-have. Naming a range makes its meaning readable without changing its
-boundaries. Names do not change interval equality or chronological
-ordering.
+There are three intervals here regardless of how many visit records we have. Naming a range makes its meaning readable
+without changing its boundaries. Names do not change interval equality or chronological ordering.
 
 ```{r select-intervals}
 bands[1:2]
 compare_age_intervals(bands[1:2], operation = "width")
 ```
 
-Widths use the interval's coordinate unit, years here. A width in years
-is not an exact elapsed-day duration. Selection and supported
-concatenation retain names and units; coverage set operations may merge
-or split intervals and therefore discard names.
+Widths use the interval's coordinate unit, years here. A width in years is not an exact elapsed-day duration since a
+year can have 365 or 366 days. Selection and supported concatenation retain names and units; set operations may
+merge or split intervals and therefore discard names.
 
-An interval vector may have gaps or overlaps. Its class alone does not
-promise that every age belongs to exactly one range. A unit of `NULL`
-means the unit is unspecified. For this guide, both observations and
-definitions explicitly use years so their coordinates are directly
-comparable.
+An interval vector may have gaps or overlaps. Its class alone does not promise that every age belongs to exactly one
+range. A unit of `NULL` means the unit is unspecified. For this guide, both the visit observations and the interval
+definitions explicitly use years so their time units are directly comparable.
 
 ## The age_group class: assignments with their definitions
 
-We have age observations and interval definitions. Classifying the
+We have age observations and interval/group definitions. Classifying the
 observations connects them:
 
 ```{r assign-groups}
@@ -237,14 +234,13 @@ The result is an `age_group`, with classes `age_group`, `ordered`, and
 `factor`. Each element is one observation's category assignment. Both
 infants belong to "Under 1"; the child exactly five belongs to "5 and
 older". The missing birth date produces a missing age and assignment. An
-age outside every interval would also receive `NA`; that assignment
-alone does not distinguish the causes.
+age outside every interval would also receive `<NA>`.  So, `<NA>` can be caused by a `<NA>` age   or when an age
+not  covered by one of the defined intervals.
 
 ### What an assignment retains
 
-Like an ordered factor, an `age_group` contains integer category codes
-and readable levels. It also retains one interval definition per level,
-available through `group_intervals()`:
+Like an ordered factor, an `age_group` contains integer category codes and readable levels. It also retains one interval
+definition per level, available through `group_intervals()`:
 
 ```{r inspect-groups}
 levels(visits$group)
@@ -252,14 +248,12 @@ as.integer(visits$group)
 group_intervals(visits$group)
 ```
 
-The codes identify categories; they are not ages. The definitions have
-three elements, while the assignment vector has five, one per visit.
-Category levels follow interval order. The original exact ages and
-scheme provenance are not stored in an `age_group`. Keep the age column
-when later calculations or new boundaries may require it.
+The codes identify categories; they are not ages. The age_interval definitions have three elements, while the
+ages-assignment vector has five, one per visit. Category levels follow interval order. The original exact ages and
+scheme provenance are not stored in an `age_group`. Keep the age column when later calculations or new boundaries may
+require it.
 
-Subsetting preserves unused categories and their definitions. Remove
-them explicitly when a reduced set is wanted:
+Subsetting preserves unused categories and their definitions. Remove them explicitly when a reduced set is wanted:
 
 ```{r subset-groups}
 infants <- visits$group[1:2]
@@ -289,10 +283,20 @@ than factor codes with a shared level definition.
 
 ## The age_scheme class: a reusable definition with context
 
-An interval vector tells us where boundaries fall. A scheme also records
-what the definition is for, how it is identified, and which validation
-rules apply. Use an `age_scheme` when the same definition must be reused
-across reports or retained with its source and purpose.
+Age groups are analytical choices. Their boundaries determine which
+age-related differences remain visible and which are combined into a
+single summary. A useful scheme preserves distinctions relevant to the
+analysis question, supports reliable estimates, and permits the intended comparisons.
+Published boundaries need to be assessed against the available observations
+and population denominators.
+
+An `age_scheme` brings interval definitions together with their origin and
+intended use. Provenance records the source and history, including versions
+and adaptations. Purpose and rationale explain what the scheme is intended
+to describe and why the boundaries were chosen. For a worked comparison
+showing how pooling can conceal infant incidence, see
+[Choosing age groups for an analysis](age_scheme_selection.html).
+Here we follow how the class represents and retains those decisions.
 
 ```{r define-scheme}
 visit_scheme <- age_scheme(
@@ -315,19 +319,65 @@ organization, version, and verification status. Information that is
 unknown can remain unspecified. The scheme does not contain the visit
 records or their assignments.
 
-A scheme contains intervals; it does not inherit from `age_interval`.
+A scheme *contains* an age_interval vector.
 Its intervals supply boundaries, labels, and units, while the scheme
-supplies context and rules. `scheme_intervals()` retrieves the
+supplies context and rules. The `scheme_intervals()` function retrieves the
 definitions, and `summary()` reports coverage and provenance.
+
+### Locate the definition, purpose, and source
+
+The fictional visit scheme above has no external authority. To see how
+source information accompanies published boundaries, use the childhood
+pattern described in CDC's archived epidemiology teaching guidance. This
+is a disease-surveillance pattern.
+
+```{r sourced-childhood-scheme}
+childhood_intervals <- age_interval(
+  c(0, 1, 5, 10, 15, 20), c(1, 5, 10, 15, 20, Inf), unit = "year"
+)
+names(childhood_intervals) <- c("Under 1", "1-4", "5-9", "10-14", "15-19", "20+")
+childhood_scheme <- age_scheme(
+  childhood_intervals,
+  id = "cdc_childhood_teaching", name = "CDC childhood teaching pattern",
+  domain = c(0, Inf), complete = TRUE,
+  purpose = "Retain infant and childhood detail for a teaching analysis",
+  organization = "Centers for Disease Control and Prevention",
+  source = "Principles of Epidemiology, Lesson 5, Section 5 (archived)",
+  reference = paste0("https://archive.cdc.gov/www_cdc_gov/csels/dsepd/",
+                     "ss1978/lesson5/section5.html"),
+  verified = FALSE,
+  notes = "Historical teaching guidance; source edition not recorded."
+)
+as.data.frame(childhood_scheme)
+childhood_scheme$purpose
+childhood_scheme$reference
+```
+
+Each data-frame row describes one interval. Its `start` and `end` columns are in the reported `unit`; the final `Inf`
+denotes the top open-ended group. The `scheme_metadata` attribute carries the scheme's remaining metadata. For routine
+interval operations such as categorizing ages, use the `scheme_intervals()` function to retrive the age_interval vector.
+
+| Concept | Supported representation or inspection |
+| --- | --- |
+| Bounds, endpoint rule, labels, units | `scheme_intervals(x)` gives named, left-closed, right-open intervals; `as.data.frame(x)` displays bounds and units. |
+| Source and edition | `x$organization`, `x$source`, `x$reference`, and `x$version`; unknown information can remain `NULL`. |
+| Intended use and rationale | `x$purpose` and `x$notes`; there is no separate rationale or adaptation field. |
+| Domain and completeness | `x$domain`, `x$complete`, and `summary(x)` describe coverage claims and their checks. |
+| Verification and ancestry | `x$verified` records the caller's claim; `x$derived_from` records ancestry after a tracked substantive edit. |
+| Assigned observations | `categorize_age(ages, by = x)` returns an `age_group`; retain `x` separately for its provenance. |
+
+This example leaves the source edition unspecified and verification false.
+Attribution alone does not certify that the pattern suits a new question.
+A scheme does not store population denominators, assess statistical precision,
+or establish comparability with another report. Record those decisions with
+the analysis. Use `notes` to explain a deliberate adaptation, and consult the
+[schemes guide](age-schemes.html) before editing a sourced definition.
 
 ### Validation expresses the intended classification
 
-A `partition` prohibits overlapping categories. With
-`domain = c(0, Inf)` and `complete = TRUE`, construction also checks
-that these bands cover the declared all-age domain. Completeness is a
-separate property from nonoverlap. A `classification` may permit
-overlapping memberships, and `complete = NA` makes no completeness
-claim.
+A `partition` prohibits overlapping categories. With `domain = c(0, Inf)` and `complete = TRUE`, construction also
+checks that these bands cover the declared all-age domain. Completeness is a separate property from nonoverlap. A
+`classification` may permit overlapping memberships, and `complete = NA` makes no completeness claim.
 
 These checks establish properties of the definition. They do not
 establish that its categories are appropriate for a reporting system or

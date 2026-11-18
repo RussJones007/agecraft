@@ -1,0 +1,246 @@
+---
+title: "Choosing age groups for an analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Choosing age groups for an analysis}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(agecraft)
+```
+
+Age groups are analytical choices. Their boundaries determine which differences
+remain visible and which are combined into a single summary. Choose boundaries
+that preserve distinctions relevant to your question, support reliable estimates,
+and permit the intended comparisons.
+
+This vignette follows one decision: how much childhood detail to retain when
+reporting pertussis incidence. You will compare three schemes, examine what
+pooling conceals, and document a choice. It assumes familiarity with R data
+frames and with age values and intervals; see [Understanding agecraft
+classes](classes.html) for those concepts.
+
+## Start with the question
+
+A scheme suitable for describing a population may be unsuitable for measuring
+vaccination timeliness. Establish the measure and comparison before choosing
+boundaries.
+
+| Task | What should determine the boundaries? |
+| --- | --- |
+| Disease surveillance | Age-related occurrence, exposure, and the reporting question |
+| Vaccination coverage | The age by which receipt is assessed and the eligible cohort |
+| Population description | The demographic structure and detail needed for comparison |
+| Age adjustment | Compatible age-specific rates and standard-population weights |
+
+CDC's archived [surveillance guidance][cdc-surveillance] gives a childhood
+pattern of under 1, 1–4, 5–9, 10–14, 15–19, and 20+. This is historical teaching
+guidance, not a universal current reporting requirement or a vaccination
+schedule. The [CDC pertussis teaching example][cdc-pertussis] illustrates why
+separating infants from ages 1–4 can matter.
+
+## Preserve differences that matter
+
+To examine that consequence, use the following **synthetic data**. Each row is
+one completed year of age in a fictional population during the same one-year
+period. The counts deliberately illustrate higher infant incidence; they are
+not CDC observations or estimates of present-day pertussis risk. Population
+values represent compatible annual population denominators for this example.
+
+```{r teaching-data}
+pertussis <- data.frame(
+  age_year = 0:19,
+  cases = c(40, rep(5, 4), rep(3, 5), rep(4, 5), rep(2, 5)),
+  population = rep(10000, 20)
+)
+pertussis$age <- age(pertussis$age_year, unit = "year")
+```
+
+Here a completed age of zero identifies the under-one interval. The integer
+coordinates are sufficient because all the proposed cutpoints are whole years.
+They would not support splitting infants into month-based groups.
+
+Construct the complete schemes, including their adult and terminal intervals,
+then display only childhood rates. The first follows CDC's childhood pattern;
+the other two use uniform bands ending at 85+ and 90+, respectively. Those
+terminal groups are explicit teaching choices.
+
+```{r define-schemes}
+make_bands <- function(breaks, labels = NULL) {
+  intervals <- age_interval(head(breaks, -1), tail(breaks, -1), unit = "year")
+  if (is.null(labels)) {
+    starts <- head(breaks, -1)
+    ends <- tail(breaks, -1)
+    labels <- ifelse(is.infinite(ends), paste0(starts, "+"),
+                     paste0(starts, "-", ends - 1))
+  }
+  names(intervals) <- labels
+  intervals
+}
+
+childhood <- age_scheme(
+  make_bands(c(0, 1, 5, 10, 15, 20, Inf),
+             c("Under 1", "1-4", "5-9", "10-14", "15-19", "20+")),
+  id = "cdc_childhood_teaching", name = "CDC childhood teaching pattern",
+  domain = c(0, Inf), complete = TRUE,
+  purpose = "Preserve infant and childhood distinctions in a teaching analysis",
+  organization = "Centers for Disease Control and Prevention",
+  source = "Principles of Epidemiology, Lesson 5, Section 5 (archived)",
+  reference = paste0("https://archive.cdc.gov/www_cdc_gov/csels/dsepd/",
+                     "ss1978/lesson5/section5.html"),
+  verified = FALSE,
+  notes = "Historical teaching pattern; source edition not recorded. Not a vaccine schedule."
+)
+five_year <- age_scheme(
+  make_bands(c(seq(0, 85, 5), Inf)),
+  id = "five_year_teaching", name = "Five-year teaching bands",
+  domain = c(0, Inf), complete = TRUE,
+  purpose = "Compare pooling infants with ages 1-4"
+)
+ten_year <- age_scheme(
+  make_bands(c(seq(0, 90, 10), Inf)),
+  id = "ten_year_teaching", name = "Ten-year teaching bands",
+  domain = c(0, Inf), complete = TRUE,
+  purpose = "Compare further pooling of childhood ages"
+)
+schemes <- list("Childhood pattern" = childhood,
+                "Five-year bands" = five_year, "Ten-year bands" = ten_year)
+```
+
+The published pattern is attributed, while `verified = FALSE` avoids claiming
+a verified source edition that has not been recorded. Neither uniform scheme
+is presented as an institutional standard.
+
+For each scheme, assign the same age rows and add their counts and populations.
+This is exact aggregation: every source row falls wholly within one destination
+interval. No population is divided across a boundary.
+
+```{r calculate-rates}
+summarize_rates <- function(scheme) {
+  group <- categorize_age(pertussis$age, by = scheme)
+  totals <- aggregate(pertussis[c("cases", "population")],
+                      by = list(group = group), FUN = sum)
+  totals$rate <- 100000 * totals$cases / totals$population
+  totals
+}
+rates <- lapply(schemes, summarize_rates)
+knitr::kable(do.call(rbind, lapply(names(rates), function(view) {
+  data.frame(view = view, rates[[view]], row.names = NULL)
+})), digits = 1, row.names = FALSE,
+caption = "Synthetic childhood incidence per 100,000 population")
+```
+
+Infant incidence is 400 per 100,000 in these data. Pooling ages 0–4 produces
+120 per 100,000; pooling ages 0–9 produces 75 per 100,000. The observations
+have not changed. The summaries answer progressively broader questions and
+conceal the infant contrast. Actual data need not show this same pattern.
+
+```{r compare-rates, fig.width=8, fig.height=3.5, fig.alt="Three point plots on a common rate scale show the synthetic infant rate of 400 falling to 120 in ages 0-4 and 75 in ages 0-9."}
+old_par <- par(mfrow = c(1, 3), mar = c(5, 4, 3, 1))
+for (view in names(rates)) {
+  result <- rates[[view]]
+  plot(seq_len(nrow(result)), result$rate, xaxt = "n", pch = 19,
+       ylim = c(0, 420), xlab = "Age group (years)",
+       ylab = "Cases per 100,000", main = view)
+  axis(1, at = seq_len(nrow(result)), labels = result$group, las = 2)
+}
+par(old_par)
+```
+
+These points represent interval-specific rates, not a continuous age curve.
+Equally spaced labels do not imply equal interval widths. A common vertical
+scale keeps the comparison visible without using bar areas to represent rates.
+
+The pooled rate is a population-weighted combination of component rates:
+
+\[
+R = 100{,}000\frac{\sum_i C_i}{\sum_i N_i}.
+\]
+
+Do not average rates without their populations. For under 1 and ages 1–4 here,
+the simple mean of 400 and 50 would be 225, whereas their pooled rate is 120.
+
+## Check whether the denominators support the choice
+
+Preserving infant detail requires both infant cases and an infant denominator.
+A population total for ages 0–4 cannot supply separate under-one and 1–4
+populations without further information or an estimation assumption. Match age
+bounds, geography, period, and relevant population characteristics before
+calculating rates. CDC's [surveillance guidance][cdc-surveillance] specifically
+warns against mismatched case and population age categories.
+
+Keep the finest suitable source ages when permitted. Aggregating compatible
+single-year populations to broader groups is possible; recovering single-year
+populations from ten-year totals is not an exact operation. Interval crosswalks
+can identify overlap but do not justify allocating aggregate counts.
+
+## Balance detail against precision
+
+Narrow groups can expose a useful difference while producing uncertain estimates.
+Review counts alongside rates and use confidence intervals appropriate to the
+measure and study design. There is no universal minimum count that makes every
+rate reliable. Zero observed cases also do not establish absence of risk.
+
+This teaching display omits uncertainty to isolate the effect of pooling. In an
+actual report, assess uncertainty before choosing a reporting resolution. You
+might combine periods, retain detail with uncertainty intervals, or combine
+adjacent groups and state the detail lost. Avoid selecting boundaries solely to
+produce a striking contrast.
+
+An infant analysis in months could address vaccination opportunities, but needs
+suitable age precision, denominators, and a separately cited schedule version.
+Coverage achieved by a milestone is a different measure from incidence within
+an age interval. Calculate age in the target calendar unit from the original
+dates where needed; do not assume a fixed number of days per month.
+
+## Preserve the comparisons you need
+
+When comparing reports, check definitions and editions as well as labels.
+[NCI SEER's age-adjustment tutorial][seer] illustrates why: it describes a
+20-group standard ending in 85–89 and 90+, alongside an earlier 19-group
+arrangement ending at 85+. An age-adjusted comparison requires compatible
+age groups, standard-population weights, and methods. A scheme object supplies
+definitions; it does not calculate an age-adjusted rate or establish that its
+weights and denominators are appropriate.
+
+If mandatory reporting bands hide a relevant distinction, consider retaining
+the required summary and providing a supplementary detailed view with its
+limitations stated.
+
+## Make boundaries and rationale explicit
+
+In agecraft, intervals include their lower endpoint and exclude their upper
+endpoint. Ages 1–4 mean `[1, 5)` years, including 4.9; a value exactly 5 belongs
+to the next interval. An open-ended group uses `Inf` as its upper bound.
+
+```{r boundary-example}
+categorize_age(age(c(0.9, 1, 4.9, 5, NA), unit = "year"), by = childhood)
+```
+
+The missing age remains unassigned. All three schemes cover nonnegative finite
+ages, so valid age values have a match. With partial coverage, an unmatched age
+also gives a missing assignment; `classify_age_scheme()` can distinguish missing
+input from unmatched input in its status column.
+
+For this teaching question, retain the childhood pattern because it exposes the
+infant distinction and the synthetic denominators support it. Document that
+rationale alongside the source and any adaptations. Purpose explains why a
+scheme was selected; provenance records where it came from and its history.
+Use `purpose` for the intended analysis and `notes` for rationale, caveats, or
+adaptations that lack a dedicated field.
+
+Before adopting a scheme, record the question, the risk distinctions retained,
+denominator compatibility, uncertainty, intended comparisons, and boundary
+rules. These are analytical decisions; they need not all become class fields.
+Save the scheme with the analysis because classified `age_group` results retain
+interval definitions but do not retain scheme provenance. See the
+[classes vignette](classes.html#the-age_scheme-class-a-reusable-definition-with-context)
+for the storage model and [Reusable age schemes](age-schemes.html) for validation
+and derivative tracking.
+
+[cdc-surveillance]: https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson5/section5.html
+[cdc-pertussis]: https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson1/section6.html
+[seer]: https://seer.cancer.gov/seerstat/tutorials/aarates/definition.html
