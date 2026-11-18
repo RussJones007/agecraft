@@ -117,7 +117,7 @@ with \code{\link[=as_age]{as_age()}} guards approximate conversions involving mo
 Request output = "units" for the previous completed-unit return format, or
 output = "numeric" for completed ages as plain numbers.
 
-Fractional years are completed birthdays plus the fraction of civil days
+Fractional years are completed birthdays plus the fraction of civil (i.e. calendar) days
 between the previous and next birthdays. Leap birthdays reach their next
 year on March 1 in non-leap years. Fractional months analogously use calendar
 month anniversaries, rolling back to the final day of shorter months.
