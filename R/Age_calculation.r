@@ -20,7 +20,7 @@
 #'   Request output = "units" for the previous completed-unit return format, or
 #'   output = "numeric" for completed ages as plain numbers.
 #'
-#'   Fractional years are completed birthdays plus the fraction of civil days
+#'   Fractional years are completed birthdays plus the fraction of civil (i.e. calendar) days
 #'   between the previous and next birthdays. Leap birthdays reach their next
 #'   year on March 1 in non-leap years. Fractional months analogously use calendar
 #'   month anniversaries, rolling back to the final day of shorter months.
@@ -81,7 +81,7 @@ calculate_age <- function(start,
   if (any(end < start, na.rm = TRUE)) {
     stop("end must not precede start when calculating age", call. = FALSE)
   }
-  # Calendar ages use local civil dates in the starting time zone.
+  # Calendar ages use local civil (.e. calendar) dates in the starting time zone.
   civil_start <- as_civil_date(start)
   civil_end <- as_civil_date(end, tz = lubridate::tz(start))
   res <- switch(unit,
