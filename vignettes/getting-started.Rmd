@@ -13,8 +13,8 @@ library(agecraft)
 ```
 
 Calculating ages and putting them into useful groups are everyday tasks in many disciplines, like public health,
-education, economics and population research to name just a few. An age is an interval time between a beginning and
-ending.  For example using a birth date and a later event date. A birth date and an event date look simple enough, but
+education, economics and population research to name just a few. An age is an interval of time between a beginning and
+ending.  For example, using a birth date and a later event date. That sounds simple, but
 birthdays, leap years, time units, and group boundaries can make the details surprisingly fiddly.
 
 **agecraft** brings those steps and fiddly nuances together in a flexible, vector-based framework:
@@ -42,12 +42,12 @@ Its class lets R display **2.75 years** as **2**, with the unit in the class hea
 An `age` vector can:
 
 - Store fractional ages without discarding their precision.
-- Display completed whole units, as people usually report their age.
+- Displays completed whole units, as people usually report their age.
 - Keep one unit, such as year, month, week, or day, for the entire vector.
 - Retain its unit when you select, sort, or combine observations.
 - Supply its stored fractional values when you classify ages into groups.
 
-For a small example, construct an age directly:
+Here is a small example, construct an age directly:
 
 ```{r meet-age}
 example_age <- age(2.75, unit = "year")
@@ -59,7 +59,7 @@ as.integer(example_age)
 The printed age is `2` under a year header, but the stored value is **2.75 years**.
 `as.numeric()` extracts the whole and fractional value; `as.integer()` extracts the
 completed whole units. Printing the age does not round or change its value.
-To display the fractions explicitly, use the format() function:
+To display the fractions explicitly, use the format() function like so:
 
 ```{r show-fractions}
 format(example_age, fractional = TRUE)
@@ -68,7 +68,7 @@ format(example_age, fractional = TRUE)
 ## Calculate ages from dates
 
 Most workflows start with dates rather than numeric ages. `calculate_age()`
-needs a `start`, usually a birth date. Its `end` is the date or time at which
+needs a `start`, like a birth date. Its `end` is the date or time at which
 you want to know the age. R needs these as dates or date-times, rather than
 ordinary text.
 

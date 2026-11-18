@@ -1,8 +1,8 @@
 ---
-title: "Understanding agecraft classes"
+title: "Understanding ages, intervals, groups, and schemes"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Understanding agecraft classes}
+  %\VignetteIndexEntry{Understanding ages, intervals, groups, and schemes}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -15,27 +15,28 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-This vignette introduces the different classes in the package, how they work, information they contain, and when you
-should use them.  An age, an age range, and an assigned category describe different things. An age tells us how old
-someone or something is at a particular time. An age interval defines a range of possible ages. An age group has
-categorized the ages into intervals and records which range an observation belongs to. A scheme gives a reusable set of
-ranges with provenance, an identity, purpose, and rules.
+Age is commonly expressed in whole numbers. For example, we might describe a person as 20 years old, while an infant's
+age is more often expressed in months or weeks. More generally, age represents the elapsed time between a starting
+point, such as birth, and a particular event. That event might be the onset of puberty, graduation from high school, a
+first office visit, or the onset of an illness.
 
-This guide explains the four main classes in agecraft so you can choose
-objects to use in an analysis and understand what information
-each preserves. 
+Age is an important characteristic in many types of analysis. Although we often work with individual ages, we also
+frequently organize them into defined intervals or groups to summarize data, compare populations, and examine patterns
+across different stages of life.
 
-| Class | What it represents | What it contains |
-|:-----------------------|:-----------------------|:-----------------------|
-| `age` | Age values for observations | Fractional numeric values and one time unit (e.g. year, month, week, etc) |
-| `age_interval` | Age range definitions, including category definitions | Lower and upper bounds, an optional time unit, optional names, and display settings |
-| `age_group` | Age group or category assignments for ages | Ordered-factor codes and labels, with one age interval definition per level |
-| `age_scheme` | A reusable age interval classification definition | Named intervals, identity, purpose, provenance, and validation rules |
+The agecraft package provides four S3 classes for representing ages and organizing them for analysis:
+- age — Represents individual ages, expressed in units such as years, months, weeks, or days.
+- age_interval — Represents a collection of defined age intervals used to classify observations. Each interval specifies 
+a range of ages, and together the intervals establish the boundaries used to organize ages into groups.
+- age_scheme — Contains a collection of age intervals together with information about their source, provenance, and 
+intended use. This allows established age-grouping schemes to be documented, shared, and applied consistently across 
+analyses.
+- age_group — Represents the classified age groups assigned to observations after their ages have been placed into the 
+defined intervals. The resulting values identify the age group to which each observation belongs.
 
-These are S3 classes. A class tells R what an object represents and how to handle operations such as printing or
-subsetting. `age` and `age_interval` use the [vctrs](https://vctrs.r-lib.org/) framework for vector behavior;
-`age_interval` builds on [ivs](https://davisvaughan.github.io/ivs/) intervals. `age_group` is an ordered-factor
-subclass. An `age_scheme` is a list-based metadata object containing an interval vector.
+Together, these classes provide a structured approach to working with ages, from representing individual observations 
+and defining age intervals to classifying ages and applying documented age-grouping schemes. 
+
 
 ## Observations to follow through the classes
 
@@ -421,10 +422,7 @@ tables. A scheme summary uses the supporting `summary_age_scheme` class
 for readable printing. These support the four roles above without
 replacing them.
 
-For detailed assignment operations, see [Age groups: assignments with
-interval definitions](age-groups.html). For overlapping classifications,
-provenance, and editing definitions, see [Reusable age
-schemes](age-schemes.html). For individual arithmetic tasks, see [Age
-arithmetic and classification examples](age_math_examples.html). The
+For detailed assignment operations, see [Working with assigned age groups](age-groups.html). For overlapping classifications,
+provenance, and editing definitions, see [Creating and using reusable age schemes](age-schemes.html). For individual arithmetic tasks, see [Calculating, comparing, and grouping ages](age_math_examples.html). The
 help topics `?age`, `?age_interval`, `?age_group`, and `?age_scheme`
 provide their full construction and behavior contracts.

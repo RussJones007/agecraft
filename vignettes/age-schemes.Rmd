@@ -1,8 +1,8 @@
 ---
-title: "Reusable age schemes: partitions and overlapping classifications"
+title: "Creating and using reusable age schemes"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Reusable age schemes: partitions and overlapping classifications}
+  %\VignetteIndexEntry{Creating and using reusable age schemes}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

@@ -61,11 +61,11 @@ For development in the repository, use `devtools::load_all()`.
 | Guide | What it covers |
 |:---|:---|
 | [Getting started](vignettes/getting-started.Rmd) | A beginner workflow: dates, output choices, supplied groups, names, and tables |
-| [Working with age and age_interval](vignettes/age-and-age-interval.Rmd) | Both classes in detail, using one sample data frame throughout |
-| [A public-health age workflow](vignettes/public-health-workflow.Rmd) | Reporting groups, units, and overlapping definitions |
-| [Comparing age ranges](vignettes/age-range-comparisons.Rmd) | Crosswalks, membership, ordering, age gaps, and interval coverage |
+| [Understanding ages, intervals, groups, and schemes](vignettes/classes.Rmd) | The four main classes and how they work together |
+| [An age reporting workflow for public health](vignettes/public-health-workflow.Rmd) | Reporting groups, units, and overlapping definitions |
+| [Comparing age intervals](vignettes/age-range-comparisons.Rmd) | Crosswalks, membership, ordering, age gaps, and interval coverage |
 
-After installing with vignettes, use `vignette("getting-started", package = "agecraft")` or `vignette("age-and-age-group", package = "agecraft")`.
+After installing with vignettes, use `vignette("getting-started", package = "agecraft")` or `vignette("classes", package = "agecraft")`.
 
 ## Calculate ages and choose the return format
 

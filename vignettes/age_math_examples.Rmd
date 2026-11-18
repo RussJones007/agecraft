@@ -1,9 +1,9 @@
 ---
-title: "Age arithmetic and classification examples"
+title: "Calculating, comparing, and grouping ages"
 author: "Russ Jones"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Age arithmetic and classification examples}
+  %\VignetteIndexEntry{Calculating, comparing, and grouping ages}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

@@ -21,33 +21,33 @@ x - 0.25
 x + c(0.5, 1, 2)
 # Ages: 2.75, 6.75, 12.5 years
 
-age(2, "day") + age(12, "hour")
+y <- age(2, "day") + age(12, "hour")
+y
+format(y, fractional = TRUE)
 # 2.5 days
 
 age(12, "hour") + age(2, "day")
 # 60 hours
 
-six_months <- as_age(
-  age(6, "month"),
-  unit = "year",
-  allow_approx = TRUE
-)
+six_months <- as_age(age(6, "month"),unit = "year",allow_approx = TRUE)
+six_months
 
 age(2, "year") + six_months
 # 2.5 years
 
 round(x)          # 2, 6, 10 years: R uses ties-to-even rounding
-round(x, digits = 1)
+round(x, digits = 1) |> format(fractional = TRUE)
 floor(x)          # 2, 5, 10 years
 ceiling(x)        # 3, 6, 11 years
 trunc(x)          # 2, 5, 10 years
-abs(x)            # Unchanged because ages are nonnegative
+abs(x)            # Unchanged because ages are non-negative
 
 mean(x)    # About 6.166667 years
 median(x)  # 5.75 years
 min(x)     # 2.25 years
 max(x)     # 10.5 years
 range(x)   # 2.25 and 10.5 years
+range(x) |> format(fractional = TRUE)   # 2.25 and 10.5 years
 
 y <- age(c(2.5, NA, 7), "year")
 
@@ -70,6 +70,10 @@ groups <- age_interval(
   c(5, 18, Inf),
   unit = "year"
 )
+
+groups
+
+
 
 names(groups) <- c("Under 5", "5 to under 18", "18 and older")
 
