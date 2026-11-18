@@ -200,6 +200,9 @@ valid_age_interval_symbol <- function(x){
 #' @param unit Optional time unit, such as "year" or "day".
 #' @param below,sep,above Display symbols, as in [as_age_interval()].
 #' @details
+#' `age_interval` is an S3 subclass of `ivs_iv`. Classification accepts
+#' supported `units` objects and performs explicit unit conversion.
+#'
 #' With `breaks`, `n` cut points create `n - 1` adjacent intervals. A finite
 #' final cut is the exclusive upper boundary of the final interval; append Inf
 #' for an open-ended group. These rules agree with numeric cut points in

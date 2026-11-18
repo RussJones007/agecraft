@@ -60,7 +60,7 @@ Both forms use `ivs::new_iv()` through the package's validated constructor. The 
 
 ## 5. Classification and comparison — Current
 
-`categorize_age()` accepts numeric cut points, widths, or `age_interval` definitions. It classifies using fractional age values and supports ordered-factor output (default) or matched `age_interval` intervals (`output = "interval"`). Missing or unmatched observations remain missing.
+`categorize_age()` accepts numeric cut points, widths, or `age_interval` definitions. It classifies using fractional age values and returns an `age_group` ordered-factor subclass by default, with level-aligned `age_interval` definitions available through `group_intervals()`, or matched `age_interval` intervals (`output = "interval"`). Missing or unmatched observations remain missing.
 
 - Overlapping matches **error by default**; `multiple = "first"` or `"last"` selects in sorted interval order.
 - Unspecified group units inherit the input ages' unit; unitless ages cannot be matched to explicitly unit-bearing groups without resolution. `convert_units` governs direction/denial of conversion; month/year conversions and approximate calendar-to-finer conversions require explicit permission.

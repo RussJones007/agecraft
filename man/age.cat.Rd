@@ -25,7 +25,8 @@ age.cat(
 \item{.above.char}{Suffix for the open-ended upper group.}
 }
 \value{
-An ordered factor of age groups.
+An \code{age_group} ordered-factor subclass with level-aligned
+\code{age_interval} definitions available through \code{\link[=group_intervals]{group_intervals()}}.
 }
 \description{
 Use \code{\link[=categorize_age]{categorize_age()}} instead. The legacy wrapper emits a deprecation message.

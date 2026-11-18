@@ -42,6 +42,9 @@ age coverage. Each interval includes \code{start} and excludes \code{end}: bound
 1 and 5 describe completed ages 1–4. Gaps and overlaps are allowed.
 }
 \details{
+\code{age_interval} is an S3 subclass of \code{ivs_iv}. Classification accepts
+supported \code{units} objects and performs explicit unit conversion.
+
 With \code{breaks}, \code{n} cut points create \code{n - 1} adjacent intervals. A finite
 final cut is the exclusive upper boundary of the final interval; append Inf
 for an open-ended group. These rules agree with numeric cut points in

@@ -11,7 +11,7 @@
 
 ## 1. Purpose and position in the architecture
 
-`age_interval` is Agecraft's existing **S3 vector class for age intervals**. It builds on `ivs` interval vectors and participates in `vctrs` operations. It represents one or more age ranges with numeric boundaries, an optional common age unit, display symbols, and optional names for individual groups.
+`age_interval` is Agecraft's existing **S3 vector class for age intervals**. It is an S3 subclass of `ivs_iv` and participates in `vctrs` operations. Classification accepts supported `units` objects and performs explicit unit conversion. It represents one or more age ranges with numeric boundaries, an optional common age unit, display symbols, and optional names for individual groups.
 
 It is **not** an age-classification scheme: it does not, by itself, assert a source, reporting purpose, publication date, partition status, or completeness of coverage. The implemented `age_scheme` **contains** an `age_interval` vector and supplies that higher-level information, without subclassing or replacing `age_interval`.
 
@@ -153,7 +153,7 @@ labels <- categorize_age(ages, by = as_age_interval(c(0, 5, 18, 65, Inf)))
 
 Current behavior:
 
-- Default `output = "factor"` returns an **ordered factor**.
+- Default `output = "factor"` returns an `age_group` ordered-factor subclass with level-aligned `age_interval` definitions available through `group_intervals()`.
 - `output = "interval"` returns the matched `age_interval` interval per observation.
 - Unmatched and missing ages produce missing assignments.
 - The default `multiple = "error"` rejects ages that match more than one group.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/Age_calculation.r
 \name{age_cat}
 \alias{age_cat}
-\title{Calculate Age and Age Groups}
+\title{Classify ages into ordered groups (deprecated)}
 \usage{
 age_cat(ages, lower = 0, upper = 70, by = 10, sep = "-", above.char = " +")
 }
@@ -31,67 +31,14 @@ not be inclusive of ages above unless 'Inf' is added e.g., 'c(5, 15, 35, 65, Inf
 \item{above.char}{is the character used for the upper summary group.  It can be '>', '+', 'plus' and 'above'}
 }
 \value{
-For calculate_age(), an age vector by default. With output = "units",
-a completed-age units vector; with output = "numeric", completed ages as doubles.
-
-For \code{categorize_age()}, an \code{\link[=age_group]{age_group()}} ordered factor by default,
-retaining defining intervals through \code{\link[=group_intervals]{group_intervals()}}. Its \code{units}
-attribute records the original observation unit, normalized to a supported
-unit name, when present. It does not specify the category boundaries' units
-or necessarily the internal comparison unit. Factor integer codes identify
-categories, not numerical ages. This attribute is not a complete or durable
-provenance record; ordinary factor operations may discard it. Retain the
-grouping definition or use \code{group_intervals()} for boundaries and units, or request
-\code{output = "interval"} to return matched \code{age_interval} intervals in that
-definition's units. Comparisons use group units with \code{"age_to_group"} and
-observation units with \code{"group_to_age"}; the factor attribute always describes
-the original observations. See the age-schemes vignette for a day/hour example.
+An \code{age_group} ordered-factor subclass with level-aligned
+\code{age_interval} definitions available through \code{\link[=group_intervals]{group_intervals()}}.
+Use \code{\link[=categorize_age]{categorize_age()}} for additional matching controls or interval output.
 }
 \description{
-Functions to calculate age and age groups. The calculate_age() function returns the age from start to
-end dates. The age is calculated in years by default, though other time units can be specified. If the end date is
-chronologically before the start date, an error is raised. The start and end date vectors should be either
-the same length or one vector must have length one for scalar recycling.
-
-The categorize_age() function categorizes ages into age groups as an ordered and labeled factor.
+Classify ages using \code{\link[=categorize_age]{categorize_age()}} with its default
+matching controls and factor output.
 }
 \details{
 This compatibility wrapper warns once per session. Use categorize_age().
-}
-\examples{
- # create 10 random birth dates
- begin <- as.Date("1990-01-01")
- last  <- as.Date("1998-12-31")
-
- set.seed(123)
- birth_days <- seq(begin, last, by = "week") |>
-      sample(size = 10, replace = FALSE)
- birth_days
-
- # Age in years as of Christmas 2025
- age_vec  <- calculate_age(start = birth_days, end = as.Date("2025-12-25"))
- age_vec
-
- # Weeks between July 4th 1959 and 1969
- age_2 <- calculate_age(start = as.Date("1959-07-04"), end = as.Date("1969-07-04"), unit = "week")
- age_2
-
-
- age_2 <- as_age(age_2, "year", allow_approx = TRUE)
- age_2
-
-
-#age_vec <- c(25, 23, 20, 1, 0, 7, 10, 50, 50, 52, 54, 56,34)
-
-#default 10 year age groups
-grp10 <- categorize_age(ages = age_vec)
-grp10
-data.frame(age = age_vec, grp10)
-
-# special age groups with a different age separator
-categorize_age(ages = age_vec,  sep = " to ", by = age_interval_presets$Spec)
-
-}
-\seealso{
-\link{age_interval_presets} for a pre-defined list of age groups that are often used.
 }

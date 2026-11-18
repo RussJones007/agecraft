@@ -189,9 +189,11 @@ explicitly say that the supplied cut points represent years. Choose a
 definition that fits your analysis; the presets are inherited reporting
 conventions, and their names and provenance are documented in the package.
 
-`categorize_age()` returns an **ordered factor**: a vector of category labels
-whose levels follow interval order. You can put it straight into `table()`
-or add it to a data frame.
+`categorize_age()` returns an `age_group` ordered-factor subclass: a vector of
+category labels whose levels follow interval order. Its level-aligned
+`age_interval` definitions are available through `group_intervals()`. With
+`output = "interval"`, it returns one matched `age_interval` per observation.
+You can put the default result straight into `table()` or add it to a data frame.
 
 ## Make and name your own groups
 

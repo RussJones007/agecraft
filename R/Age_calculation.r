@@ -178,7 +178,8 @@ calc_year <- function(start, end){
 #' @param .by Group width or numeric cut points.
 #' @param .sep Separator used in labels.
 #' @param .above.char Suffix for the open-ended upper group.
-#' @return An ordered factor of age groups.
+#' @return An `age_group` ordered-factor subclass with level-aligned
+#'   `age_interval` definitions available through [group_intervals()].
 #' @export
 age.cat <- function(.ages, .lower = 0, .upper=70, .by = 10,
                     .sep = "-", .above.char = " +") {
@@ -367,7 +368,13 @@ age_auto_unit <- function(birth, event, allowed_units = c("day", "month", "year"
 }
 
 
-#' @inherit categorize_age
+#' @inheritParams categorize_age
+#' @title Classify ages into ordered groups (deprecated)
+#' @description Classify ages using [categorize_age()] with its default
+#'   matching controls and factor output.
+#' @return An `age_group` ordered-factor subclass with level-aligned
+#'   `age_interval` definitions available through [group_intervals()].
+#'   Use [categorize_age()] for additional matching controls or interval output.
 #' @details This compatibility wrapper warns once per session. Use categorize_age().
 #' @export
 age_cat <- function(ages, lower = 0, upper=70, by = 10,

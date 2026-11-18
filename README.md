@@ -173,7 +173,7 @@ These are inherited reporting conventions. Their provenance and limitations are 
 
 ## Classification and interval analysis
 
-`categorize_age()` returns an ordered factor by default. Nonblank group names supply its labels; blank or missing names fall back to interval labels. Distinct intervals require unique resulting labels. Levels follow sorted interval order. Unmatched or missing observations return `NA`.
+`categorize_age()` returns an `age_group` ordered-factor subclass by default, with level-aligned `age_interval` definitions available through `group_intervals()`. Nonblank group names supply its labels; blank or missing names fall back to interval labels. Distinct intervals require unique resulting labels. Levels follow sorted interval order. Unmatched or missing observations return `NA`.
 
 To keep one matched interval per observation, including repeats and missing assignments, request interval output:
 
