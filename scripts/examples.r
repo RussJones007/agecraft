@@ -73,8 +73,6 @@ groups <- age_interval(
 
 groups
 
-
-
 names(groups) <- c("Under 5", "5 to under 18", "18 and older")
 
 categorize_age(
@@ -101,11 +99,20 @@ scheme_intervals(scheme)         # Underlying intervals
 as.data.frame(scheme)         # Labels and numerical boundaries
 summary(scheme)               # Coverage and validation summary
 
-list_age_schemes()            # Available built-in schemes
+(scheme_list <- list_age_schemes())        # Available built-in schemes
+
+
+
+schemes_df <- purrr::map(scheme_list$id, ~ get_age_scheme(.x) |> as.data.frame()) |>
+  dplyr::bind_rows()
+
+scheme_list[2]$id
+
 
 a <- age_interval(0, 18, unit = "year")
 b <- age_interval(5, 25, unit = "year")
 
+# intersection, a type of overlap
 compare_age_intervals(a, b, operation = "intersection")
 # [5, 18)
 
