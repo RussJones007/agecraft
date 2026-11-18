@@ -135,11 +135,7 @@ The fractional part is now a fraction of a day. Conversion uses the units packag
 
 ## Define groups with boundaries, units, and names
 
-`age_interval(breaks = cuts, unit = "year")` constructs adjacent right-open
-intervals from strictly increasing nonnegative cut points. Each consecutive pair
-defines one interval; no boundary is appended. Include a final `Inf` for an
-open-ended group. Use `age_interval(start, end, unit)` for paired bounds,
-including gaps or overlaps. Fractional bounds are preserved without rounding; `[0, 0.077)` displays explicitly, while whole-number intervals retain completed-age labels such as `1-4` for `[1, 5)`. One unit applies to every interval in a group vector; `NULL` leaves the unit unspecified. Only upper bounds may be infinite. A scalar `end` is recycled to the length of `start`; starts are not recycled. Missing intervals require both bounds to be missing.
+`age_interval(breaks = cuts, unit = "year")` constructs adjacent right-open intervals from strictly increasing nonnegative cut points. Each consecutive pair defines one interval; no boundary is appended. Include a final `Inf` for an open-ended group. Use `age_interval(start, end, unit)` for paired bounds, including gaps or overlaps. Fractional bounds are preserved without rounding; `[0, 0.077)` displays explicitly, while whole-number intervals retain completed-age labels such as `1-4` for `[1, 5)`. One unit applies to every interval in a group vector; `NULL` leaves the unit unspecified. Only upper bounds may be infinite. A scalar `end` is recycled to the length of `start`; starts are not recycled. Missing intervals require both bounds to be missing.
 
 ``` r
 fine_groups <- age_interval(breaks = c(0, 0.077, 1, 3, 6), unit = "year")
