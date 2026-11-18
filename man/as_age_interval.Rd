@@ -96,6 +96,12 @@ the age stated plus all ages greater are included in the group. So, '80+' would 
 special key words in the character vector can be used: 'all' and 'total', which are encoded as \verb{[0, Inf)} and means all
 ages.
 
+For new definitions from numeric cut points, use
+\code{age_interval(breaks = cuts)}: each consecutive pair defines one interval.
+This converter retains a different rule: a finite final numeric cut also
+creates a final one-unit interval. For example, \code{as_age_interval(c(0, 5, 18))}
+includes \verb{[18, 19)}, whereas \code{age_interval(breaks = c(0, 5, 18))} ends at 18.
+
 A numeric vector will be converted to age groups by using each value as a cut point resulting in age groups with no
 gaps. For example, a c(0,10,20,60,Inf) vector results in age groups: "0-9" "10-19", "20-59" and "60+".
 

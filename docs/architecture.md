@@ -44,7 +44,10 @@ The package is an **experimental**, S3/vctrs-oriented R package (R >= 4.1.0). It
 
 ## 4. `age_interval` intervals — Current
 
-`age_interval(start, end, unit = NULL, ...)` uses `ivs::new_iv()` through the package's validated constructor. The interval convention is **`[start, end)`**: lower inclusive, upper exclusive. `[1,5)` represents completed ages 1–4; fractional boundaries are retained and displayed as explicit interval notation, e.g. `[0, 0.077)`.
+`age_interval(breaks = cuts, unit = NULL)` defines adjacent intervals from
+consecutive numeric cut points without appending a boundary. Paired
+`age_interval(start, end, unit = NULL, ...)` bounds also support gaps and overlaps.
+Both forms use `ivs::new_iv()` through the package's validated constructor. The interval convention is **`[start, end)`**: lower inclusive, upper exclusive. `[1,5)` represents completed ages 1–4; fractional boundaries are retained and displayed as explicit interval notation, e.g. `[0, 0.077)`.
 
 - Finite starts are nonnegative; only upper ends may be `Inf`; missing intervals have two missing endpoints; reversed or zero-width bounds are rejected.
 - Gaps and overlaps are valid *interval data* and are preserved. `age_interval` does not itself promise an exhaustive or disjoint partition.

@@ -1,3 +1,36 @@
+# Cut-point interval construction — 2026-11-18
+
+Implemented `age_interval(breaks = cuts)` as an additive final argument.
+Consecutive cut points define adjacent right-open intervals with no appended
+boundary. Non-NULL breaks require at least two strictly increasing, nonnegative,
+nonmissing unclassed numeric values, with `Inf` allowed only last, and cannot be
+combined with explicit start/end arguments. Existing positional calls and
+`as_age_interval()` numeric conversion retain their behavior.
+
+Updated roxygen help, README, eight vignettes, interval architecture and API
+policy. Added regression tests for fractional and finite boundaries, open-ended
+bands, classification equivalence, names, units, invalid input, conflicting
+arguments and existing constructor forms.
+
+Validation:
+
+- `Rscript -e 'devtools::document()'`: generated help successfully.
+- `Rscript -e 'devtools::test()'`: 3,424 passing assertions, no failures or
+  warnings; one optional mudnester skip.
+- `Rscript -e 'devtools::check(document = FALSE,
+  check_dir = "/tmp/agecraft-breaks-final-check")'`: zero errors, warnings or
+  notes, including installed tests, examples and vignette rebuilds.
+- `git diff --check`: passed.
+- Rendered constructor help to HTML and inspected its usage, arguments and
+  boundary guidance. Inspected the new calls and output in all eight affected
+  rendered vignette HTML files produced by the package build.
+
+Validation logs are `/tmp/agecraft-breaks-tests.log` and
+`/tmp/agecraft-breaks-check.log`; rendered help is
+`/tmp/agecraft-breaks-help.html`.
+
+---
+
 # Development version 0.1.0.9021 — 2026-11-12
 
 Both naming phases are committed on refactor/age-class-names: e25155c (intervals)

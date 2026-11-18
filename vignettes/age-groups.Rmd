@@ -19,7 +19,7 @@ vectors retain neither original exact ages nor scheme provenance.
 ## Readable labels and retrievable bounds
 
 ```{r}
-groups <- age_interval(c(0, 5, 10), c(5, 10, Inf), sep = " to ")
+groups <- age_interval(breaks = c(0, 5, 10, Inf), sep = " to ")
 categories <- categorize_age(c(2, 5, 8, NA), by = groups)
 categories
 class(categories)
@@ -29,6 +29,12 @@ group_intervals(categories)
 These are ordered factors with integer category codes. Codes are identifiers,
 not numerical ages. Bounds retain their half-open meaning: age 5 belongs to
 `[5, 10)`. Optional group names supply labels instead of formatted intervals.
+
+`breaks` uses consecutive cut points, so four boundaries define three intervals.
+The final `Inf` includes all ages from 10 onward. A finite final boundary stays
+exclusive: `age_interval(breaks = c(0, 5, 10))` defines only `[0, 5)` and `[5, 10)`.
+You can pass the same cuts directly to `categorize_age(ages, by = cuts)`.
+For gaps or overlaps, supply paired `start` and `end` vectors instead.
 
 ## Subsets keep unused categories
 
@@ -78,7 +84,7 @@ is.null(attr(ordinary, "intervals"))
 For custom plot ordering, convert to an ordinary factor first.
 
 ```{r}
-weekly <- age_interval(c(0, 1), c(1, Inf), unit = "week")
+weekly <- age_interval(breaks = c(0, 1, Inf), unit = "week")
 result <- categorize_age(age(c(3, 8), unit = "day"), by = weekly)
 group_intervals(result)
 attr(result, "units")

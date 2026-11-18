@@ -258,3 +258,14 @@ reference and version remain explicit. Derivatives say "Adapted from" and retain
 current identity separately from ancestor metadata. Export validates the object
 but does not verify external sources or fetch references. No new dependency,
 metadata field, generic or change to interval/classification semantics is added.
+
+
+## Interval construction from cut points — 2026-11-18
+
+`age_interval()` accepts an additive final argument `breaks = NULL`. Non-NULL
+breaks must contain at least two strictly increasing nonnegative numeric cut
+points, without missing values and with `Inf` allowed only last. Consecutive
+pairs define right-open intervals; no final boundary or one-unit interval is
+appended. Non-NULL breaks exclude explicitly supplied start/end arguments.
+Existing positional calls, empty construction, endpoint recycling and the legacy
+numeric behavior of `as_age_interval()` remain unchanged.

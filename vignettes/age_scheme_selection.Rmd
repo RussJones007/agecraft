@@ -70,7 +70,7 @@ terminal groups are explicit teaching choices.
 
 ```{r define-schemes}
 make_bands <- function(breaks, labels = NULL) {
-  intervals <- age_interval(head(breaks, -1), tail(breaks, -1), unit = "year")
+  intervals <- age_interval(breaks = breaks, unit = "year")
   if (is.null(labels)) {
     starts <- head(breaks, -1)
     ends <- tail(breaks, -1)

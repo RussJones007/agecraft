@@ -2,7 +2,7 @@
 % Please edit documentation in R/age-interval-class.R
 \name{age_interval}
 \alias{age_interval}
-\title{Define age intervals from bounds}
+\title{Define age intervals from cut points or paired bounds}
 \usage{
 age_interval(
   start = double(),
@@ -10,7 +10,8 @@ age_interval(
   unit = NULL,
   below = "0-",
   sep = "-",
-  above = "+"
+  above = "+",
+  breaks = NULL
 )
 }
 \arguments{
@@ -20,19 +21,33 @@ to the length of start. Only end may be Inf. Missing pairs require two NAs.}
 \item{unit}{Optional time unit, such as "year" or "day".}
 
 \item{below, sep, above}{Display symbols, as in \code{\link[=as_age_interval]{as_age_interval()}}.}
+
+\item{breaks}{An unclassed numeric vector of at least two strictly increasing,
+nonnegative cut points, or NULL (the default) to use paired bounds. Missing
+values are not allowed. Only the final cut point may be Inf. Each consecutive
+pair defines one interval; no boundary is appended. Supply \code{breaks} without
+\code{start} or \code{end}. Names on cut points are ignored.}
 }
 \value{
-An \code{age_interval} vector with one interval per element of \code{start}.
+An \code{age_interval} vector with \code{length(breaks) - 1} intervals when
+using cut points, or one interval per element of \code{start} with paired bounds.
 It retains the supplied bounds and one common unit. Use \code{names()} to
 assign optional labels and \code{\link[=categorize_age]{categorize_age()}} to classify observations.
 }
 \description{
-Describe age ranges using lower and upper bounds. Use these intervals to
+Describe adjacent age bands with \code{breaks}, or supply paired \code{start} and
+\code{end} bounds for intervals with gaps or overlaps. Use these intervals to
 define reporting categories, record ages known only as ranges, or compare
 age coverage. Each interval includes \code{start} and excludes \code{end}: bounds
 1 and 5 describe completed ages 1–4. Gaps and overlaps are allowed.
 }
 \details{
+With \code{breaks}, \code{n} cut points create \code{n - 1} adjacent intervals. A finite
+final cut is the exclusive upper boundary of the final interval; append Inf
+for an open-ended group. These rules agree with numeric cut points in
+\code{\link[=categorize_age]{categorize_age()}}. In contrast, \code{\link[=as_age_interval]{as_age_interval()}} retains its legacy
+numeric conversion rule, adding a one-unit interval after a finite final cut.
+
 Fractional bounds are preserved. Intervals with fractional endpoints display
 as \verb{[start, end)}; whole-number bounds retain completed-age labels such as 1-4.
 Assign category labels with \code{names(x) <- labels}. Classification and factor
@@ -43,8 +58,11 @@ interval set operations discard names because they can create new intervals.
 Names do not change interval equality or ordering.
 }
 \examples{
-age_interval(c(1, 10), c(5, Inf), unit = "year")
-groups <- age_interval(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
+age_interval(breaks = c(0, 5, 18, 65, Inf), unit = "year")
+age_interval(breaks = c(0, 5, 18), unit = "year")
+# Paired bounds can describe gaps or overlaps.
+age_interval(start = c(1, 10), end = c(5, Inf), unit = "year")
+groups <- age_interval(breaks = c(0, 0.077, 1, 3), unit = "year")
 names(groups) <- c("Neonate", "Infant", "Toddler")
 categorize_age(units::set_units(c(0.02, 0.5, 2), "year"), by = groups)
 }

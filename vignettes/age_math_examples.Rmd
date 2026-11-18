@@ -129,8 +129,7 @@ sort(x, decreasing = TRUE)
 ## 8. Classify ages into named groups
 ```{r}
 groups <- age_interval(
-  c(0, 5, 18),
-  c(5, 18, Inf),
+  breaks = c(0, 5, 18, Inf),
   unit = "year"
 )
 

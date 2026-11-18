@@ -58,7 +58,25 @@ does not independently verify provenance or source authority.
 
 ## 3. Construction and conversion
 
-### Direct construction
+### Construction from cut points
+
+Use `age_interval(breaks = cuts, unit = "year")` for adjacent bands. Cut points
+must be an unclassed numeric vector with at least two strictly increasing,
+nonnegative, nonmissing values; only the final value may be `Inf`. Each
+consecutive pair defines one interval, so `n` boundaries produce `n - 1`
+intervals. A finite last boundary remains exclusive; no boundary is appended.
+Names on cut points are ignored. `breaks = NULL` uses the paired-bound form.
+Non-NULL `breaks` cannot be combined with explicitly supplied `start` or `end`.
+
+```r
+groups <- age_interval(breaks = c(0, 1, 5, 18, 65, Inf), unit = "year")
+```
+
+These cut-point semantics agree with `categorize_age(..., by = cuts)` for
+vectors of at least two cuts. The legacy numeric converter described below
+retains its final one-unit interval behavior.
+
+### Direct construction from paired bounds
 
 The public `age_interval(start, end, unit = NULL, below = "0-", sep = "-", above = "+")` constructor accepts paired bounds. A scalar `end` may be recycled to the number of starts.
 

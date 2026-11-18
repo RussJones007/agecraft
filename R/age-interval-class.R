@@ -183,17 +183,29 @@ valid_age_interval_symbol <- function(x){
   return(ret)
 }
 
-#' Define age intervals from bounds
+#' Define age intervals from cut points or paired bounds
 #'
-#' Describe age ranges using lower and upper bounds. Use these intervals to
+#' Describe adjacent age bands with `breaks`, or supply paired `start` and
+#' `end` bounds for intervals with gaps or overlaps. Use these intervals to
 #' define reporting categories, record ages known only as ranges, or compare
 #' age coverage. Each interval includes `start` and excludes `end`: bounds
 #' 1 and 5 describe completed ages 1–4. Gaps and overlaps are allowed.
+#' @param breaks An unclassed numeric vector of at least two strictly increasing,
+#'   nonnegative cut points, or NULL (the default) to use paired bounds. Missing
+#'   values are not allowed. Only the final cut point may be Inf. Each consecutive
+#'   pair defines one interval; no boundary is appended. Supply `breaks` without
+#'   `start` or `end`. Names on cut points are ignored.
 #' @param start,end Nonnegative numeric endpoints. A scalar end is recycled
 #'   to the length of start. Only end may be Inf. Missing pairs require two NAs.
 #' @param unit Optional time unit, such as "year" or "day".
 #' @param below,sep,above Display symbols, as in [as_age_interval()].
 #' @details
+#' With `breaks`, `n` cut points create `n - 1` adjacent intervals. A finite
+#' final cut is the exclusive upper boundary of the final interval; append Inf
+#' for an open-ended group. These rules agree with numeric cut points in
+#' [categorize_age()]. In contrast, [as_age_interval()] retains its legacy
+#' numeric conversion rule, adding a one-unit interval after a finite final cut.
+#'
 #' Fractional bounds are preserved. Intervals with fractional endpoints display
 #' as `[start, end)`; whole-number bounds retain completed-age labels such as 1-4.
 #' Assign category labels with `names(x) <- labels`. Classification and factor
@@ -202,17 +214,36 @@ valid_age_interval_symbol <- function(x){
 #' Names follow observations through slicing, sorting, concatenation and casts;
 #' interval set operations discard names because they can create new intervals.
 #' Names do not change interval equality or ordering.
-#' @return An `age_interval` vector with one interval per element of `start`.
+#' @return An `age_interval` vector with `length(breaks) - 1` intervals when
+#'   using cut points, or one interval per element of `start` with paired bounds.
 #'   It retains the supplied bounds and one common unit. Use `names()` to
 #'   assign optional labels and [categorize_age()] to classify observations.
 #' @export
 #' @examples
-#' age_interval(c(1, 10), c(5, Inf), unit = "year")
-#' groups <- age_interval(c(0, 0.077, 1), c(0.077, 1, 3), unit = "year")
+#' age_interval(breaks = c(0, 5, 18, 65, Inf), unit = "year")
+#' age_interval(breaks = c(0, 5, 18), unit = "year")
+#' # Paired bounds can describe gaps or overlaps.
+#' age_interval(start = c(1, 10), end = c(5, Inf), unit = "year")
+#' groups <- age_interval(breaks = c(0, 0.077, 1, 3), unit = "year")
 #' names(groups) <- c("Neonate", "Infant", "Toddler")
 #' categorize_age(units::set_units(c(0.02, 0.5, 2), "year"), by = groups)
 age_interval <- function(start = double(), end = double(), unit = NULL,
-                      below = "0-", sep = "-", above = "+") {
+                      below = "0-", sep = "-", above = "+", breaks = NULL) {
+  if (!is.null(breaks)) {
+    if (!missing(start) || !missing(end)) {
+      stop("Supply `breaks` without `start` or `end`", call. = FALSE)
+    }
+    if (!is.numeric(breaks) || is.object(breaks) || !is.null(dim(breaks)) ||
+        length(breaks) < 2L || anyNA(breaks) || any(breaks < 0) ||
+        is.unsorted(breaks, strictly = TRUE) ||
+        any(!is.finite(utils::head(breaks, -1L)))) {
+      stop(paste("`breaks` must contain at least two strictly increasing,",
+                 "nonmissing, nonnegative numeric cut points; only the final cut may be Inf"),
+           call. = FALSE)
+    }
+    start <- utils::head(breaks, -1L)
+    end <- utils::tail(breaks, -1L)
+  }
   new_age_interval(start, end, symbols = list(below = below, sep = sep, above = above),
                 unit = unit)
 }

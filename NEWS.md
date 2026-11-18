@@ -1,5 +1,11 @@
 # agecraft 0.1.0.9021
 
+- Add `age_interval(breaks = cuts)` for adjacent age bands. Each consecutive pair
+  defines one right-open interval, with no appended boundary. Include `Inf` for
+  an open-ended final band. Existing paired-bound calls and legacy numeric
+  `as_age_interval()` conversion remain unchanged. Help, README and vignettes
+  introduce the cut-point form and explain the finite-final-cut distinction.
+
 ## Breaking changes: age intervals and assigned groups
 
 - Rename the interval class and constructor from `age_group` to `age_interval`. Use `as_age_interval()`, `is_age_interval()` and `compare_age_intervals()` instead of `as.age_group()`, `is.age_group()` and `compare_age_groups()`. Formatting helpers use `age_interval_to_char()` and `valid_age_interval_symbol()`.

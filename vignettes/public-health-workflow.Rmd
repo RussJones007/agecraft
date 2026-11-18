@@ -41,7 +41,7 @@ or years.
 ## Assign reporting groups
 
 ```{r groups}
-groups <- as_age_interval(age_interval_presets$Annual, unit = "year")
+groups <- age_interval(breaks = age_interval_presets$Annual, unit = "year")
 category <- categorize_age(age, by = groups)
 data.frame(birth, age, category)
 table(category, useNA = "ifany")
@@ -67,7 +67,7 @@ refer to sorted interval order, not the original input order.
 
 ```{r units}
 days <- calculate_age(as.Date("2025-01-01"), as.Date("2025-02-15"), "day")
-day_groups <- as_age_interval(c(0, 7, 14, 30, 60, Inf), unit = "day")
+day_groups <- age_interval(breaks = c(0, 7, 14, 30, 60, Inf), unit = "day")
 categorize_age(days, by = day_groups)
 ```
 

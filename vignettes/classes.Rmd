@@ -185,7 +185,7 @@ example, the 0-1 year interval could be named `infant`.
 For our visit records, define three illustrative reporting bands:
 
 ```{r define-intervals}
-bands <- age_interval(start = c(0, 1, 5), end = c(1, 5, Inf), unit = "year")
+bands <- age_interval(breaks = c(0, 1, 5, Inf), unit = "year")
 names(bands) <- c("infant", "1 to under 5", "5 and older")
 bands
 
@@ -333,7 +333,7 @@ is a disease-surveillance pattern.
 
 ```{r sourced-childhood-scheme}
 childhood_intervals <- age_interval(
-  c(0, 1, 5, 10, 15, 20), c(1, 5, 10, 15, 20, Inf), unit = "year"
+  breaks = c(0, 1, 5, 10, 15, 20, Inf), unit = "year"
 )
 names(childhood_intervals) <- c("Under 1", "1-4", "5-9", "10-14", "15-19", "20+")
 childhood_scheme <- age_scheme(

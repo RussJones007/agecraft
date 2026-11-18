@@ -25,7 +25,7 @@ overlapping groups. Completeness is a separate claim against a declared domain.
 
 ```{r partition}
 cuts <- c(seq(0, 85, by = 5), Inf)
-g <- age_interval(head(cuts, -1), tail(cuts, -1), unit = "year")
+g <- age_interval(breaks = cuts, unit = "year")
 names(g) <- as.character(g)
 five_year <- age_scheme(
   g, id = "example_five_year", name = "Illustrative five-year bands",
@@ -61,7 +61,7 @@ observation unit (normalized to a supported name), rather than the units definin
 its category boundaries. For example, hour-based ages can match day-based bands:
 
 ```{r category-factor-units}
-day_groups <- age_interval(c(0, 1), c(1, Inf), unit = "day")
+day_groups <- age_interval(breaks = c(0, 1, Inf), unit = "day")
 names(day_groups) <- c("Under one day", "One day or older")
 day_scheme <- age_scheme(day_groups, "example_days", "Illustrative day bands")
 hours <- age(c(12, 36, NA), unit = "hour")
@@ -116,7 +116,7 @@ converting ages to group units can classify differently from converting group
 boundaries to age units. For example, with the conversion backend used here:
 
 ```{r floating-point-boundary}
-g <- age_interval(c(0, 11), c(11, Inf), unit = "second")
+g <- age_interval(breaks = c(0, 11, Inf), unit = "second")
 names(g) <- c("Under eleven", "Eleven or more")
 seconds <- age_scheme(g, "seconds", "Second categories")
 x <- as_age(age(11, unit = "second"), unit = "day")
@@ -161,7 +161,7 @@ birth <- as.Date("2021-02-01")
 reference <- as.Date("2021-03-01")
 months <- calculate_age(birth, reference, unit = "month")
 years <- calculate_age(birth, reference, unit = "year")
-g <- age_interval(c(0, 1), c(1, Inf), unit = "month")
+g <- age_interval(breaks = c(0, 1, Inf), unit = "month")
 names(g) <- c("Under one month", "One month or older")
 monthly <- age_scheme(g, "example_monthly", "Illustrative monthly bands")
 as.numeric(months) # 1 calendar month

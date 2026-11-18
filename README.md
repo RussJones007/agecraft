@@ -35,7 +35,7 @@ visits <- data.frame(
 visits$age <- calculate_age(visits$birth_date, visits$visit_date, unit = "year")
 
 # Include each lower bound and exclude each upper bound.
-groups <- age_interval(start = c(0, 1, 3), end = c(1, 3, 6), unit = "year")
+groups <- age_interval(breaks = c(0, 1, 3, 6), unit = "year")
 names(groups) <- c("Infant", "Toddler", "Young child")
 
 visits$category <- categorize_age(visits$age, by = groups)
@@ -135,10 +135,14 @@ The fractional part is now a fraction of a day. Conversion uses the units packag
 
 ## Define groups with boundaries, units, and names
 
-`age_interval(start, end, unit)` constructs right-open intervals directly. Fractional bounds are preserved without rounding; `[0, 0.077)` displays explicitly, while whole-number intervals retain completed-age labels such as `1-4` for `[1, 5)`. One unit applies to every interval in a group vector; `NULL` leaves the unit unspecified. Only upper bounds may be infinite. A scalar `end` is recycled to the length of `start`; starts are not recycled. Missing intervals require both bounds to be missing.
+`age_interval(breaks = cuts, unit = "year")` constructs adjacent right-open
+intervals from strictly increasing nonnegative cut points. Each consecutive pair
+defines one interval; no boundary is appended. Include a final `Inf` for an
+open-ended group. Use `age_interval(start, end, unit)` for paired bounds,
+including gaps or overlaps. Fractional bounds are preserved without rounding; `[0, 0.077)` displays explicitly, while whole-number intervals retain completed-age labels such as `1-4` for `[1, 5)`. One unit applies to every interval in a group vector; `NULL` leaves the unit unspecified. Only upper bounds may be infinite. A scalar `end` is recycled to the length of `start`; starts are not recycled. Missing intervals require both bounds to be missing.
 
 ``` r
-fine_groups <- age_interval(c(0, 0.077, 1, 3), c(0.077, 1, 3, 6), unit = "year")
+fine_groups <- age_interval(breaks = c(0, 0.077, 1, 3, 6), unit = "year")
 names(fine_groups) <- c("Neonate", "Infant", "Toddler", "Young child")
 fine_ages <- age(c(0.02, 0.5, 2, 4, NA), unit = "year")
 categorize_age(fine_ages, by = fine_groups)
@@ -154,14 +158,14 @@ as_age_interval(c("< 5", "5-9", "10+"), unit = "year")
 as_age_interval(c(0, 5, 10, Inf), unit = "year")
 ```
 
-A final `Inf` in numeric cuts produces an open-ended final group. With a final finite cut, `as_age_interval()` adds a final one-unit interval. Use explicit `age_interval(start, end)` bounds when every upper boundary must be specified.
+A final `Inf` in numeric cuts produces an open-ended final group. With a final finite cut, `as_age_interval()` adds a final one-unit interval. Use `age_interval(breaks = cuts)` for exactly the intervals between consecutive cuts.
 
 ### Supplied age-group definitions
 
 `age_interval_presets` is a named list of numeric cut points: `ILI`, `IMM`, `Yr.5`, `Yr.10`, `Spec`, `Annual`, `School`, and `Covid`. Assign their intended unit when constructing groups:
 
 ``` r
-reporting_groups <- as_age_interval(age_interval_presets$Yr.5, unit = "year")
+reporting_groups <- age_interval(breaks = age_interval_presets$Yr.5, unit = "year")
 categorize_age(visits$age, by = reporting_groups)
 ```
 
@@ -276,7 +280,7 @@ With `mudnester` installed, `import_mudnester_scheme("abs_5yr")` imports a valid
 `categorize_age()` returns an `age_group` ordered factor with readable labels and retained interval definitions.
 
 ``` r
-groups <- age_interval(c(0, 5, 10), c(5, 10, Inf), sep = " to ")
+groups <- age_interval(breaks = c(0, 5, 10, Inf), sep = " to ")
 categories <- categorize_age(c(2, 7, NA), by = groups)
 group_intervals(categories)
 group_intervals(droplevels(categories[1]))

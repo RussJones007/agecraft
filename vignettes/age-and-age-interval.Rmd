@@ -250,14 +250,13 @@ For example, `[1, 3)` contains ages beginning at the first birthday and ending
 just before the third birthday. Its ordinary completed-age label is `1-2`.
 For completed ages 1 through 3, use `[1, 4)`.
 
-### Construct groups from bounds
+### Construct groups from cut points
 
 Define a set of categories for the same sample data. The boundaries and names
 below illustrate the mechanics; choose definitions appropriate to your analysis.
 
 ```{r construct-groups}
-groups <- age_interval(start = c(0, 0.077, 1, 3, 13, 20),
-                    end = c(0.077, 1, 3, 13, 20, Inf), unit = "year")
+groups <- age_interval(breaks = c(0, 0.077, 1, 3, 13, 20, Inf), unit = "year")
 groups
 is_age_interval(groups)
 ```
@@ -273,11 +272,12 @@ boundary, define groups in days and classify `visits$age_days` instead.
 ### Convert existing definitions
 
 `as_age_interval()` accepts numeric cut points, supported completed-age labels,
-factors of those labels, or ivs intervals. For example, the same sample can
-also be classified using the package's five-year preset:
+factors of those labels, or ivs intervals. For numeric cut points, prefer
+`age_interval(breaks = ...)` so every upper boundary is explicit. The same
+sample can also be classified using the package's five-year preset:
 
 ```{r supplied-definitions}
-preset_groups <- as_age_interval(age_interval_presets$Yr.5, unit = "year")
+preset_groups <- age_interval(breaks = age_interval_presets$Yr.5, unit = "year")
 head(preset_groups)
 categorize_age(visits$age_years, by = preset_groups)
 ```
@@ -288,7 +288,10 @@ conventions of your analysis.
 
 For custom numeric cuts, a final `Inf` creates an open-ended final group.
 A final finite cut also creates a final one-unit interval in `as_age_interval()`;
-use `age_interval(start, end)` when you want to control every upper bound explicitly.
+use `age_interval(breaks = cuts)` to create only the intervals between consecutive
+cut points. For example, `breaks = c(0, 5, 18)` creates `[0, 5)` and `[5, 18)`
+and excludes ages 18 and older. Append `Inf` to include those ages. Use paired
+`start` and `end` vectors when you need gaps or overlaps.
 
 ### Name the groups
 
@@ -392,7 +395,8 @@ ages with explicitly unit-bearing groups are rejected.
 
 | Function or operation | Use |
 |:--|:--|
-| `age_interval(start, end, unit)` | Define explicit interval boundaries |
+| `age_interval(breaks = cuts, unit = "year")` | Define adjacent bands from cut points |
+| `age_interval(start, end, unit)` | Define paired bounds, including gaps or overlaps |
 | `as_age_interval(x, unit)` | Convert cuts, labels, factors, or intervals |
 | `is_age_interval(x)` | Check whether a vector has the age_interval class |
 | `names(x) <- labels` | Assign category names |
