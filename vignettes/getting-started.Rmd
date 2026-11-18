@@ -12,9 +12,9 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(agecraft)
 ```
 
-Calculating ages and putting them into useful groups are everyday tasks in many disciplines, like public health, education, economics and population research to name just a few. An age is an interval of time between a beginning and ending. For example, using a birth date and a later event date. That sounds simple, but birthdays, leap years, time units, and group boundaries can make the details surprisingly fiddly.
+Calculating ages and putting them into useful groups are everyday tasks in many disciplines, like public health, education, economics and population research to name just a few. An age is an interval of time between a beginning and ending and often stated as a whole number. For example, using a birth date and a later event date. That sounds simple, but birthdays, leap years, time units, and group boundaries can make the details surprisingly fiddly.
 
-**agecraft** brings steps to calculate an age or assign an age group and the fiddly nuances together in a flexible, vector-based framework: calculate ages, keep track of their units, and classify them into groups so that you can use them in tables and analyses. This introduction walks through that workflow using ordinary R vectors and data frames.
+**agecraft** brings the steps to calculate an age or assign an age group and the fiddly nuances together in a flexible, vector-based framework: calculate ages, keep track of their units, and classify them into groups so that you can use them in tables and analyses. This introduction walks through that workflow using ordinary R vectors and data frames.
 
 ## Load the package
 
