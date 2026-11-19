@@ -1,0 +1,14 @@
+x + y
+WARNING: Incompatible methods ("+.vctrs_vctr", "Ops.units") for "+"
+structure(2, units = structure(list(numerator = "month", denominator = character(0)), class = "symbolic_units"), class = c("age",
+"vctrs_vctr", "double"), unit = "year")
+y + x
+WARNING: Incompatible methods ("Ops.units", "+.vctrs_vctr") for "+"
+structure(2, unit = "year", class = "units", units = structure(list(
+    numerator = "month", denominator = character(0)), class = "symbolic_units"))
+as.data.frame(x)
+structure(list(x = structure(1, unit = "year", class = c("age",
+"vctrs_vctr", "double"))), row.names = c(NA, -1L), class = "data.frame")
+as.list(x)
+list(structure(1, unit = "year", class = c("age", "vctrs_vctr",
+"double")))

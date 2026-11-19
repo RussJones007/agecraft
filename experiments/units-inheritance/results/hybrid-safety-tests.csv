@@ -1,0 +1,3 @@
+"test","nb","failed","skipped","error","warning","passed"
+"mixed units arithmetic cannot bypass calendar consent",4,2,FALSE,FALSE,2,0
+"base data frame and list conversions retain valid ages",2,0,FALSE,FALSE,0,2

@@ -1,0 +1,7 @@
+"test","nb","failed","skipped","error","warning","passed"
+"baseline observations and integration are preserved",38,0,FALSE,FALSE,0,38
+"all directed conversions match current policy and units factors",224,0,FALSE,FALSE,0,224
+"prototype setters and coercions enforce explicit boundaries",1,0,TRUE,FALSE,0,0
+"tibble and dplyr preserve vectors and classification",8,0,FALSE,FALSE,0,8
+"prototype public conversions and unit removal have explicit returns",1,0,TRUE,FALSE,0,0
+"classification conversions preserve interval and group contracts",13,0,FALSE,FALSE,0,13

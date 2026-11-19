@@ -1,0 +1,1014 @@
+R version 4.6.2 (2026-10-29)
+Platform: x86_64-pc-linux-gnu
+Running under: Linux Mint 22.1
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8
+ [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8
+ [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C
+[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C
+
+time zone: America/Chicago
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base
+
+other attached packages:
+[1] vctrs_0.7.3         units_1.0-1         agecraft_0.1.0.9022
+[4] testthat_3.3.2
+
+loaded via a namespace (and not attached):
+ [1] cli_3.6.6         rlang_1.3.0       otel_0.3.0        stringi_1.8.9
+ [5] purrr_1.2.2       pkgload_1.5.3     generics_0.1.4    assertthat_0.2.1
+ [9] glue_1.8.1        rprojroot_2.1.1   pkgbuild_1.4.8    brio_1.1.5
+[13] ellipsis_0.3.3    fastmap_1.2.0     lifecycle_1.0.5   memoise_2.0.1
+[17] stringr_1.6.0     compiler_4.6.2    fs_2.1.0          sessioninfo_1.2.4
+[21] Rcpp_1.1.1-1.1    timechange_0.4.0  rstudioapi_0.19.0 ivs_0.2.0
+[25] R6_2.6.1          usethis_3.2.2     magrittr_2.0.5    tools_4.6.2
+[29] devtools_2.5.2    lubridate_1.9.5   cachem_1.1.0      desc_1.4.3
+structure(c(a = 1, b = NA), units = structure(list(numerator = "year",
+    denominator = character(0)), class = "symbolic_units"), class = "units")
+storage: double
+
+ set_units.units
+function (x, value, ..., mode = units_options("set_units_mode"))
+{
+    if (missing(value))
+        value <- unitless
+    else if (mode == "symbols") {
+        value <- substitute(value)
+        if (is.numeric(value) && !identical(value, 1) && !identical(value,
+            1L))
+            stop("The only valid number defining a unit is '1', signifying a unitless unit")
+        if (is.name(value) || is.call(value))
+            value <- format(value)
+    }
+    units(x) <- as_units(value, ...)
+    x
+}
+<bytecode: 0x611454d15758>
+<environment: namespace:units>
+
+ units<-.units
+function (x, value)
+{
+    if (!length(value))
+        return(drop_units(x))
+    if (!inherits(value, "units") && !inherits(value, "symbolic_units")) {
+        if ((is.character(value) && length(value) > 1))
+            return(set_units(mixed_units(x), value))
+        value <- as_units(value)
+    }
+    dimx = dim(x)
+    if (inherits(value, "units")) {
+        if (!identical(as.numeric(value), 1))
+            x <- .as.units(unclass(x) * unclass(value), units(x))
+        value <- units(value)
+    }
+    if (identical(units(x), value))
+        return(x)
+    str1 <- ud_char(units(x))
+    str2 <- ud_char(value)
+    if (ud_are_convertible(str1, str2))
+        .as.units(ud_convert(unclass(x), str1, str2), value,
+            dim = dimx)
+    else stop(paste("cannot convert", units(x), "into", value),
+        call. = FALSE)
+}
+<bytecode: 0x611454d126e0>
+<environment: namespace:units>
+
+ Ops.units
+function (e1, e2)
+{
+    if (missing(e2))
+        return(NextMethod())
+    cmp <- .Generic %in% c("==", "!=", "<", ">", "<=", ">=")
+    div <- .Generic %in% c("/", "%/%")
+    mul <- .Generic %in% "*"
+    prd <- .Generic %in% c("*", "/", "%/%", "%%")
+    pw <- .Generic %in% c("**", "^")
+    mod <- .Generic %in% c("%/%", "%%")
+    pm <- .Generic %in% c("+", "-")
+    if (!any(cmp, pm, prd, pw, mod))
+        stop(paste("operation", .Generic, "not allowed"))
+    e1_inherits_units <- inherits(e1, "units")
+    e2_inherits_units <- inherits(e2, "units")
+    both_inherit_units <- e1_inherits_units && e2_inherits_units
+    if ((pm || cmp) && !both_inherit_units)
+        stop("both operands of the expression should be \"units\" objects")
+    if (cmp) {
+        if (!ud_are_convertible(units(e1), units(e2)))
+            stop("cannot compare non-convertible units")
+        if (length(e1) >= length(e2)) {
+            e1 <- ud_compare(e1, e2, ud_char(units(e1)), ud_char(units(e2)))
+            attr <- attributes(e2)
+            e2 <- rep(0, length(e2))
+            attributes(e2) <- attr
+        }
+        else {
+            e2 <- ud_compare(e2, e1, ud_char(units(e2)), ud_char(units(e1)))
+            attr <- attributes(e1)
+            e1 <- rep(0, length(e1))
+            attributes(e1) <- attr
+        }
+        return(NextMethod())
+    }
+    if (!isFALSE(.units.simplify())) {
+        identical_units <- both_inherit_units && identical(units(e1),
+            units(e2))
+        inverse_units <- both_inherit_units && identical(units(e1)$numerator,
+            units(e2)$denominator) && identical(units(e1)$denominator,
+            units(e2)$numerator)
+        if ((div && identical_units) || (mul && inverse_units)) {
+            e1 <- drop_units(e1)
+            e2 <- drop_units(e2)
+            return(set_units(NextMethod(), 1))
+        }
+    }
+    if (mod) {
+        div <- e1/e2
+        int <- floor(div)
+        if (.Generic == "%/%") {
+            return(int)
+        }
+        else {
+            return(e1 - int * e2)
+        }
+    }
+    else if (prd) {
+        if (!e1_inherits_units)
+            e1 <- set_units(e1, 1)
+        if (!e2_inherits_units)
+            e2 <- set_units(e2, 1)
+        ve1 <- unclass(e1)
+        ue1 <- units(e1)
+        ve2 <- unclass(e2)
+        ue2 <- units(e2)
+        if (.Generic == "*") {
+            numerator <- sort(c(ue1$numerator, ue2$numerator))
+            denominator <- sort(c(ue1$denominator, ue2$denominator))
+        }
+        else {
+            numerator <- sort(c(ue1$numerator, ue2$denominator))
+            denominator <- sort(c(ue1$denominator, ue2$numerator))
+        }
+        return(.simplify_units(NextMethod(), .symbolic_units(numerator,
+            denominator)))
+    }
+    else if (pw) {
+        if (e2_inherits_units) {
+            if (e1_inherits_units && identical(units(e1), units(as_units(1)))) {
+                e1 <- drop_units(e1)
+            }
+            else if (e1_inherits_units) {
+                stop("power operation only allowed with numeric power")
+            }
+            u <- units(e2)
+            invalid_lengths <- length(u$numerator) > 1 || length(u$denominator)
+            if (u == unitless || invalid_lengths || !grepl("\\(re",
+                u$numerator))
+                stop("power operation only allowed with logarithmic unit")
+            sp <- strsplit(u$numerator, "\\(re ")[[1]]
+            type <- strsplit(sp[1], " ")[[1]]
+            fc <- if (length(type) == 1)
+                1
+            else as.numeric(type[1])
+            base <- switch(type[length(type)], lb = 2, lg = 10,
+                ln = exp(1/fc))
+            if (!isTRUE(all.equal(e1, base)))
+                stop("wrong base in power operation")
+            nxt_u <- paste(sp[-1], collapse = "(re ")
+            nxt_u <- substr(nxt_u, 1, nchar(nxt_u) - 1)
+            if (length(sp) > 2) {
+                mult <- 1
+                attr(e2, "units")$numerator <- sub("^1 ", "",
+                  nxt_u)
+            }
+            else {
+                nxt_u <- strsplit(nxt_u, " ")[[1]]
+                mult <- as.numeric(nxt_u[1])
+                nxt_u <- as_units(nxt_u[2])
+                attr(e2, "units") <- units(nxt_u)
+            }
+            return(mult * NextMethod())
+        }
+        if (length(e2) > 1L) {
+            if (length(unique(e2)) == 1)
+                e2 = e2[1]
+            else return(.as.mixed_units(mapply("^", e1, e2, SIMPLIFY = FALSE)))
+        }
+        if (e2 == 0) {
+            u <- units(as_units(1))
+        }
+        else {
+            tbl_den <- tabulate(factor(units(e1)$denominator))
+            tbl_num <- tabulate(factor(units(e1)$numerator))
+            if (any((tbl_den * e2)%%1 != 0) || any((tbl_num *
+                e2)%%1 != 0))
+                stop("powers not divisible")
+            u <- if (e2 > 0)
+                .symbolic_units(rep(unique(units(e1)$numerator),
+                  tbl_num * e2), rep(unique(units(e1)$denominator),
+                  tbl_den * e2))
+            else .symbolic_units(rep(unique(units(e1)$denominator),
+                tbl_den * abs(e2)), rep(unique(units(e1)$numerator),
+                tbl_num * abs(e2)))
+        }
+    }
+    else {
+        units(e2) <- units(e1)
+        u <- units(e1)
+    }
+    .as.units(NextMethod(), u)
+}
+<bytecode: 0x611454d05410>
+<environment: namespace:units>
+
+ [.units
+function (x, i, j, ..., drop = TRUE)
+{
+    restore_units(NextMethod(), x)
+}
+<bytecode: 0x611454cd6860>
+<environment: namespace:units>
+
+ [<-.units
+function (x, ..., value)
+{
+    units(value) <- units(x)
+    NextMethod()
+}
+<bytecode: 0x611454cce160>
+<environment: namespace:units>
+
+ c.units
+function (..., recursive = FALSE, allow_mixed = units_options("allow_mixed"))
+{
+    args <- list(...)
+    args[sapply(args, is.null)] <- NULL
+    u <- units(args[[1]])
+    if (length(args) == 1)
+        return(.as.units(NextMethod(), u))
+    dup <- vapply(args, function(x) identical(units(x), u), TRUE)
+    if (all(dup))
+        return(.as.units(do.call(c, lapply(args, drop_units)),
+            u))
+    if (.units_are_convertible(args[!dup], u)) {
+        args[!dup] <- lapply(args[!dup], set_units, u, mode = "standard")
+        return(.as.units(do.call(c, lapply(args, drop_units)),
+            u))
+    }
+    if (allow_mixed)
+        return(do.call(c, lapply(args, mixed_units)))
+    stop("units are not convertible, and cannot be mixed; try setting units_options(allow_mixed = TRUE)?")
+}
+<bytecode: 0x611454cc77c0>
+<environment: namespace:units>
+
+ Math.units
+function (x, ...)
+{
+    if (.Generic == "sqrt")
+        return(x^0.5)
+    if (.Generic == "exp")
+        return(exp(1)^x)
+    if (.Generic == "expm1") {
+        out <- exp(1)^x
+        mult <- drop_units(out)/exp(1)^drop_units(x)
+        return(out - set_units(mult, units(out), mode = "standard"))
+    }
+    if (.Generic == "sign")
+        return(as.numeric(NextMethod()))
+    OK <- switch(.Generic, abs = , sign = , floor = , ceiling = ,
+        log = , log1p = , trunc = , round = , signif = , cumsum = ,
+        cummax = , cummin = TRUE, FALSE)
+    rad = units(as_units("rad"))
+    deg = units(as_units("degree"))
+    if (!OK && (units(x) == rad || units(x) == deg || units(x) ==
+        unitless)) {
+        OK <- switch(.Generic, sin = , cos = , tan = , sinpi = ,
+            cospi = , tanpi = TRUE, FALSE)
+        if (OK) {
+            units(x) <- "rad"
+            x <- set_units(x)
+        }
+    }
+    if (!OK && units(x) == unitless) {
+        OK <- switch(.Generic, asin = , acos = , atan = TRUE,
+            FALSE)
+        if (OK)
+            units(x) <- "rad"
+    }
+    if (!OK) {
+        warning(paste("Operation", .Generic, "not meaningful for units"))
+        x <- drop_units(x)
+        NextMethod()
+    }
+    else {
+        if (.Generic %in% c("log", "log1p")) {
+            base <- if (missing(...))
+                exp(1)
+            else c(...)[1]
+            uptr <- R_ut_parse(ud_char(units(x)))
+            u <- R_ut_format(R_ut_log(uptr, base), ascii = TRUE)
+            .as.units(NextMethod(), units(symbolic_unit(u)))
+        }
+        else .as.units(NextMethod(), units(x))
+    }
+}
+<bytecode: 0x611454cb0c58>
+<environment: namespace:units>
+
+ Summary.units
+function (..., na.rm = FALSE)
+{
+    OK <- switch(.Generic, sum = , min = , max = , range = TRUE,
+        FALSE)
+    if (!OK)
+        stop(paste("Summary operation", .Generic, "not allowed"))
+    args <- list(...)
+    if (length(args) > 1) {
+        args <- do.call(c, args)
+        do.call(.Generic, c(list(args), na.rm = na.rm))
+    }
+    else .as.units(NextMethod(), units(args[[1]]))
+}
+<bytecode: 0x611454c98668>
+<environment: namespace:units>
+
+ restore_units
+function (x, to)
+{
+    out <- .as.units(x, units(to))
+    attr(out, "pillar") <- attr(to, "pillar")
+    out
+}
+<bytecode: 0x611454c95270>
+<environment: namespace:units>
+
+ vec_restore.units
+function (x, to, ...)
+{
+    restore_units(x, to)
+}
+<bytecode: 0x611456e57540>
+<environment: namespace:units>
+
+ vec_proxy.units
+function (x, ...)
+{
+    x
+}
+<bytecode: 0x611456e6bb28>
+<environment: namespace:units>
+
+ vec_ptype2.units.units
+function (x, y, ..., x_arg = "", y_arg = "")
+{
+    x_units = units(x)
+    y_units = units(y)
+    if (!ud_are_convertible(x_units, y_units))
+        vctrs::stop_incompatible_type(x, y, x_arg = x_arg, y_arg = y_arg)
+    x_bare = drop_units(x)
+    y_bare = drop_units(y)
+    common = vctrs::vec_ptype2(x_bare, y_bare, ..., x_arg = x_arg,
+        y_arg = y_arg)
+    set_units(common, x_units, mode = "standard")
+}
+<bytecode: 0x611456e3e0a0>
+<environment: namespace:units>
+
+ vec_cast.units.units
+function (x, to, ..., x_arg = "", to_arg = "")
+{
+    x_units = units(x)
+    to_units = units(to)
+    if (!ud_are_convertible(x_units, to_units))
+        vctrs::stop_incompatible_cast(x, to, x_arg = x_arg, to_arg = to_arg)
+    out = set_units(x, to_units, mode = "standard")
+    out_bare = drop_units(out)
+    to_bare = drop_units(to)
+    out = vctrs::vec_cast(out_bare, to_bare, ..., x_arg = x_arg,
+        to_arg = to_arg)
+    set_units(out, to_units, mode = "standard")
+}
+<bytecode: 0x611456dae618>
+<environment: namespace:units>
+_H_a_n_d_l_e _m_e_a_s_u_r_e_m_e_n_t _u_n_i_t_s
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     A number of functions are provided for handling unit objects.
+
+        • ‘`units<-`’ and ‘units’ are the basic functions to set and
+          retrieve units.
+
+        • ‘as_units’, a generic with methods for a character string and
+          for quoted language. Note, direct usage of this function by
+          users is typically not necessary, as coercion via ‘as_units’
+          is automatically done with ‘`units<-`’ and ‘set_units’.
+
+        • ‘make_units’, constructs units from bare expressions.
+          ‘make_units(m/s)’ is equivalent to ‘as_units(quote(m/s))’.
+
+        • ‘set_units’, a pipe-friendly version of ‘`units<-`’. By
+          default it operates with bare expressions, but this behavior
+          can be disabled by a specifying ‘mode = "standard"’ or
+          setting ‘units_options(set_units_mode = "standard")’.  If
+          ‘value’ is missing or set to ‘1’, the object becomes
+          unitless.
+
+_U_s_a_g_e:
+
+     ## S3 replacement method for class 'numeric'
+     units(x) <- value
+
+     ## S3 replacement method for class 'units'
+     units(x) <- value
+
+     ## S3 replacement method for class 'logical'
+     units(x) <- value
+
+     ## S3 method for class 'units'
+     units(x)
+
+     ## S3 method for class 'symbolic_units'
+     units(x)
+
+     set_units(x, value, ..., mode = units_options("set_units_mode"))
+
+     make_units(bare_expression, check_is_valid = TRUE)
+
+     as_units(x, ...)
+
+     ## Default S3 method:
+     as_units(x, value = unitless, ...)
+
+     ## S3 method for class 'units'
+     as_units(x, value, ...)
+
+     ## S3 method for class 'symbolic_units'
+     as_units(x, value, ...)
+
+     ## S3 method for class 'difftime'
+     as_units(x, value, ...)
+
+     ## S3 method for class 'character'
+     as_units(x, ..., check_is_valid = TRUE,
+       force_single_symbol = FALSE)
+
+     ## S3 method for class 'call'
+     as_units(x, ...)
+
+     ## S3 method for class 'expression'
+     as_units(x, ...)
+
+     ## S3 method for class 'name'
+     as_units(x, ...)
+
+     ## S3 method for class 'POSIXt'
+     as_units(x, value, ...)
+
+     ## S3 method for class 'Date'
+     as_units(x, value, ...)
+
+_A_r_g_u_m_e_n_t_s:
+
+       x: numeric vector, or object of class ‘units’.
+
+   value: object of class ‘units’ or ‘symbolic_units’, or in the case
+          of ‘set_units’ expression with symbols (see examples).
+
+     ...: passed on to other methods.
+
+    mode: if ‘"symbols"’ (the default), then unit is constructed from
+          the expression supplied. Otherwise, if‘mode = "standard"’,
+          standard evaluation is used for the supplied value This
+          argument can be set via a global option
+          ‘units_options(set_units_mode = "standard")’
+
+bare_expression: a bare R expression describing units. Must be valid R
+          syntax (reserved R syntax words like ‘in’ must be backticked)
+
+check_is_valid: throw an error if all the unit symbols are not either
+          recognized by udunits2, or a custom user defined via
+          ‘install_unit()’. If ‘FALSE’, no check for validity is
+          performed.
+
+force_single_symbol: Whether to perform no string parsing and force
+          treatment of the string as a single symbol.
+
+_D_e_t_a_i_l_s:
+
+     If ‘value’ is of class ‘units’ and has a value unequal to 1, this
+     value is ignored unless ‘units_options("simplifiy")’ is ‘TRUE’. If
+     ‘simplify’ is ‘TRUE’, ‘x’ is multiplied by this value.
+
+_V_a_l_u_e:
+
+     An object of class ‘units’.
+
+     The ‘units’ method retrieves the units attribute, which is of
+     class ‘symbolic_units’.
+
+_C_h_a_r_a_c_t_e_r _s_t_r_i_n_g_s:
+
+     Generally speaking, there are 3 types of unit strings are accepted
+     in ‘as_units’ (and by extension, ‘`units<-`’).
+
+     The first type, and likely most common, is a "standard" format
+     unit specification where the relationship between unit symbols or
+     names is specified explicitly with arithmetic symbols for division
+     ‘/’, multiplication ‘*’ and power exponents ‘^’.
+
+     The second type of unit string accepted is one with implicit
+     exponents. In this format, ‘/’, ‘*’, and ‘^’, may not be present
+     in the string, and unit symbol or names must be separated by a
+     space. Each unit symbol may optionally be followed by a single
+     number, specifying the power.  For example ‘"m2 s-2"’ is
+     equivalent to ‘"(m^2)*(s^-2)"’.
+
+     If the string supplied fails to parse, then the string is treated
+     as a single symbolic unit and ‘symbolic_unit(chr)’ is used as a
+     fallback with a warning. In that case, automatic unit
+     simplification may not work properly when performing operations on
+     unit objects, but unit conversion and other Math operations should
+     still give correct results so long as the unit string supplied
+     returns ‘TRUE’ for ‘ud_is_parsable()’.
+
+     It must be noted that prepended numbers are supported too, but are
+     not treated as magnitudes. For example, ‘"1000 m"’ is interpreted
+     as a prefixed unit, and it is equivalent to ‘"km"’ to all effects.
+
+     The third type of unit string format accepted is the special case
+     of udunits time duration with a reference origin, for example
+     ‘"hours since 1970-01-01 00:00:00"’. Note, that the handling of
+     time and calendar operations via the udunits library is subtly
+     different from the way R handles date and time operations. This
+     functionality is mostly exported for users that work with udunits
+     time data, e.g., with NetCDF files. Users are otherwise encouraged
+     to use ‘R’'s date and time functionality provided by ‘Date’ and
+     ‘POSIXt’ classes.
+
+_N_o_t_e:
+
+     By default, unit names are automatically substituted with unit
+     names (e.g., kilogram -> kg). To turn off this behavior, set
+     ‘units_options(auto_convert_names_to_symbols = FALSE)’
+
+_S_e_e _A_l_s_o:
+
+     ‘install_unit’, ‘valid_udunits’
+
+_E_x_a_m_p_l_e_s:
+
+     x = 1:3
+     class(x)
+     units(x) <- as_units("m/s")
+     class(x)
+     y = 2:5
+     a <- set_units(1:3, m/s)
+     units(a) <- make_units(km/h)
+     a
+     # convert to a mixed_units object:
+     units(a) <- c("m/s", "km/h", "km/h")
+     a
+     # The easiest way to assign units to a numeric vector is like this:
+     x <- y <- 1:4
+     units(x) <- "m/s"  # meters / second
+
+     # Alternatively, the easiest pipe-friendly way to set units:
+     if(requireNamespace("magrittr", quietly = TRUE)) {
+       library(magrittr)
+       y %>% set_units(m/s)
+     }
+
+     # these are different ways of creating the same unit:
+     # meters per second squared, i.e, acceleration
+     x1 <- make_units(m/s^2)
+     x2 <- as_units(quote(m/s^2))
+     x2 <- as_units("m/s^2")
+     x3 <- as_units("m s-2") # in product power form, i.e., implicit exponents = T
+     x4 <- set_units(1,  m/s^2) # by default, mode = "symbols"
+     x5 <- set_units(1, "m/s^2",   mode = "standard")
+     x6 <- set_units(1, x1,        mode = "standard")
+     x7 <- set_units(1, units(x1), mode = "standard")
+     x8 <- as_units("m") / as_units("s")^2
+
+     all_identical <- function(...) {
+       l <- list(...)
+       for(i in seq_along(l)[-1])
+         if(!identical(l[[1]], l[[i]]))
+           return(FALSE)
+       TRUE
+     }
+     all_identical(x1, x2, x3, x4, x5, x6, x7, x8)
+
+     # Note, direct usage of these unit creation functions is typically not
+     # necessary, since coercion is automatically done via as_units(). Again,
+     # these are all equivalent ways to generate the same result.
+
+     x1 <- x2 <- x3 <- x4 <- x5 <- x6 <- x7 <- x8 <- 1:4
+     units(x1) <- "m/s^2"
+     units(x2) <- "m s-2"
+     units(x3) <- quote(m/s^2)
+     units(x4) <- make_units(m/s^2)
+     units(x5) <- as_units(quote(m/s^2))
+     x6 <- set_units(x6, m/s^2)
+     x7 <- set_units(x7, "m/s^2", mode = "standard")
+     x8 <- set_units(x8, units(x1), mode = "standard")
+
+     all_identical(x1, x2, x3, x4, x5, x6, x7, x8)
+
+
+     # Both unit names or symbols can be used. By default, unit names are
+     # automatically converted to unit symbols.
+     make_units(degree_C)
+     make_units(kilogram)
+     make_units(ohm)
+
+     ## Arithmetic operations and units
+     # conversion between unit objects that were defined as symbols and names will
+     # work correctly, although unit simplification in printing may not always occur.
+     x <- 500 * make_units(micrograms/liter)
+     y <- set_units(200, ug/l)
+     x + y
+     x * y # numeric result is correct, but units not simplified completely
+
+     # note, plural form of unit name accepted too ('liters' vs 'liter'), and
+     # denominator simplification can be performed correctly
+     x * set_units(5, liters)
+
+     # unit conversion works too
+     set_units(x, grams/gallon)
+
+     ## Creating custom, user defined units
+     # For example, a microbiologist might work with counts of bacterial cells
+     # make_units(cells/ml) # by default, throws an ERROR
+     # First define the unit, then the newly defined unit is accepted.
+     install_unit("cells")
+     make_units(cells/ml)
+
+     # Note that install_unit() adds support for defining relationships between
+     # the newly created symbols or names and existing units.
+
+     ## set_units()
+     # set_units is a pipe friendly version of `units<-`.
+     if(requireNamespace("magrittr", quietly = TRUE)) {
+       library(magrittr)
+       1:5 %>% set_units(N/m^2)
+       # first sets to m, then converts to km
+       1:5 %>% set_units(m) %>% set_units(km)
+     }
+
+     # set_units has two modes of operation. By default, it operates with
+     # bare symbols to define the units.
+     set_units(1:5, m/s)
+
+     # use `mode = "standard"` to use the value of supplied argument, rather than
+     # the bare symbols of the expression. In this mode, set_units() can be
+     # thought of as a simple alias for `units<-` that is pipe friendly.
+     set_units(1:5, "m/s", mode = "standard")
+     set_units(1:5, make_units(m/s), mode = "standard")
+
+     # the mode of set_units() can be controlled via a global option
+     # units_options(set_units_mode = "standard")
+
+     # To remove units use
+     units(x) <- NULL
+     # or
+     set_units(x, NULL)
+     # or
+     drop_units(y)
+     s = Sys.time()
+     d  = s - (s+1)
+     as_units(d)
+
+[1] ""
+_H_a_n_d_l_e _m_e_a_s_u_r_e_m_e_n_t _u_n_i_t_s
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     A number of functions are provided for handling unit objects.
+
+        • ‘`units<-`’ and ‘units’ are the basic functions to set and
+          retrieve units.
+
+        • ‘as_units’, a generic with methods for a character string and
+          for quoted language. Note, direct usage of this function by
+          users is typically not necessary, as coercion via ‘as_units’
+          is automatically done with ‘`units<-`’ and ‘set_units’.
+
+        • ‘make_units’, constructs units from bare expressions.
+          ‘make_units(m/s)’ is equivalent to ‘as_units(quote(m/s))’.
+
+        • ‘set_units’, a pipe-friendly version of ‘`units<-`’. By
+          default it operates with bare expressions, but this behavior
+          can be disabled by a specifying ‘mode = "standard"’ or
+          setting ‘units_options(set_units_mode = "standard")’.  If
+          ‘value’ is missing or set to ‘1’, the object becomes
+          unitless.
+
+_U_s_a_g_e:
+
+     ## S3 replacement method for class 'numeric'
+     units(x) <- value
+
+     ## S3 replacement method for class 'units'
+     units(x) <- value
+
+     ## S3 replacement method for class 'logical'
+     units(x) <- value
+
+     ## S3 method for class 'units'
+     units(x)
+
+     ## S3 method for class 'symbolic_units'
+     units(x)
+
+     set_units(x, value, ..., mode = units_options("set_units_mode"))
+
+     make_units(bare_expression, check_is_valid = TRUE)
+
+     as_units(x, ...)
+
+     ## Default S3 method:
+     as_units(x, value = unitless, ...)
+
+     ## S3 method for class 'units'
+     as_units(x, value, ...)
+
+     ## S3 method for class 'symbolic_units'
+     as_units(x, value, ...)
+
+     ## S3 method for class 'difftime'
+     as_units(x, value, ...)
+
+     ## S3 method for class 'character'
+     as_units(x, ..., check_is_valid = TRUE,
+       force_single_symbol = FALSE)
+
+     ## S3 method for class 'call'
+     as_units(x, ...)
+
+     ## S3 method for class 'expression'
+     as_units(x, ...)
+
+     ## S3 method for class 'name'
+     as_units(x, ...)
+
+     ## S3 method for class 'POSIXt'
+     as_units(x, value, ...)
+
+     ## S3 method for class 'Date'
+     as_units(x, value, ...)
+
+_A_r_g_u_m_e_n_t_s:
+
+       x: numeric vector, or object of class ‘units’.
+
+   value: object of class ‘units’ or ‘symbolic_units’, or in the case
+          of ‘set_units’ expression with symbols (see examples).
+
+     ...: passed on to other methods.
+
+    mode: if ‘"symbols"’ (the default), then unit is constructed from
+          the expression supplied. Otherwise, if‘mode = "standard"’,
+          standard evaluation is used for the supplied value This
+          argument can be set via a global option
+          ‘units_options(set_units_mode = "standard")’
+
+bare_expression: a bare R expression describing units. Must be valid R
+          syntax (reserved R syntax words like ‘in’ must be backticked)
+
+check_is_valid: throw an error if all the unit symbols are not either
+          recognized by udunits2, or a custom user defined via
+          ‘install_unit()’. If ‘FALSE’, no check for validity is
+          performed.
+
+force_single_symbol: Whether to perform no string parsing and force
+          treatment of the string as a single symbol.
+
+_D_e_t_a_i_l_s:
+
+     If ‘value’ is of class ‘units’ and has a value unequal to 1, this
+     value is ignored unless ‘units_options("simplifiy")’ is ‘TRUE’. If
+     ‘simplify’ is ‘TRUE’, ‘x’ is multiplied by this value.
+
+_V_a_l_u_e:
+
+     An object of class ‘units’.
+
+     The ‘units’ method retrieves the units attribute, which is of
+     class ‘symbolic_units’.
+
+_C_h_a_r_a_c_t_e_r _s_t_r_i_n_g_s:
+
+     Generally speaking, there are 3 types of unit strings are accepted
+     in ‘as_units’ (and by extension, ‘`units<-`’).
+
+     The first type, and likely most common, is a "standard" format
+     unit specification where the relationship between unit symbols or
+     names is specified explicitly with arithmetic symbols for division
+     ‘/’, multiplication ‘*’ and power exponents ‘^’.
+
+     The second type of unit string accepted is one with implicit
+     exponents. In this format, ‘/’, ‘*’, and ‘^’, may not be present
+     in the string, and unit symbol or names must be separated by a
+     space. Each unit symbol may optionally be followed by a single
+     number, specifying the power.  For example ‘"m2 s-2"’ is
+     equivalent to ‘"(m^2)*(s^-2)"’.
+
+     If the string supplied fails to parse, then the string is treated
+     as a single symbolic unit and ‘symbolic_unit(chr)’ is used as a
+     fallback with a warning. In that case, automatic unit
+     simplification may not work properly when performing operations on
+     unit objects, but unit conversion and other Math operations should
+     still give correct results so long as the unit string supplied
+     returns ‘TRUE’ for ‘ud_is_parsable()’.
+
+     It must be noted that prepended numbers are supported too, but are
+     not treated as magnitudes. For example, ‘"1000 m"’ is interpreted
+     as a prefixed unit, and it is equivalent to ‘"km"’ to all effects.
+
+     The third type of unit string format accepted is the special case
+     of udunits time duration with a reference origin, for example
+     ‘"hours since 1970-01-01 00:00:00"’. Note, that the handling of
+     time and calendar operations via the udunits library is subtly
+     different from the way R handles date and time operations. This
+     functionality is mostly exported for users that work with udunits
+     time data, e.g., with NetCDF files. Users are otherwise encouraged
+     to use ‘R’'s date and time functionality provided by ‘Date’ and
+     ‘POSIXt’ classes.
+
+_N_o_t_e:
+
+     By default, unit names are automatically substituted with unit
+     names (e.g., kilogram -> kg). To turn off this behavior, set
+     ‘units_options(auto_convert_names_to_symbols = FALSE)’
+
+_S_e_e _A_l_s_o:
+
+     ‘install_unit’, ‘valid_udunits’
+
+_E_x_a_m_p_l_e_s:
+
+     x = 1:3
+     class(x)
+     units(x) <- as_units("m/s")
+     class(x)
+     y = 2:5
+     a <- set_units(1:3, m/s)
+     units(a) <- make_units(km/h)
+     a
+     # convert to a mixed_units object:
+     units(a) <- c("m/s", "km/h", "km/h")
+     a
+     # The easiest way to assign units to a numeric vector is like this:
+     x <- y <- 1:4
+     units(x) <- "m/s"  # meters / second
+
+     # Alternatively, the easiest pipe-friendly way to set units:
+     if(requireNamespace("magrittr", quietly = TRUE)) {
+       library(magrittr)
+       y %>% set_units(m/s)
+     }
+
+     # these are different ways of creating the same unit:
+     # meters per second squared, i.e, acceleration
+     x1 <- make_units(m/s^2)
+     x2 <- as_units(quote(m/s^2))
+     x2 <- as_units("m/s^2")
+     x3 <- as_units("m s-2") # in product power form, i.e., implicit exponents = T
+     x4 <- set_units(1,  m/s^2) # by default, mode = "symbols"
+     x5 <- set_units(1, "m/s^2",   mode = "standard")
+     x6 <- set_units(1, x1,        mode = "standard")
+     x7 <- set_units(1, units(x1), mode = "standard")
+     x8 <- as_units("m") / as_units("s")^2
+
+     all_identical <- function(...) {
+       l <- list(...)
+       for(i in seq_along(l)[-1])
+         if(!identical(l[[1]], l[[i]]))
+           return(FALSE)
+       TRUE
+     }
+     all_identical(x1, x2, x3, x4, x5, x6, x7, x8)
+
+     # Note, direct usage of these unit creation functions is typically not
+     # necessary, since coercion is automatically done via as_units(). Again,
+     # these are all equivalent ways to generate the same result.
+
+     x1 <- x2 <- x3 <- x4 <- x5 <- x6 <- x7 <- x8 <- 1:4
+     units(x1) <- "m/s^2"
+     units(x2) <- "m s-2"
+     units(x3) <- quote(m/s^2)
+     units(x4) <- make_units(m/s^2)
+     units(x5) <- as_units(quote(m/s^2))
+     x6 <- set_units(x6, m/s^2)
+     x7 <- set_units(x7, "m/s^2", mode = "standard")
+     x8 <- set_units(x8, units(x1), mode = "standard")
+
+     all_identical(x1, x2, x3, x4, x5, x6, x7, x8)
+
+
+     # Both unit names or symbols can be used. By default, unit names are
+     # automatically converted to unit symbols.
+     make_units(degree_C)
+     make_units(kilogram)
+     make_units(ohm)
+
+     ## Arithmetic operations and units
+     # conversion between unit objects that were defined as symbols and names will
+     # work correctly, although unit simplification in printing may not always occur.
+     x <- 500 * make_units(micrograms/liter)
+     y <- set_units(200, ug/l)
+     x + y
+     x * y # numeric result is correct, but units not simplified completely
+
+     # note, plural form of unit name accepted too ('liters' vs 'liter'), and
+     # denominator simplification can be performed correctly
+     x * set_units(5, liters)
+
+     # unit conversion works too
+     set_units(x, grams/gallon)
+
+     ## Creating custom, user defined units
+     # For example, a microbiologist might work with counts of bacterial cells
+     # make_units(cells/ml) # by default, throws an ERROR
+     # First define the unit, then the newly defined unit is accepted.
+     install_unit("cells")
+     make_units(cells/ml)
+
+     # Note that install_unit() adds support for defining relationships between
+     # the newly created symbols or names and existing units.
+
+     ## set_units()
+     # set_units is a pipe friendly version of `units<-`.
+     if(requireNamespace("magrittr", quietly = TRUE)) {
+       library(magrittr)
+       1:5 %>% set_units(N/m^2)
+       # first sets to m, then converts to km
+       1:5 %>% set_units(m) %>% set_units(km)
+     }
+
+     # set_units has two modes of operation. By default, it operates with
+     # bare symbols to define the units.
+     set_units(1:5, m/s)
+
+     # use `mode = "standard"` to use the value of supplied argument, rather than
+     # the bare symbols of the expression. In this mode, set_units() can be
+     # thought of as a simple alias for `units<-` that is pipe friendly.
+     set_units(1:5, "m/s", mode = "standard")
+     set_units(1:5, make_units(m/s), mode = "standard")
+
+     # the mode of set_units() can be controlled via a global option
+     # units_options(set_units_mode = "standard")
+
+     # To remove units use
+     units(x) <- NULL
+     # or
+     set_units(x, NULL)
+     # or
+     drop_units(y)
+     s = Sys.time()
+     d  = s - (s+1)
+     as_units(d)
+
+[1] ""
+
+PROBE: raw set_units year to day without consent
+structure(c(a = 365.24219878125, b = NA), units = structure(list(
+    numerator = "d", denominator = character(0)), class = "symbolic_units"), class = "units")
+
+PROBE: raw replacement year to month without consent
+structure(c(a = 12, b = NA), units = structure(list(numerator = "month",
+    denominator = character(0)), class = "symbolic_units"), class = "units")
+
+PROBE: raw multiplication creates squared units
+structure(c(a = 1, b = NA), unit = "year", units = structure(list(
+    numerator = c("year", "year"), denominator = character(0)), class = "symbolic_units"), class = "units")
+
+PROBE: raw subtraction produces negative age
+structure(c(a = -1, b = NA), units = structure(list(numerator = "year",
+    denominator = character(0)), class = "symbolic_units"), class = "units", unit = "year")
+
+PROBE: raw comparison silently converts calendar units
+c(a = TRUE, b = NA)
+
+PROBE: raw vctrs slice
+structure(c(a = 1), unit = "year", class = c("age", "vctrs_vctr",
+"double"))
+
+PROBE: raw numeric offset
+ERROR: both operands of the expression should be "units" objects
+
+UDUNITS definitions
+    month      year
+ 30.43685 365.24220

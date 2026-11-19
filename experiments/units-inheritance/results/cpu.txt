@@ -1,0 +1,8 @@
+Architecture:                            x86_64
+CPU(s):                                  12
+On-line CPU(s) list:                     0-11
+Model name:                              AMD Ryzen 5 1600 Six-Core Processor
+Thread(s) per core:                      2
+Core(s) per socket:                      6
+CPU(s) scaling MHz:                      75%
+NUMA node0 CPU(s):                       0-11

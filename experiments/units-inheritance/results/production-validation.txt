@@ -1,0 +1,20 @@
+Production source at 7e732d4; experiment scripts are not loaded by package tests.
+
+Command: Rscript -e 'devtools::test()'
+══ Results ═════════════════════════════════════════════════════════════════════
+Duration: 23.8 s
+
+── Skipped tests (1) ───────────────────────────────────────────────────────────
+• {mudnester} is not installed (1): 'test-mudnester.R:103:3'
+
+[ FAIL 0 | WARN 0 | SKIP 1 | PASS 3424 ]
+
+Command: Rscript -e 'devtools::check(document = FALSE, check_dir = "/tmp/agecraft-units-experiment-check")'
+── R CMD check results ──────────────────────────────── agecraft 0.1.0.9022 ────
+Duration: 1m 15.3s
+
+❯ checking top-level files ... NOTE
+  Non-standard file/directory found at top level:
+    ‘experiments’
+
+0 errors ✔ | 0 warnings ✔ | 1 note ✖

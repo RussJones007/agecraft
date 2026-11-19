@@ -1,0 +1,23 @@
+safety: W1W234
+
+══ Warnings ════════════════════════════════════════════════════════════════════
+1. mixed units arithmetic cannot bypass calendar consent ('test-safety.R:4:5') - Incompatible methods ("Ops.age", "Ops.units") for "+"
+
+2. mixed units arithmetic cannot bypass calendar consent ('test-safety.R:5:5') - Incompatible methods ("Ops.units", "Ops.age") for "+"
+
+══ Failed ══════════════════════════════════════════════════════════════════════
+── 1. Failure ('test-safety.R:4:5'): mixed units arithmetic cannot bypass calend
+Expected `x + y` to throw a error.
+
+── 2. Failure ('test-safety.R:5:5'): mixed units arithmetic cannot bypass calend
+Expected `y + x` to throw a error.
+
+── 3. Failure ('test-safety.R:8:5'): base data frame and list conversions retain
+Expected `as.data.frame(x)$x` to inherit from "age".
+Actual class: "units".
+
+── 4. Failure ('test-safety.R:9:5'): base data frame and list conversions retain
+Expected `as.list(x)[[1]]` to inherit from "age".
+Actual class: "units".
+
+══ DONE ════════════════════════════════════════════════════════════════════════
