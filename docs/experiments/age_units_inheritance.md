@@ -328,3 +328,16 @@ measurement; dplyr is optional and was available here. Results are observations
 on this machine, not cross-platform performance guarantees.
 
 Production remains on the existing vctrs representation pending a go/no-go decision.
+
+## Follow-up: faster comparisons without units inheritance
+
+A separate [baseline comparison investigation](../../experiments/comparison-performance/report.md)
+found that casting and repeated value validation dominate equality comparisons.
+A session-only same-class cast candidate uses scalar minimum/maximum reductions
+to preserve validation while reducing temporary allocations. Fresh paired
+million-element measurements showed equality improving from 84 to 19 ms and
+ordering from 46 to 14 ms, with roughly half the allocation. The workloads differ
+from the original inheritance benchmark; see that report for limits. The existing
+3,424-assertion package suite passed with the candidate active. No production
+source was changed. This provides a route to improving the existing class
+without adopting units inheritance.

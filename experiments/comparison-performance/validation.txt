@@ -1,0 +1,15 @@
+Command: Rscript experiments/comparison-performance/investigate.R
+............................................................
+══ DONE ════════════════════════════════════════════════════════════════════════
+Comparison and cast assertions completed; measurements written.
+
+Command: Rscript experiments/comparison-performance/check.R
+══ Results ═════════════════════════════════════════════════════════════════════
+Duration: 23.2 s
+
+── Skipped tests (1) ───────────────────────────────────────────────────────────
+• {mudnester} is not installed (1): 'test-mudnester.R:103:3'
+
+[ FAIL 0 | WARN 0 | SKIP 1 | PASS 3424 ]
+Verified candidate registration remained active throughout this test process.
+Ran 4/4 deferred expressions
