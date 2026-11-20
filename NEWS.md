@@ -1,5 +1,11 @@
 # agecraft 0.1.0.9022
 
+- Add `calculate_age(leap_day = "feb28")` for studies that count yearly
+  anniversaries of February 29 births on February 28 in non-leap years.
+  March 1 remains the default.
+- On the experiment branch, use RcppDate for vectorized calendar-year and
+  calendar-month calculations in `calculate_age()`.
+
 - Add `age_interval(breaks = cuts)` for adjacent age bands. Each consecutive pair
   defines one right-open interval, with no appended boundary. Include `Inf` for
   an open-ended final band. Existing paired-bound calls and legacy numeric

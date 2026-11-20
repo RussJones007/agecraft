@@ -26,7 +26,8 @@ age <- calculate_age(birth, reference, "year")
 age
 ```
 
-Leap birthdays reach their next year on March 1 in non-leap years. The
+Leap birthdays reach their next year on March 1 by default in non-leap years.
+Set `leap_day = "feb28"` if your analysis uses February 28. The
 default result is an `age` vector that retains fractions while
 displaying completed whole years. Use `as.numeric(age)` to extract the
 fractions or `as.integer(age)` for completed years. Request

@@ -9,7 +9,8 @@ calculate_age(
   start,
   end = lubridate::now(),
   unit = c("year", "day", "hour", "minute", "month", "second", "week"),
-  output = c("age", "units", "numeric")
+  output = c("age", "units", "numeric"),
+  leap_day = c("mar1", "feb28")
 )
 
 categorize_age(
@@ -43,6 +44,10 @@ the matched age_interval per observation, in the original group units. Both
 preserve input order, repeats and missing/unmatched observations. Interval
 inputs match only when completely contained in a group. Named groups use
 their nonblank names as factor labels; other groups use interval labels.}
+
+\item{leap_day}{A character string specifying the yearly anniversary of a
+February 29 birth in non-leap years. Use \code{"mar1"} (the default) for March 1
+or \code{"feb28"} for February 28. Applies to completed and fractional years.}
 
 \item{ages}{A numeric, \code{age}, \code{units}, or interval vector. \code{units} observations
 must already have a supported simple time unit or alias: second, minute,
@@ -118,8 +123,7 @@ Request output = "units" for the previous completed-unit return format, or
 output = "numeric" for completed ages as plain numbers.
 
 Fractional years are completed birthdays plus the fraction of civil (i.e. calendar) days
-between the previous and next birthdays. Leap birthdays reach their next
-year on March 1 in non-leap years. Fractional months analogously use calendar
+between the previous and next birthdays. Fractional months use calendar
 month anniversaries, rolling back to the final day of shorter months.
 Both anniversaries are anchored to the original start date.
 For POSIXct inputs, calendar calculations use the start time zone and ignore

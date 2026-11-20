@@ -38,6 +38,9 @@ class or tibble column header and displays completed whole units without suffixe
 `fractional = TRUE`), an intentional change from unit-suffixed strings;
 `as.numeric()` extracts the fractions and `as.integer()` extracts completed units.
 Years and months use calendar anniversaries; finer units use elapsed time.
+For yearly ages of February 29 births, `leap_day = "mar1"` is the default
+and `leap_day = "feb28"` uses February 28 in non-leap years. The choice sets
+the anniversary for both completed and fractional years.
 
 This default changed during development in 0.1.0.9013. Use `output = "units"`
 for the previous completed-age units vector or `output = "numeric"` for plain

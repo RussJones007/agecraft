@@ -36,7 +36,7 @@ The package is an **experimental**, S3/vctrs-oriented R package (R >= 4.1.0). It
 - `calculate_age(start, end, unit, output = "age")` returns a fractional `age` vector by default. Its display shows completed whole units; `as.numeric()` retrieves stored fractions and `as.integer()` completed units.
 - `output = "units"` returns the older completed-age `units` representation; `output = "numeric"` returns plain completed ages. The older `calc_age()` wrapper and `age_auto_unit()` continue to return completed values. Lost fractions cannot be recovered by coercion.
 - Age values are nonnegative, finite, or missing. Each `age` vector has one explicit unit. Combining/comparing incompatible units requires explicit conversion.
-- Years/months use calendar anniversaries; finer units use elapsed time. Calendar calculation uses civil dates in the start time zone and ignores time of day. Leap-day birthdays advance on March 1 in non-leap years; month-end anniversaries roll back to the last day of shorter months.
+- Years and months use calendar anniversaries. Calendar calculation uses civil dates in the start time zone and ignores time of day. Finer units use elapsed time. In non-leap years, yearly anniversaries for February 29 births fall on March 1 by default, or February 28 with `leap_day = "feb28"`. Month-end anniversaries roll back to the last day of shorter months.
 - Month/year conversions in either direction, and calendar-versus-finer-unit conversions, are potentially approximate and require `allow_approx = TRUE`. A converted value does not reconstruct the original dates.
 - `age_auto_unit()` defaults to day/month/year reporting and optionally supports weeks. Automatic hours and calendar shifting remain deferred.
 

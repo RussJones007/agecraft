@@ -104,7 +104,7 @@ calculate_age(birth_dates, reference_date, unit = "month")
 calculate_age(birth_dates, reference_date, unit = "day")
 ```
 
-Years and months use calendar anniversaries. A fractional year is the number of completed birthdays plus the fraction of days between the previous and next birthdays. Months use the analogous month anniversaries. Leap birthdays fall on March 1 in non-leap years; month anniversaries fall on the last day of a shorter month when necessary.
+Years and months use calendar anniversaries. A fractional year is the number of completed birthdays plus the fraction of days between the previous and next birthdays. In non-leap years, leap birthdays fall on March 1 by default. Use `leap_day = "feb28"` to use February 28. Month anniversaries fall on the last day of a shorter month when necessary.
 
 For date-times, calendar years and months use calendar dates in the starting time zone and ignore time of day. Smaller units measure elapsed time: a day means 24 hours, so crossing a daylight-saving transition may give a fraction of a day.
 

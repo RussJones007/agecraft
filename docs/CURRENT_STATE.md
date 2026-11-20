@@ -1,3 +1,38 @@
+# RcppDate calendar-age experiment
+
+On `experiment_RCPP`, `calculate_age()` computes calendar years and months
+in one C++ pass over validated civil-date pairs. The fractional result uses
+the days elapsed between anniversaries anchored to the original birth date.
+The completed-only formats skip the fractional calculation. The R calculation
+handles fractional day counts or dates outside the C++ calendar range.
+
+Yearly anniversaries for February 29 births in non-leap years fall on March 1
+by default. Set `leap_day = "feb28"` for February 28 in all three output
+formats. Elapsed-time units continue to use the original inputs, including
+the full time of day for `POSIXct` values.
+
+Run `scripts/validation/benchmark-calendar-age.R` from the repository root
+with the optimized package installed and `bench` available. It checks
+agreement against the original R implementation at `7e732d4` before timing.
+This run used R 4.5.0 and RcppDate 0.0.7 on Linux with 100,000 pairwise dates:
+
+| Calculation | Original median | Experiment median | Original allocation | Experiment allocation |
+| --- | ---: | ---: | ---: | ---: |
+| Fractional years | 913.2 ms | 8.0 ms | 199.2 MB | 4.8 MB |
+| Completed years | 187.7 ms | 4.7 ms | 57.2 MB | 2.0 MB |
+| Fractional months | 1081.4 ms | 6.8 ms | 235.5 MB | 4.8 MB |
+| Completed months | 420.8 ms | 5.1 ms | 97.3 MB | 2.0 MB |
+| Automatic unit selection | 576.6 ms | 19.2 ms | 176.5 MB | 25.3 MB |
+
+`timeplyr` 1.1.2 matched completed years on the timed inputs. For 100,000
+pairwise dates it took 20.6 ms. With one shared reference date it took 5.34 ms,
+compared with 5.28 ms for the experiment.
+
+The Linux source-package build and `R CMD check --no-manual` passed, including
+examples, vignette rebuilds, and 3,647 test assertions.
+
+---
+
 # Cut-point interval construction — 2026-11-18
 
 Implemented `age_interval(breaks = cuts)` as an additive final argument.
