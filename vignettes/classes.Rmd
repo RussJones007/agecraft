@@ -121,9 +121,9 @@ fraction between consecutive anniversaries. These rules account for dates that
 do not occur in every year or month:
 
 - **Leap birthdays:** For someone born on February 29, the yearly anniversary
-  falls on March 1 in a non-leap year and February 29 in a leap year. Someone
-  born on February 29, 2020 therefore completes one year on March 1, 2021,
-  rather than February 28.
+  falls on February 29 in a leap year and on March 1 by default in a non-leap
+  year. Someone born on February 29, 2020 completes one year on March 1, 2021
+  by default, or on February 28, 2021 with `leap_day = "feb28"`.
 - **Month ends:** If the original day does not exist in the target month,
   the monthly anniversary falls on that month's last day. For someone born
   on January 31, 2025, the first two monthly anniversaries are February 28

@@ -32,10 +32,14 @@ Imports:
     ivs,
     lubridate,
     purrr,
+    Rcpp,
     rlang,
     stringr,
     units,
     vctrs
+LinkingTo:
+    Rcpp,
+    RcppDate
 Roxygen: list(markdown = TRUE)
 Config/roxygen2/version: 8.1.1
 VignetteBuilder: knitr

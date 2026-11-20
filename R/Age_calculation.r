@@ -21,8 +21,7 @@
 #'   output = "numeric" for completed ages as plain numbers.
 #'
 #'   Fractional years are completed birthdays plus the fraction of civil (i.e. calendar) days
-#'   between the previous and next birthdays. Leap birthdays reach their next
-#'   year on March 1 in non-leap years. Fractional months analogously use calendar
+#'   between the previous and next birthdays. Fractional months use calendar
 #'   month anniversaries, rolling back to the final day of shorter months.
 #'   Both anniversaries are anchored to the original start date.
 #'   For POSIXct inputs, calendar calculations use the start time zone and ignore
@@ -37,6 +36,9 @@
 #'   end must also be POSIXct.
 #' @param unit  A character string of the age unit to use like: year (default), month, week, day, hour, minute, or
 #'   second.
+#' @param leap_day A character string specifying the yearly anniversary of a
+#'   February 29 birth in non-leap years. Use `"mar1"` (the default) for March 1
+#'   or `"feb28"` for February 28. Applies to completed and fractional years.
 #'
 #' @return For calculate_age(), an age vector by default. With output = "units",
 #'   a completed-age units vector; with output = "numeric", completed ages as doubles.
@@ -67,9 +69,11 @@
 calculate_age <- function(start,
                           end = lubridate::now(),
                           unit = c("year", "day", "hour", "minute", "month", "second", "week"),
-                          output = c("age", "units", "numeric")) {
+                          output = c("age", "units", "numeric"),
+                          leap_day = c("mar1", "feb28")) {
   unit <- match.arg(unit)
   output <- match.arg(output)
+  leap_day <- match.arg(leap_day)
   if (lubridate::is.Date(start)) end <- as.Date(end)
   assertthat::assert_that(
     (lubridate::is.Date(start) && lubridate::is.Date(end)) ||
@@ -81,32 +85,38 @@ calculate_age <- function(start,
   if (any(end < start, na.rm = TRUE)) {
     stop("end must not precede start when calculating age", call. = FALSE)
   }
-  # Calendar ages use local civil (.e. calendar) dates in the starting time zone.
-  civil_start <- as_civil_date(start)
-  civil_end <- as_civil_date(end, tz = lubridate::tz(start))
-  res <- switch(unit,
-    year = calc_year(civil_start, civil_end),
-    month = calc_month(civil_start, civil_end),
-    as.numeric(difftime(end, start, units = "secs")) /
-      switch(unit, second = 1, minute = 60, hour = 3600, day = 86400, week = 604800)
-  )
-  if (output == "age") {
-    if (unit %in% c("year", "month")) {
-      # Anchor both anniversaries to the original birth date, avoiding drift
-      # after a shorter month or a leap birthday.
-      lower <- lubridate::add_with_rollback(
-        civil_start, if (unit == "year") lubridate::period(year = res) else lubridate::period(month = res),
-        roll_to_first = unit == "year")
-      upper <- lubridate::add_with_rollback(
-        civil_start, if (unit == "year") lubridate::period(year = res + 1) else lubridate::period(month = res + 1),
-        roll_to_first = unit == "year")
-      res <- res + as.numeric(civil_end - lower) / as.numeric(upper - lower)
+  if (unit %in% c("year", "month")) {
+    # Calendar ages use local civil dates in the starting time zone.
+    civil_start <- as_civil_date(start)
+    civil_end <- as_civil_date(end, tz = lubridate::tz(start))
+    yearly <- unit == "year"
+    fractional <- output == "age"
+    res <- calendar_age_cpp(civil_start, civil_end, yearly, fractional, leap_day == "mar1")
+    if (is.null(res)) {
+      res <- calendar_age_r(civil_start, civil_end, yearly, fractional, leap_day)
     }
-    return(age(as.numeric(res), unit))
+  } else {
+    res <- as.numeric(difftime(end, start, units = "secs")) /
+      switch(unit, second = 1, minute = 60, hour = 3600, day = 86400, week = 604800)
   }
+  if (output == "age") return(age(as.numeric(res), unit))
   completed <- floor(as.numeric(res))
   if (output == "numeric") return(completed)
   units::set_units(completed, unit, mode = "standard")
+}
+
+# Preserve the R calculation for Date values outside the native kernel's domain.
+calendar_age_r <- function(start, end, yearly, fractional, leap_day) {
+  completed <- if (yearly) calc_year(start, end, leap_day) else calc_month(start, end)
+  if (!fractional) return(completed)
+
+  # Anchor both anniversaries to the original birth date.
+  roll_to_first <- yearly && leap_day == "mar1"
+  lower_period <- if (yearly) lubridate::period(year = completed) else lubridate::period(month = completed)
+  upper_period <- if (yearly) lubridate::period(year = completed + 1) else lubridate::period(month = completed + 1)
+  lower <- lubridate::add_with_rollback(start, lower_period, roll_to_first = roll_to_first)
+  upper <- lubridate::add_with_rollback(start, upper_period, roll_to_first = roll_to_first)
+  completed + as.numeric(end - lower) / as.numeric(upper - lower)
 }
 
 as_civil_date <- function(x, tz = lubridate::tz(x)) {
@@ -143,9 +153,9 @@ calc_age <- function(start,
 # updated that code to remove the error with vector use in an if function
 # Ignores NA in either start or end
 # Assumption is that start and end are the same length and is enforced by the calling function
-#' @param start, end
+#' @param start, end, leap_day
 #' @noRd
-calc_year <- function(start, end){
+calc_year <- function(start, end, leap_day = "mar1"){
   #  return vector set to NA the same length as start and end
   ret <- integer(length(start))
   ret[] <- NA_real_
@@ -155,13 +165,20 @@ calc_year <- function(start, end){
   start  <- start[!na_lgl]
   end    <- end[!na_lgl]
 
-  year_delta    <- lubridate::year(end)  - lubridate::year(start)
-  months_delta  <- lubridate::month(end) - lubridate::month(start)
-  days_delta    <- lubridate::day(end)   - lubridate::day(start)
+  end_year <- lubridate::year(end)
+  start_month <- lubridate::month(start)
+  start_day <- lubridate::day(start)
+  months_delta <- lubridate::month(end) - start_month
+  days_delta <- lubridate::day(end) - start_day
+  year_delta <- end_year - lubridate::year(start)
 
-  # take away one year based months and days have not occurred yet
-  one_lgl       <- ((months_delta < 0) | (months_delta == 0 & days_delta < 0))
-  year_delta[one_lgl]  <- year_delta[one_lgl] - 1
+  before_birthday <- months_delta < 0 | (months_delta == 0 & days_delta < 0)
+  if (leap_day == "feb28") {
+    on_early_anniversary <- start_month == 2 & start_day == 29 &
+      months_delta == 0 & days_delta == -1 & !lubridate::leap_year(end_year)
+    before_birthday[on_early_anniversary] <- FALSE
+  }
+  year_delta[before_birthday] <- year_delta[before_birthday] - 1
 
   # assign non-NA values and return
   ret[!na_lgl] <- year_delta

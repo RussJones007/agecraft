@@ -88,7 +88,7 @@ calculate_age(as.Date("2024-01-01"), as.Date("2024-07-02"), output = "numeric")
 
 ### Calendar conventions
 
-Fractional years are completed birthdays plus the fraction of civil days between the previous and next birthdays. February 29 birthdays advance on March 1 in non-leap years. Fractional months use calendar month anniversaries, falling on the last day of shorter months. Anniversaries are anchored to the original birth date to avoid drift.
+Fractional years are completed birthdays plus the fraction of civil days between the previous and next birthdays. In non-leap years, February 29 birthdays advance on March 1 by default. Use `leap_day = "feb28"` in `calculate_age()` to use February 28 instead. Fractional months use calendar month anniversaries, falling on the last day of shorter months. Anniversaries are anchored to the original birth date to avoid drift.
 
 For POSIXct inputs, years and months use civil dates in the starting time zone and ignore time of day. Smaller units measure elapsed time: a day is 24 hours and a week is seven such days. Daylight-saving transitions can therefore yield fractional days. When `start` is Date, `end` is converted with `as.Date()`; when `start` is POSIXct, `end` must also be POSIXct.
 
