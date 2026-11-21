@@ -8,11 +8,13 @@ Authors@R: person(
     email = "RussJones007@gmail.com",
     comment = NULL
   )
-Description: Calculate calendar and elapsed ages from dates and date-times,
-    retaining fractional precision with explicit time units. Represent age ranges
-    as intervals with fractional boundaries and optional names, classify ages
-    into ordered categories, and compare age intervals. Includes reusable age-interval
-    definitions and explicit unit conversion.
+Description: Calculate ages from calendar dates or elapsed time with units such as 
+    years, months, weeks, and days. Explicit unit conversion for ages included.  
+    The calculated ages from dates and date-times retain fractional precision with 
+    time units. Age ranges or intervals with fractional boundaries and 
+    optional names can be used to group/categorize ages into ordered categories. 
+    Includes reusable age-interval definitions and an age interval scheme system for 
+    provenance information. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
