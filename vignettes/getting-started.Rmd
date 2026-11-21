@@ -1,8 +1,8 @@
 ---
-title: "Getting started with agecraft"
+title: "01. Getting started with agecraft"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with agecraft}
+  %\VignetteIndexEntry{01. Getting started with agecraft}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

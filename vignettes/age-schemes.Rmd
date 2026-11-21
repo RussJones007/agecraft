@@ -1,8 +1,8 @@
 ---
-title: "Creating and using reusable age schemes"
+title: "07. Creating and using reusable age schemes"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Creating and using reusable age schemes}
+  %\VignetteIndexEntry{07. Creating and using reusable age schemes}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

@@ -1,9 +1,9 @@
 ---
-title: "Calculating, comparing, and grouping ages"
+title: "04. Calculating, comparing, and grouping ages"
 author: "Russ Jones"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Calculating, comparing, and grouping ages}
+  %\VignetteIndexEntry{04. Calculating, comparing, and grouping ages}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

@@ -1,8 +1,8 @@
 ---
-title: "Understanding ages, intervals, groups, and schemes"
+title: "03. Understanding ages, intervals, groups, and schemes"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Understanding ages, intervals, groups, and schemes}
+  %\VignetteIndexEntry{03. Understanding ages, intervals, groups, and schemes}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

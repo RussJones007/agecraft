@@ -1,8 +1,8 @@
 ---
-title: "An age reporting workflow for public health"
+title: "02. An age reporting workflow for public health"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{An age reporting workflow for public health}
+  %\VignetteIndexEntry{02. An age reporting workflow for public health}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

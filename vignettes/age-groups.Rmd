@@ -1,8 +1,8 @@
 ---
-title: "Working with assigned age groups"
+title: "05. Working with assigned age groups"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Working with assigned age groups}
+  %\VignetteIndexEntry{05. Working with assigned age groups}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

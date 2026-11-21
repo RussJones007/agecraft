@@ -1,8 +1,8 @@
 ---
-title: "Comparing age intervals"
+title: "08. Comparing age intervals"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Comparing age intervals}
+  %\VignetteIndexEntry{08. Comparing age intervals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

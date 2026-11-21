@@ -1,8 +1,8 @@
 ---
-title: "Choosing age groups for an analysis"
+title: "06. Choosing age groups for an analysis"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Choosing age groups for an analysis}
+  %\VignetteIndexEntry{06. Choosing age groups for an analysis}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
