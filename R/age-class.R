@@ -177,6 +177,7 @@ format.age <- function(x, ..., fractional = get_option("agecraft.display.fractio
   if (!is.logical(fractional) || length(fractional) != 1L || is.na(fractional)) {
     stop("fractional must be TRUE or FALSE", call. = FALSE)
   }
+
   values <- vctrs::vec_data(x)
   if (!fractional) values <- floor(values)
   out <- format(values, trim = TRUE, ...)
@@ -224,7 +225,7 @@ as.character.age <- function(x, ..., fractional = get_option("agecraft.display.f
 vec_ptype_abbr.age <- function(x, ...) paste0("age-", attr(x, "unit"))
 
 #' @exportS3Method vctrs::vec_ptype_full
-vec_ptype_full.age <- function(x, ...) paste0("age [", attr(x, "unit"), "]")
+vec_ptype_full.age <- function(x, ...) paste0("age (", attr(x, "unit"), ")")
 
 #' @exportS3Method vctrs::vec_restore
 vec_restore.age <- function(x, to, ...) new_age(x, attr(to, "unit"))
