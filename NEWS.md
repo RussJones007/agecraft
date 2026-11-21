@@ -1,5 +1,16 @@
 # agecraft 0.1.0.9023
 
+- Reversed date pairs in `calculate_age()` return `NA` and warn once with the
+  affected count instead of stopping by default. Set
+  `options(agecraft.end_before_start = "error")` to retain strict validation.
+  This also applies to `calc_age()` and `age_auto_unit()`.
+- Add session defaults `agecraft.display.fractional = FALSE`,
+  `agecraft.compare.ambiguous = "allow"`, and
+  `agecraft.classify.unmatched = "allow"`. Explicit display/comparison arguments
+  override their options; unmatched diagnostics exclude missing input ages.
+- Add `as.character()` for age vectors, showing completed units by default or
+  stored fractions with `fractional = TRUE`, without unit suffixes. Names and
+  missing values are preserved.
 - Speed up completed and fractional calendar-year and calendar-month
   calculations in `calculate_age()` with a vectorized RcppDate backend.
   Elapsed-time calculations use the full time of day supplied in `POSIXct`

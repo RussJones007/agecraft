@@ -40,6 +40,14 @@
 #' @return An ordered factor identifying each age group, ordered by interval.
 #'   Nonblank group names supply labels; missing or blank names fall back to
 #'   interval labels. Distinct intervals must have unique resulting labels.
+#' @details
+#'   `getOption("agecraft.classify.unmatched", "allow")` controls present ages
+#'   with no matching category. `"allow"` returns missing assignments silently;
+#'   `"warn"` also issues one warning per call reporting their count; `"error"`
+#'   stops. Missing input ages are excluded. Interval ages require full
+#'   containment, so partial overlap alone is unmatched. Multiple matches are
+#'   governed separately by `multiple`. The option must be exactly `"allow"`,
+#'   `"warn"`, or `"error"`; invalid settings error, including for empty input.
 #' @keywords internal
 #' @export
 #'
@@ -231,10 +239,7 @@ age_cat_iv.numeric <- function(age, intervals,
                                     convert_units = convert_units, allow_approx = allow_approx)
   age <- aligned$age
   intervals <- aligned$intervals
-  locations <- ivs::iv_locate_between(
-    needles = as.numeric(age),
-    haystack = aligned$haystack %||% intervals
-  )
+  locations <- age_interval_locations(age, aligned$haystack %||% intervals)
   age_cat_iv_to_factor(locations = locations, intervals = intervals, n_needles = length(age), multiple = multiple)
 }
 
@@ -257,10 +262,7 @@ age_cat_iv.units <- function(age, intervals,
                                     convert_units = convert_units, allow_approx = allow_approx)
   age <- aligned$age
   intervals <- aligned$intervals
-  locations <- ivs::iv_locate_between(
-    needles = as.numeric(age),
-    haystack = aligned$haystack %||% intervals
-  )
+  locations <- age_interval_locations(age, aligned$haystack %||% intervals)
   age_cat_iv_to_factor(locations = locations, intervals = intervals, n_needles = length(age), multiple = multiple)
 }
 
@@ -277,11 +279,7 @@ age_cat_iv.age_interval <- function(age, intervals,
   # Unit conversion may produce fractional matching boundaries. Use bare
   # intervals internally and retain the original group labels.
   haystack <- aligned$haystack %||% intervals
-  locations <- ivs::iv_locate_overlaps(
-    needles = ivs::iv(ivs::iv_start(age), ivs::iv_end(age)),
-    haystack = ivs::iv(ivs::iv_start(haystack), ivs::iv_end(haystack)),
-    type = "within"
-  )
+  locations <- age_interval_locations(age, haystack)
   age_cat_iv_to_factor(locations = locations, intervals = intervals, n_needles = length(age), multiple = multiple)
 }
 
@@ -340,11 +338,13 @@ age_interval_labels <- function(x) {
 
 # Shared matching path for single assignment and all-membership output.
 age_interval_locations <- function(ages, intervals) {
-  if (inherits(ages, "ivs_iv")) {
+  locations <- if (inherits(ages, "ivs_iv")) {
     ivs::iv_locate_overlaps(
       ivs::iv(ivs::iv_start(ages), ivs::iv_end(ages)),
       ivs::iv(ivs::iv_start(intervals), ivs::iv_end(intervals)), type = "within")
   } else {
     ivs::iv_locate_between(as.numeric(ages), intervals)
   }
+  age_check_unmatched(ages, locations)
+  locations
 }

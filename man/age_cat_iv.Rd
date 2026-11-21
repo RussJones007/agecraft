@@ -55,6 +55,15 @@ ages match the interval containing their value; observed intervals must fit
 entirely inside a category. Use \code{\link[=categorize_age]{categorize_age()}} for an interface that
 also accepts age schemes and retains category definitions in its output.
 }
+\details{
+\code{getOption("agecraft.classify.unmatched", "allow")} controls present ages
+with no matching category. \code{"allow"} returns missing assignments silently;
+\code{"warn"} also issues one warning per call reporting their count; \code{"error"}
+stops. Missing input ages are excluded. Interval ages require full
+containment, so partial overlap alone is unmatched. Multiple matches are
+governed separately by \code{multiple}. The option must be exactly \code{"allow"},
+\code{"warn"}, or \code{"error"}; invalid settings error, including for empty input.
+}
 \examples{
 # categorize each age into an age group
 ages <- c(0L, 82L, 1L, 1L, 93L, 83L, 76L, 57L, 59L, 67L, 0L, 64L, 60L, 0L)

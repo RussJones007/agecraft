@@ -30,6 +30,12 @@ for month calculations fall on the last day of the month.
 Surveillance systems often store a value and unit together, so 6
 days, 6 months and 6 years remain distinguishable. Values are whole numbers;
 unit labels are vector names, not a single common units attribute.
+
+\code{getOption("agecraft.end_before_start", "warn")} controls events before
+births. The default \code{"warn"} returns \code{NA} with a blank unit name for those
+entries and issues one warning per call with their count. Set
+\code{options(agecraft.end_before_start = "error")} to stop instead. Existing
+missing dates do not trigger warnings. Invalid option values error.
 }
 \examples{
 birth <- as.Date("2024-01-01")

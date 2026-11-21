@@ -203,6 +203,12 @@ present-but-unmatched ages have separate statuses and one placeholder row each.
 The `group` column contains matched intervals in the scheme's original units.
 Interval-valued observations match only if fully contained in a category.
 
+`getOption("agecraft.classify.unmatched", "allow")` controls diagnostics for
+present observations without a match in this table and in `categorize_age()`
+and `age_cat_iv()`. Use `options(agecraft.classify.unmatched = "warn")` for one
+warning per call with their count, or `"error"` to stop. Missing inputs are
+excluded, and overlapping memberships are not unmatched observations.
+
 `categorize_age()` continues to error on multiple matches by default. An explicit
 `multiple = "first"` or `"last"` selects one match in sorted interval order.
 Overlapping categories cannot be summed as if they were mutually exclusive

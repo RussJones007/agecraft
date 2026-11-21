@@ -48,6 +48,14 @@ does not make an invalid dimensional expression valid.
 
 \code{as.numeric()} extracts full precision and \code{as.integer()} extracts completed units. \code{format(x, fractional = TRUE)} shows
 fractions; \code{format(x)} and printing show completed whole units (floor).
+\code{as.character()} follows the same display rules; see \code{\link[=as.character.age]{as.character.age()}}.
+\code{getOption("agecraft.display.fractional", FALSE)} supplies the default for
+\code{format()} and \code{as.character()}, including ordinary printing and tibble
+display. Set \code{options(agecraft.display.fractional = TRUE)} to show fractions
+during the session. Explicit \code{fractional = FALSE} or \code{TRUE} overrides it.
+The option must be a single non-missing logical value; invalid settings error
+when the default is used. Display choices do not change stored ages or
+classification. With the option unset, display shows completed units.
 Formatted values contain numbers without unit suffixes. Printing shows the
 unit once in the class header, for example \verb{<age [year][6]>} for six ages.
 Tibble column headers use an abbreviated

@@ -59,6 +59,15 @@ Unit-bearing schemes require unit-bearing observations; plain numbers are
 not silently interpreted as years. Missing ages differ from present ages
 outside the scheme's intervals. Even a complete scheme may have unmatched
 inputs outside its declared domain.
+
+\code{getOption("agecraft.classify.unmatched", "allow")} controls present ages
+with no containing category. \code{"allow"} returns their \code{"unmatched"} rows
+silently; \code{"warn"} also issues one warning reporting the number of unmatched
+observations; \code{"error"} stops. Missing ages retain \code{"missing"} rows without
+triggering this diagnostic. The count is per observation, not membership
+row. Multiple memberships remain valid and are returned in full. The option
+must be exactly \code{"allow"}, \code{"warn"}, or \code{"error"}; invalid settings error,
+including for empty input.
 }
 \examples{
 g <- age_interval(c(10, 15), c(20, 25), unit = "year")

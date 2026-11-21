@@ -10,5 +10,5 @@ test_that("weeks are opt-in and calendar units have explicit priority", {
   expect_error(age_auto_unit(birth, event, "week"), "must contain day")
   expect_error(age_auto_unit(birth, event, c("day", "hour")), "must contain day")
   expect_length(age_auto_unit(as.Date(character()), birth, c("day", "week")), 0)
-  expect_error(age_auto_unit(birth, birth - 1, c("day", "week")), "precede")
+  expect_warning(age_auto_unit(birth, birth - 1, c("day", "week")), "1 entry where")
 })

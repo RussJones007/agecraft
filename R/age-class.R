@@ -26,6 +26,14 @@
 #'
 #' `as.numeric()` extracts full precision and `as.integer()` extracts completed units. `format(x, fractional = TRUE)` shows
 #' fractions; `format(x)` and printing show completed whole units (floor).
+#' `as.character()` follows the same display rules; see [as.character.age()].
+#' `getOption("agecraft.display.fractional", FALSE)` supplies the default for
+#' `format()` and `as.character()`, including ordinary printing and tibble
+#' display. Set `options(agecraft.display.fractional = TRUE)` to show fractions
+#' during the session. Explicit `fractional = FALSE` or `TRUE` overrides it.
+#' The option must be a single non-missing logical value; invalid settings error
+#' when the default is used. Display choices do not change stored ages or
+#' classification. With the option unset, display shows completed units.
 #' Formatted values contain numbers without unit suffixes. Printing shows the
 #' unit once in the class header, for example `<age [year][6]>` for six ages.
 #' Tibble column headers use an abbreviated
@@ -163,8 +171,9 @@ as_age.units <- function(x, unit = NULL, allow_approx = FALSE, ...) {
   as_age(out, unit = unit, allow_approx = allow_approx)
 }
 
+#' @rdname as.character.age
 #' @exportS3Method
-format.age <- function(x, ..., fractional = FALSE) {
+format.age <- function(x, ..., fractional = get_option("agecraft.display.fractional", FALSE)) {
   if (!is.logical(fractional) || length(fractional) != 1L || is.na(fractional)) {
     stop("fractional must be TRUE or FALSE", call. = FALSE)
   }
@@ -174,6 +183,41 @@ format.age <- function(x, ..., fractional = FALSE) {
   out[is.na(values)] <- NA_character_
   names(out) <- names(x)
   out
+}
+
+#' Convert ages to character labels
+#'
+#' Create character labels for reporting ages. By default, labels show completed
+#' whole units when the display option is unset, just like printing an age vector.
+#' Use `fractional = TRUE` to
+#' display the stored fractions instead.
+#'
+#' @param x An `age` vector.
+#' @param ... Formatting arguments passed to [format()] for the numeric values,
+#'   such as `digits`, `nsmall`, or `scientific`. Leading spaces are trimmed.
+#' @param fractional A single non-missing logical value. If `FALSE`, floor ages
+#'   to completed units before formatting. If `TRUE`, format
+#'   the stored fractional values.
+#' @details
+#'   `getOption("agecraft.display.fractional", FALSE)` supplies the default for
+#'   `fractional` in both methods and in ordinary age printing and tibble display.
+#'   Set `options(agecraft.display.fractional = TRUE)` for fractional labels
+#'   throughout the session. An explicit `fractional` argument overrides the
+#'   option. The option must be a single non-missing logical value; invalid
+#'   settings error when used. Neither method changes the stored age vector.
+#' @return A character vector with the same length, order and names as `x`.
+#'   Missing ages (`NA` or `NaN`) become `NA_character_`; empty input returns
+#'   `character()`. Labels have no unit suffix or age metadata. Formatting can
+#'   round displayed fractions, so labels are not a lossless storage format.
+#' @seealso [age()] for age storage and numeric coercion, [format()].
+#' @examples
+#' x <- age(c(child = 2.75, infant = 0.5, unknown = NA), "year")
+#' as.character(x)
+#' as.character(x, fractional = TRUE)
+#' as.character(x, fractional = TRUE, nsmall = 2)
+#' @exportS3Method
+as.character.age <- function(x, ..., fractional = get_option("agecraft.display.fractional", FALSE)) {
+  format(x, ..., fractional = fractional)
 }
 
 #' @exportS3Method vctrs::vec_ptype_abbr

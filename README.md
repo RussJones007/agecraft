@@ -79,12 +79,20 @@ x                            # displays 0, with year in the class header
 as.numeric(x)                # 0.5: full fractional precision
 as.integer(x)                # 0: completed whole units
 format(x, fractional = TRUE) # display the fraction
+as.character(x)             # completed-age labels without unit suffixes
 
 calculate_age(as.Date("2024-01-01"), as.Date("2024-07-02"), output = "numeric")
 # 0
 ```
 
-`as.numeric(x)` on an age object retains its fractions. It is different from asking `calculate_age()` for `output = "numeric"`, which returns completed ages. Missing date pairs return `NA`; empty recyclable inputs return an empty vector. An end date before its start raises an error.
+`as.numeric(x)` on an age object retains its fractions. It is different from asking `calculate_age()` for `output = "numeric"`, which returns completed ages. Missing date pairs return `NA`; empty recyclable inputs return an empty vector. An end date before its start returns `NA` and triggers one warning per call with the affected count. Set `options(agecraft.end_before_start = "error")` to stop instead; the default is `"warn"`.
+
+Session defaults also control fractional display
+(`agecraft.display.fractional = FALSE`), ambiguous comparison diagnostics
+(`agecraft.compare.ambiguous = "allow"`), and unmatched classification diagnostics
+(`agecraft.classify.unmatched = "allow"`). See the function help Details for
+accepted settings. Explicit `fractional` and `ambiguous` arguments override
+their session defaults.
 
 ### Calendar conventions
 

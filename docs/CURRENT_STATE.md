@@ -1,3 +1,58 @@
+# Session options and reversed-date warnings — 2026-11-21
+
+Implemented four validated, call-time session defaults through private
+`get_option()`, wrapping base `getOption()` without modifying session state:
+
+- `agecraft.end_before_start = "warn"`: reversed date pairs become missing and
+  issue one counted warning; `"error"` retains strict rejection. No argument was
+  added to `calculate_age()`. All output formats and the `calc_age()` wrapper
+  share the policy. `age_auto_unit()` masks once before its three calculations.
+- `agecraft.display.fractional = FALSE`: supplies omitted `fractional` arguments
+  for age formatting/character conversion, including print and tibble display.
+  Explicit arguments override it; storage and classification remain unchanged.
+- `agecraft.compare.ambiguous = "allow"`: supplies omitted `ambiguous` arguments
+  for comparisons; supports `"warn"` and `"error"` with explicit overrides.
+- `agecraft.classify.unmatched = "allow"`: supports counted warnings or errors
+  for present unmatched observations in `categorize_age()`, `age_cat_iv()` and
+  `classify_age_scheme()`. Missing inputs are excluded. Interval containment,
+  conversion safeguards and multiple-match policies are unchanged.
+
+Updated function Details, README, API policy, NEWS and five vignettes. The
+getting-started guide executes a reversed-date example, showing one warning
+and valid/missing results. Regenerated help and reviewed rendered Details and
+the updated text/output in the five built vignette HTML files.
+
+Validation: `devtools::document()` completed. The full `devtools::test()` run
+passed 3,701 assertions with zero failures/warnings and one optional mudnester
+skip, including 211 new option assertions. `devtools::check(document = FALSE,
+check_dir = "/tmp/agecraft-options-check")` completed with zero errors, zero
+warnings and the same two notes as the earlier character-method check:
+`purrr_eval` foreign-call registration and the compiler flag
+`-mno-omit-leaf-frame-pointer`. Examples, installed tests and all vignette
+rebuilds passed. `git diff --check` passed. Temporary logs:
+`/tmp/agecraft-options-tests.log`, `/tmp/agecraft-options-check.log`, and
+`/tmp/agecraft-options-help-review.log`.
+
+---
+
+# Age character coercion — 2026-11-21
+
+Added registered `as.character.age(x, ..., fractional = FALSE)`, delegating to
+the existing age formatter. Labels show completed units by default, optionally
+fractions, without unit suffixes. Names and missingness are preserved; age/unit
+metadata is dropped. Numeric storage and calculations are unchanged.
+
+Added regression tests, method help, class/README guidance and an API policy
+entry. `devtools::document()` completed and the rendered method help was reviewed.
+`devtools::test()` passed 3,490 assertions with no failures or warnings and one
+optional mudnester skip. `devtools::check(document = FALSE)` completed with zero
+errors, zero warnings and two notes: `purrr_eval` foreign-call registration and
+the compiler flag `-mno-omit-leaf-frame-pointer`. Examples, installed tests and
+vignette rebuilds passed. Logs: `/tmp/agecraft-character-tests.log` and
+`/tmp/agecraft-character-check.log`. `git diff --check` passed.
+
+---
+
 # RcppDate calendar-age experiment
 
 On `experiment_RCPP`, `calculate_age()` computes calendar years and months

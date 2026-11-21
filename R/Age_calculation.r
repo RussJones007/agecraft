@@ -7,12 +7,30 @@
 #'
 #' @description Functions to calculate age and age groups. The calculate_age() function returns the age from start to
 #'   end dates. The age is calculated in years by default, though other time units can be specified. If the end date is
-#'   chronologically before the start date, an error is raised. The start and end date vectors should be either
+#'   chronologically before the start date, the affected age is missing and a
+#'   warning is issued by default. The start and end date vectors should be either
 #'   the same length or one vector must have length one for scalar recycling.
 #'
 #'  The categorize_age() function categorizes ages into age groups as an ordered and labeled factor.
 #'
 #' @details
+#'   `getOption("agecraft.end_before_start", "warn")` controls reversed date
+#'   pairs. With `"warn"`, each affected result is `NA` and one warning reports
+#'   the number of entries, for example "Produced NA for 3 entries where `end`
+#'   occurs before `start`." Set `options(agecraft.end_before_start = "error")`
+#'   to stop instead. Existing missing pairs do not contribute to the warning.
+#'   This applies to every output format and to the legacy `calc_age()` wrapper.
+#'   Invalid date types, incompatible lengths and unsupported arguments still
+#'   error. The option must be exactly `"warn"` or `"error"`.
+#'
+#'   For `categorize_age()`, `getOption("agecraft.classify.unmatched", "allow")`
+#'   controls present observations with no matching category: `"allow"` returns
+#'   missing assignments silently, `"warn"` also issues one warning with their
+#'   count, and `"error"` stops. Missing input ages are excluded from this count.
+#'   Interval observations need full containment. This policy also applies to
+#'   [age_cat_iv()] and [classify_age_scheme()]. Multiple-match resolution is
+#'   still controlled separately by `multiple`.
+#'
 #'   By default the result is an [age()] vector retaining fractional precision
 #'   while displaying completed whole units. Use `as.numeric()` to extract its
 #'   fractional values or `as.integer()` for completed units. Explicit conversion
@@ -82,9 +100,7 @@ calculate_age <- function(start,
   dates <- vctrs::vec_recycle_common(start = start, end = end)
   start <- dates$start
   end <- dates$end
-  if (any(end < start, na.rm = TRUE)) {
-    stop("end must not precede start when calculating age", call. = FALSE)
-  }
+  end <- age_end_before_start(start, end)
   if (unit %in% c("year", "month")) {
     # Calendar ages use local civil dates in the starting time zone.
     civil_start <- as_civil_date(start)
@@ -341,6 +357,12 @@ categorize_age <- function(ages, lower = 0, upper = 70, by = 10,
 #' @details Surveillance systems often store a value and unit together, so 6
 #'   days, 6 months and 6 years remain distinguishable. Values are whole numbers;
 #'   unit labels are vector names, not a single common units attribute.
+#'
+#'   `getOption("agecraft.end_before_start", "warn")` controls events before
+#'   births. The default `"warn"` returns `NA` with a blank unit name for those
+#'   entries and issues one warning per call with their count. Set
+#'   `options(agecraft.end_before_start = "error")` to stop instead. Existing
+#'   missing dates do not trigger warnings. Invalid option values error.
 #' @examples
 #' birth <- as.Date("2024-01-01")
 #' event <- birth + c(6, 7, 28, 31, 366, NA)
@@ -363,6 +385,7 @@ age_auto_unit <- function(birth, event, allowed_units = c("day", "month", "year"
     stop("birth and event must be Date or POSIXct vectors", call. = FALSE)
   }
   dates <- vctrs::vec_recycle_common(birth = as_civil_date(birth), event = as_civil_date(event))
+  dates$event <- age_end_before_start(dates$birth, dates$event)
   days <- as.numeric(calculate_age(dates$birth, dates$event, "day", output = "numeric"))
   years <- as.numeric(calculate_age(dates$birth, dates$event, "year", output = "numeric"))
   months <- as.numeric(calculate_age(dates$birth, dates$event, "month", output = "numeric"))

@@ -26,12 +26,30 @@ A units vector of completed ages (legacy behavior).
 \description{
 Functions to calculate age and age groups. The calculate_age() function returns the age from start to
 end dates. The age is calculated in years by default, though other time units can be specified. If the end date is
-chronologically before the start date, an error is raised. The start and end date vectors should be either
+chronologically before the start date, the affected age is missing and a
+warning is issued by default. The start and end date vectors should be either
 the same length or one vector must have length one for scalar recycling.
 
 The categorize_age() function categorizes ages into age groups as an ordered and labeled factor.
 }
 \details{
+\code{getOption("agecraft.end_before_start", "warn")} controls reversed date
+pairs. With \code{"warn"}, each affected result is \code{NA} and one warning reports
+the number of entries, for example "Produced NA for 3 entries where \code{end}
+occurs before \code{start}." Set \code{options(agecraft.end_before_start = "error")}
+to stop instead. Existing missing pairs do not contribute to the warning.
+This applies to every output format and to the legacy \code{calc_age()} wrapper.
+Invalid date types, incompatible lengths and unsupported arguments still
+error. The option must be exactly \code{"warn"} or \code{"error"}.
+
+For \code{categorize_age()}, \code{getOption("agecraft.classify.unmatched", "allow")}
+controls present observations with no matching category: \code{"allow"} returns
+missing assignments silently, \code{"warn"} also issues one warning with their
+count, and \code{"error"} stops. Missing input ages are excluded from this count.
+Interval observations need full containment. This policy also applies to
+\code{\link[=age_cat_iv]{age_cat_iv()}} and \code{\link[=classify_age_scheme]{classify_age_scheme()}}. Multiple-match resolution is
+still controlled separately by \code{multiple}.
+
 By default the result is an \code{\link[=age]{age()}} vector retaining fractional precision
 while displaying completed whole units. Use \code{as.numeric()} to extract its
 fractional values or \code{as.integer()} for completed units. Explicit conversion

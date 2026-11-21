@@ -25,6 +25,30 @@ test_that("age stores fractional precision with one validated time unit", {
   expect_error(format(x, fractional = NA), "TRUE or FALSE")
 })
 
+test_that("character coercion follows age display and preserves missingness", {
+  for (unit in c("second", "minute", "hour", "day", "week", "month", "year")) {
+    x <- age(c(child = 2.75, infant = 0.5, missing = NA, nan = NaN), unit)
+    original <- x
+    expect_identical(as.character(x),
+                     c(child = "2", infant = "0", missing = NA_character_,
+                       nan = NA_character_))
+    expect_identical(as.character(x, fractional = TRUE),
+                     c(child = "2.75", infant = "0.50", missing = NA_character_,
+                       nan = NA_character_))
+    expect_identical(x, original)
+    expect_identical(as.character(age(numeric(), unit)), character())
+    expect_identical(as.character(age(c(NA, NaN), unit)),
+                     rep(NA_character_, 2))
+  }
+  expect_identical(as.character(age(c(0, 1, 12))), c("0", "1", "12"))
+  expect_identical(as.character(age(2), nsmall = 2), "2.00")
+  expect_identical(as.character(age(2.75), fractional = TRUE, digits = 2), "2.8")
+  expect_identical(as.character(age(1000), scientific = FALSE), "1000")
+  for (invalid in list(NA, logical(), c(TRUE, FALSE), 1, "TRUE")) {
+    expect_error(as.character(age(1), fractional = invalid), "TRUE or FALSE")
+  }
+})
+
 test_that("vctrs operations retain units, precision and names", {
   x <- age(c(older = 2.75, younger = 0.5), "year")
   expect_identical(as.numeric(sort(x)), c(0.5, 2.75))

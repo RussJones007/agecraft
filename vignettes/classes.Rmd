@@ -85,6 +85,9 @@ visits$age
 # Display fractional values without changing the age vector.
 format(visits$age, fractional = TRUE)
 
+# Extract completed-age character labels for reporting.
+as.character(visits$age)
+
 # Extract full numeric values, including fractions.
 as.numeric(visits$age)
 
@@ -93,9 +96,18 @@ as.integer(visits$age)
 ```
 
 `format()` returns a character representation while leaving the original object
-unchanged. `as.numeric()` returns the full stored values as an ordinary numeric
+unchanged. `as.character()` uses the same display rules: completed units by
+default, or fractions with `fractional = TRUE`. Character labels preserve names
+and missing values but carry no unit metadata. `as.numeric()` returns the full
+stored values as an ordinary numeric
 vector; `as.integer()` returns completed whole units as integers. Both extraction
 methods remove the age class and its unit information.
+
+For fractional display throughout a session, set
+`options(agecraft.display.fractional = TRUE)`. This affects `format()`,
+`as.character()`, ordinary printing, and tibble display. The default is `FALSE`;
+an explicit `fractional` argument takes precedence. Stored values and group
+assignments are unaffected.
 
 The stored fractions allow classification within a whole unit. Two infants who
 both print as zero years can still belong to different age groups. For example,
@@ -105,6 +117,12 @@ of a calendar year does not correspond to the same number of days for every
 birth date.
 
 #### Calendar anniversaries and elapsed time
+
+`calculate_age()` returns `NA` and warns once with the affected count when an
+end precedes its start. Other valid date pairs are still calculated; missing
+date pairs remain missing without warning. Set
+`options(agecraft.end_before_start = "error")` to stop on reversed dates during
+a validation session, or `"warn"` for the default behavior.
 
 When calculating an age from dates, the chosen unit determines how the
 calculation works. Years and months follow calendar anniversaries, such as

@@ -34,7 +34,10 @@ fractions or `as.integer(age)` for completed years. Request
 `output = "numeric"` for plain completed ages or `output = "units"` for
 the previous completed-age units output. Fractional years measure the
 fraction of calendar days between consecutive birthdays. Reversed dates
-raise an error. Missing observations remain missing. Months use calendar
+produce `NA` and one warning per call with their count. Set
+`options(agecraft.end_before_start = "error")` for a strict validation session;
+the default option value is `"warn"`. Missing observations remain missing and
+do not contribute to the warning count. Months use calendar
 anniversaries, including the last day of short months; elapsed-day
 conversion with the units package is an approximation of calendar months
 or years.

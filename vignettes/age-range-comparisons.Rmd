@@ -109,6 +109,9 @@ compare_age_intervals(reported, survey_a, operation = "membership",
 Neither group definitely contains the reported range, while both are possible
 matches. If multiple possible matches require attention in your analysis, use
 `ambiguous = "warn"` or `ambiguous = "error"` with possible-membership comparisons.
+For a session default, set `options(agecraft.compare.ambiguous = "warn")` or
+`"error"`. The default is `"allow"`; an explicit `ambiguous` argument overrides
+the option. It also controls unresolved ordering comparisons.
 
 Classification into one category requires a definite match for an interval-valued
 observation. The same reported range therefore receives a missing assignment:
@@ -116,6 +119,10 @@ observation. The same reported range therefore receives a missing assignment:
 ```{r uncertain-classification}
 categorize_age(reported, by = survey_a, output = "interval")
 ```
+
+This present-but-unmatched interval is allowed silently by default. Set
+`options(agecraft.classify.unmatched = "warn")` to flag unmatched observations
+or `"error"` to stop. Missing input intervals do not trigger that diagnostic.
 
 That result reflects insufficient precision for these categories, rather than
 an absent age report. Also, an age group alone does not identify a birth cohort:

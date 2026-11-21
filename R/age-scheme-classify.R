@@ -37,6 +37,15 @@
 #'   not silently interpreted as years. Missing ages differ from present ages
 #'   outside the scheme's intervals. Even a complete scheme may have unmatched
 #'   inputs outside its declared domain.
+#'
+#'   `getOption("agecraft.classify.unmatched", "allow")` controls present ages
+#'   with no containing category. `"allow"` returns their `"unmatched"` rows
+#'   silently; `"warn"` also issues one warning reporting the number of unmatched
+#'   observations; `"error"` stops. Missing ages retain `"missing"` rows without
+#'   triggering this diagnostic. The count is per observation, not membership
+#'   row. Multiple memberships remain valid and are returned in full. The option
+#'   must be exactly `"allow"`, `"warn"`, or `"error"`; invalid settings error,
+#'   including for empty input.
 #' @seealso [age_scheme()], [scheme_intervals()]
 #' @examples
 #' g <- age_interval(c(10, 15), c(20, 25), unit = "year")

@@ -88,8 +88,8 @@ test_that("missing, empty and incompatible inputs are handled consistently", {
   expect_identical(age_auto_unit(empty, empty), setNames(numeric(), character()))
   expect_error(calculate_age(rep(birth, 2), rep(as.Date("2025-01-31"), 3)), "recycle")
   expect_error(age_auto_unit(rep(birth, 2), rep(as.Date("2025-01-31"), 3)), "recycle")
-  expect_error(calculate_age(as.Date("2025-02-01"), as.Date("2025-01-01")), "precede")
-  expect_error(age_auto_unit(as.Date("2025-02-01"), as.Date("2025-01-01")), "precede")
+  expect_warning(calculate_age(as.Date("2025-02-01"), as.Date("2025-01-01")), "1 entry where")
+  expect_warning(age_auto_unit(as.Date("2025-02-01"), as.Date("2025-01-01")), "1 entry where")
   expect_error(age_auto_unit("2025-01-01", as.Date("2025-01-02")), "Date or POSIXct")
 })
 

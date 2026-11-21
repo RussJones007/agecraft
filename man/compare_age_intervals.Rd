@@ -11,7 +11,8 @@ compare_age_intervals(
     "union", "difference", "width"),
   membership = c("definite", "possible"),
   keep_empty = FALSE,
-  ambiguous = c("allow", "warn", "error")
+  ambiguous = get_option("agecraft.compare.ambiguous", "allow", c("allow", "warn",
+    "error"))
 )
 }
 \arguments{
@@ -57,6 +58,14 @@ data or assumptions. Missing evidence cannot establish membership/order.
 Pairwise outputs contain length(x) * length(y) rows before crosswalk filtering.
 Compare ages at a shared reference date; this function does not convert age
 at a record date to age at another date or shift calendar ages.
+
+\code{getOption("agecraft.compare.ambiguous", "allow")} supplies the default
+for \code{ambiguous}. Set it to \code{"allow"} to return ambiguous comparisons
+silently, \code{"warn"} to also issue a warning, or \code{"error"} to stop. An
+explicit \code{ambiguous} argument overrides the option. This policy concerns
+multiple memberships and unresolved ordering, not crosswalk overlap or
+unmatched classifications. Invalid option values error when the default
+is used, even if the requested operation cannot be ambiguous.
 }
 \examples{
 a <- age_interval(c(0, 18), c(18, 65), unit = "year")

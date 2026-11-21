@@ -35,6 +35,14 @@
 #'   Pairwise outputs contain length(x) * length(y) rows before crosswalk filtering.
 #'   Compare ages at a shared reference date; this function does not convert age
 #'   at a record date to age at another date or shift calendar ages.
+#'
+#'   `getOption("agecraft.compare.ambiguous", "allow")` supplies the default
+#'   for `ambiguous`. Set it to `"allow"` to return ambiguous comparisons
+#'   silently, `"warn"` to also issue a warning, or `"error"` to stop. An
+#'   explicit `ambiguous` argument overrides the option. This policy concerns
+#'   multiple memberships and unresolved ordering, not crosswalk overlap or
+#'   unmatched classifications. Invalid option values error when the default
+#'   is used, even if the requested operation cannot be ambiguous.
 #' @export
 #' @examples
 #' a <- age_interval(c(0, 18), c(18, 65), unit = "year")
@@ -46,10 +54,11 @@ compare_age_intervals <- function(x, y = NULL,
                                operation = c("crosswalk", "membership", "ordering", "age_gap",
                                              "intersection", "union", "difference", "width"),
                                membership = c("definite", "possible"), keep_empty = FALSE,
-                               ambiguous = c("allow", "warn", "error")) {
+                               ambiguous = get_option("agecraft.compare.ambiguous", "allow",
+                                                      c("allow", "warn", "error"))) {
   operation <- match.arg(operation)
   membership <- match.arg(membership)
-  ambiguous <- match.arg(ambiguous)
+  ambiguous <- match.arg(ambiguous, c("allow", "warn", "error"))
   if (!is_age_interval(x)) stop("x must be an age_interval vector", call. = FALSE)
   if (!is.logical(keep_empty) || length(keep_empty) != 1L || is.na(keep_empty)) {
     stop("keep_empty must be TRUE or FALSE", call. = FALSE)

@@ -31,12 +31,37 @@ formatting/parsing helpers; use `as.character()` and `as_age_interval()` in new 
 
 ## Age precision and return formats
 
+Session options are read at call time and validated without changing the
+caller's settings. `agecraft.end_before_start` defaults to `"warn"`: reversed
+date pairs yield missing ages and one warning per call with their count, in
+every `calculate_age()` output format, `calc_age()` and `age_auto_unit()`.
+`"error"` restores strict rejection. This deliberately changes the previous
+error default; missing input dates do not trigger diagnostics.
+
+`agecraft.display.fractional` defaults to FALSE and supplies omitted `fractional`
+arguments in `format.age()` and `as.character.age()`, including print/tibble
+display. TRUE shows fractions without changing storage or classification.
+`agecraft.compare.ambiguous` defaults to `"allow"` and supplies omitted
+`ambiguous` arguments in `compare_age_intervals()`; `"warn"` and `"error"`
+control multiple memberships and unresolved ordering. Explicit arguments
+override these session defaults.
+
+`agecraft.classify.unmatched` defaults to `"allow"`. `"warn"` reports one count
+of present unmatched observations per classification call; `"error"` stops.
+This applies to `categorize_age()`, `age_cat_iv()` and `classify_age_scheme()`.
+Missing input is excluded; interval input requires full containment. Multiple
+matches remain governed by existing policies. Unset options retain their
+documented defaults; invalid settings error when the option is used.
+
 `calculate_age()` defaults to `output = "age"`, retaining fractional precision
 with one explicit time unit per vector. Printing shows the unit once in the
 class or tibble column header and displays completed whole units without suffixes.
 `format()` returns numeric strings without unit suffixes (also with
 `fractional = TRUE`), an intentional change from unit-suffixed strings;
 `as.numeric()` extracts the fractions and `as.integer()` extracts completed units.
+`as.character()` follows `format()` with completed-unit labels by default and
+`fractional = TRUE` for fractional labels. It preserves names and missing values
+and drops age and unit metadata; character labels are a display format.
 Years and months use calendar anniversaries; finer units use elapsed time.
 For yearly ages of February 29 births, `leap_day = "mar1"` is the default
 and `leap_day = "feb28"` uses February 28 in non-leap years. The choice sets

@@ -93,7 +93,21 @@ data.frame(birth_date = birth_dates, event_date = event_dates,
            age_at_event = ages_at_event)
 ```
 
-An event must not precede the corresponding birth date. Missing dates produce missing ages, `NA`.
+An event before its corresponding birth date produces `NA` for that entry and
+one warning per call reporting the number of affected entries. Valid pairs are
+still calculated. Missing dates also produce `NA`, without contributing to the
+warning count.
+
+```{r reversed-dates, warning=TRUE}
+calculate_age(as.Date("2024-01-01"),
+              as.Date(c("2023-12-31", "2025-01-01", NA)))
+```
+
+The default is `getOption("agecraft.end_before_start", "warn")`. To stop on
+reversed pairs throughout a validation session, set
+`options(agecraft.end_before_start = "error")`; use `"warn"` to restore the
+warning policy. This applies to every output format and to `age_auto_unit()`.
+Incorrect input types and incompatible vector lengths still raise errors.
 
 ### Choose a unit
 
@@ -194,6 +208,11 @@ table(fine_category)
 Classification uses the stored fractions, even when both a neonatal age and an infant age print as `0` under a year header. The cutoff `0.077` years approximates 28 days; it is not an exact calendar-day boundary. If an exact 28-day cutoff matters, calculate the ages in days and define groups in days.
 
 Keep groups non-overlapping when each person should belong to one category. An age outside all intervals, or a missing age, returns `NA`. Overlapping matches raise an error by default, helping you spot ambiguous definitions.
+
+To flag present ages outside the intervals, set
+`options(agecraft.classify.unmatched = "warn")` or use `"error"` to stop.
+The default is `"allow"`. Missing input ages are excluded from these diagnostics;
+overlapping matches are still governed by `multiple`.
 
 ## Convert units explicitly
 
