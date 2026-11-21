@@ -4,3 +4,4 @@
 calendar_age_cpp <- function(start, end, yearly, fractional, march_first) {
     .Call(`_agecraft_calendar_age_cpp`, start, end, yearly, fractional, march_first)
 }
+
