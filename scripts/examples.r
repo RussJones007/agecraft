@@ -1,7 +1,31 @@
 # Agecraft arithmetic and classification examples
 
-library(agecraft)
+#library(agecraft)
+devtools::load_all(recompile = FALSE, debug = FALSE)
 
+bdays <- sample(1:as.integer(as.Date("2026-09-30")), replace = TRUE, size = 10^6)
+event_days <- sample(35:as.integer(365.2478 * 90), replace = TRUE, size = 10^6)
+head(bdays) |> class()
+head(event_days) |> class()
+event_dates <- (bdays + event_days) |> as.Date()
+event_dates |> head()
+
+
+library(microbenchmark)
+library(lubridate)
+
+is.Date(bdays)
+yrs   = calculate_age(start = bdays, end = event_dates)
+mnths = calculate_age(start = bdays, end = event_dates, unit = "month")
+
+microbenchmark(times = 20,
+yrs   = calculate_age(start = bdays, end = event_dates),
+mnths = calculate_age(start = bdays, end = event_dates, unit = "month"),
+dys   = calculate_age(start = bdays, end = event_dates, unit = "day"),
+hrs   = calculate_age(start = bdays, end = event_dates, unit = "hour")
+)
+
+#==============================
 x <- age(c(2.25, 5.75, 10.5), unit = "year")
 
 x                            # Prints completed ages: 2, 5, 10
