@@ -1,4 +1,4 @@
-# agecraft 0.1.0.9023
+# agecraft 0.1.0.9024
 
 - Add `age_group-class` and `agecraft-classes` help topics. Clarify that
   `age_group()` constructs category assignments together with their interval
@@ -20,6 +20,18 @@
 - Add `as.character()` for age vectors, showing completed units by default or
   stored fractions with `fractional = TRUE`, without unit suffixes. Names and
   missing values are preserved.
+- Show the age unit in parentheses in console type headers, for example
+  `<age (year)[3]>`, while retaining square brackets for the vector length.
+- Number all eight vignette titles and index entries in the intended reading
+  order, from getting started through interval comparisons; filenames remain
+  unchanged.
+- Expand the example script with calendar/elapsed-age timing comparisons and
+  optimized development loading. Ignore locally compiled native libraries and
+  object files under `src/`.
+- Refresh the package description and contributor documentation guidance.
+
+# agecraft 0.1.0.9023
+
 - Speed up completed and fractional calendar-year and calendar-month
   calculations in `calculate_age()` with a vectorized RcppDate backend.
   Elapsed-time calculations use the full time of day supplied in `POSIXct`
