@@ -1,12 +1,18 @@
 # Instructions for writing R package documentation
 
-Use these instructions whenever you create or revise documentation in this package: roxygen2 help, class references, vignettes, README content, and other guides. Write for someone who knows R but has not read the source. Help that person choose an approach, use it correctly, and understand the result. Sections 1–8 retain the detailed function and roxygen guidance; sections 9–14 extend it to classes, longer narratives, and the documentation ecosystem.
+Use these instructions whenever you create or revise documentation in this package: roxygen2 help, class references,
+vignettes, README content, and other guides. Write for someone who knows R but has not read the source. Help that person
+choose an approach, use it correctly, and understand the result. Sections 1–8 retain the detailed function and roxygen
+guidance; sections 9–14 extend it to classes, longer narratives, and the documentation ecosystem.
 
-These instructions apply to help topics, argument descriptions, examples, and related package documentation. Follow established package terminology and genuine API contracts. Do not change function behavior merely to make a documentation example work.
+These instructions apply to help topics, argument descriptions, examples, and related package documentation. Follow
+established package terminology and genuine API contracts. Do not change function behavior merely to make a
+documentation example work.
 
 ## 1. Write for the person using the function
 
-Explain what the reader can do, what they must supply, and what they receive. Give enough detail to use the function without tracing its implementation. Concision is useful only when it preserves that information.
+Explain what the reader can do, what they must supply, and what they receive. Give enough detail to use the function
+without tracing its implementation. Concision is useful only when it preserves that information.
 
 - Start with the task or result. Prefer concrete verbs such as select, combine, count, convert, read, and write.
 - Use ordinary sentences and familiar R terms: vector, list, data frame, tibble, column, row, named vector, factor, missing value, and class.
@@ -15,7 +21,9 @@ Explain what the reader can do, what they must supply, and what they receive. Gi
 - Describe observable behavior precisely. “Rows remain in their original order” is more useful than “The function preserves data integrity.”
 - Let the length follow the function's complexity. A short wrapper may need little explanation; a function with grouping, recycling, or interval rules may need several sections.
 
-Sound like a knowledgeable colleague explaining a useful function. Avoid promotional claims, generic introductions, mechanical repetition, and inflated words such as “seamlessly,” “robust,” “powerful,” and “leverages.” Do not add conversational filler to make prose sound human.
+Sound like a knowledgeable colleague explaining a useful function. Avoid promotional claims, generic introductions,
+mechanical repetition, and inflated words such as “seamlessly,” “robust,” “powerful,” and “leverages.” You may add
+conversational filler to make prose sound human.
 
 For example:
 
@@ -31,7 +39,8 @@ The better wording is appropriate only if those constraints match the actual fun
 
 ## 2. Establish the contract before writing
 
-Read the function signature, existing help, relevant tests, and enough source to establish behavior. Inspect related functions to keep terminology consistent. Prefer the project's code discovery tools when available.
+Read the function signature, existing help, relevant tests, and enough source to establish behavior. Inspect related
+functions to keep terminology consistent. Prefer the project's code discovery tools when available.
 
 Determine which of the following matter:
 
@@ -42,13 +51,17 @@ Determine which of the following matter:
 - Matching, sorting, duplicate handling, recycling, and coercion rules.
 - Warnings, errors, side effects, and external requirements.
 
-Do not infer a public guarantee from one successful example or an incidental implementation detail. If tests, code, and existing help disagree, resolve the discrepancy before documenting a confident claim. If it cannot be resolved, identify the specific uncertainty to the maintainer; do not bury it in polished prose.
+Do not infer a public guarantee from one successful example or an incidental implementation detail. If tests, code, and
+existing help disagree, resolve the discrepancy before documenting a confident claim. If it cannot be resolved, identify
+the specific uncertainty to the maintainer; do not bury it in polished prose.
 
 ## 3. Keep implementation history out of reference help
 
 Reference documentation should explain the current function. It should not read like a description of the latest patch.
 
-Apply this test to every technical detail: **Would knowing this change how someone calls the function, interprets its result, or handles a limitation?** If yes, explain its practical consequence. Otherwise, put it in an implementation comment, developer documentation, commit message, or pull request description.
+Apply this test to every technical detail: **Would knowing this change how someone calls the function, interprets its
+result, or handles a limitation?** If yes, explain its practical consequence. Otherwise, put it in an implementation
+comment, developer documentation, commit message, or pull request description.
 
 | Detail discovered while editing | Appropriate treatment |
 | --- | --- |
@@ -63,9 +76,12 @@ Apply this test to every technical detail: **Would knowing this change how someo
 
 **User-focused:** “An observation on a boundary belongs to the interval that starts at that boundary.”
 
-Use the second statement only when it describes the real boundary rule. Do not invent an observable effect to justify mentioning a refactor.
+Use the second statement only when it describes the real boundary rule. Do not invent an observable effect to justify
+mentioning a refactor.
 
-Avoid “now,” “previously,” “updated,” “refactored,” and “fixed” in ordinary reference prose. Use NEWS for release history. Retain explicit deprecation and migration guidance when readers need it, including the replacement and any consequential differences.
+Avoid “now,” “previously,” “updated,” “refactored,” and “fixed” in ordinary reference prose. Use NEWS for release
+history. Retain explicit deprecation and migration guidance when readers need it, including the replacement and any
+consequential differences.
 
 ## 4. Organize roxygen2 topics consistently
 
@@ -79,13 +95,17 @@ Use this general order, adapting it to the existing package style:
 6. Related functions and examples.
 7. Package metadata tags such as `@export`, where appropriate.
 
-Roxygen tags determine rendered sections; their source order is primarily for maintainability. Do not add empty sections or repeat the same explanation under several tags.
+Roxygen tags determine rendered sections; their source order is primarily for maintainability. Do not add empty sections
+or repeat the same explanation under several tags.
 
-Use roxygen Markdown when enabled by the package, commonly through `Roxygen: list(markdown = TRUE)` in DESCRIPTION. Check the existing setup before introducing Markdown-dependent markup. Do not hand-edit generated `man/*.Rd` files when their source is roxygen comments.
+Use roxygen Markdown when enabled by the package, commonly through `Roxygen: list(markdown = TRUE)` in DESCRIPTION.
+Check the existing setup before introducing Markdown-dependent markup. Do not hand-edit generated `man/*.Rd` files when
+their source is roxygen comments.
 
 ### Title
 
-Use a brief sentence-case phrase describing the task, without a final period. Avoid “A function to …” and titles that merely repeat the function name.
+Use a brief sentence-case phrase describing the task, without a final period. Avoid “A function to …” and titles that
+merely repeat the function name.
 
 ```r
 #' Convert counts to proportions
@@ -93,9 +113,13 @@ Use a brief sentence-case phrase describing the task, without a final period. Av
 
 ### `@description`
 
-Answer “What does this do, and when would I use it?” State the main transformation or result and any central constraint needed to choose the function. Do not begin with a tour of internal steps.
+Answer “What does this do, and when would I use it?” State the main transformation or result and any central constraint
+needed to choose the function. Do not begin with a tour of internal steps.
 
-A single introductory paragraph can supply the description without an explicit tag. Use `@description` when multiple paragraphs or a list make the boundary clearer.
+A single introductory paragraph can supply the description without an explicit tag. Use `@description` when multiple
+paragraphs or a list make the boundary clearer. When describing a class that inherits from another class, it is appropriate
+to mention the parent class and capabilities used in the sub-class.  Specific limitations or validations introduced 
+by the sub-class can alos be discussed. 
 
 ```r
 #' Convert counts to proportions
@@ -108,11 +132,13 @@ A single introductory paragraph can supply the description without an explicit t
 #' from the observed counts.
 ```
 
-Do not compress all argument rules into the description. Put each rule where a reader will look for it, and use a short pointer if a crucial caveat needs to appear early.
+Do not compress all argument rules into the description. Put each rule where a reader will look for it, and use a short
+pointer if a crucial caveat needs to appear early.
 
 ### `@param`
 
-Document every argument, including `...`. Describe the accepted input first, then its meaning and important constraints. Explain the effect of the default when it is not obvious from the signature.
+Document every argument, including `...`. Describe the accepted input first, then its meaning and important constraints.
+Explain the effect of the default when it is not obvious from the signature.
 
 Cover only relevant properties, but do not leave readers guessing about:
 
@@ -122,7 +148,9 @@ Cover only relevant properties, but do not leave readers guessing about:
 - Whether column names are supplied as strings, bare names, or selection expressions.
 - Whether a path names a file or directory, and whether existing files are overwritten.
 
-Write complete sentences with punctuation. Match argument names exactly. Explain related arguments together only when each meaning remains clear. Use `@inheritParams` for genuinely identical contracts, checking the inherited text in its new context.
+Write complete sentences with punctuation. Match argument names exactly. Explain related arguments together only when
+each meaning remains clear. Use `@inheritParams` for genuinely identical contracts, checking the inherited text in its
+new context.
 
 ```r
 #' @param x An unclassed integer or double vector of counts. Values must
@@ -141,15 +169,21 @@ For tidy evaluation, state the actual interface. These are alternative patterns 
 #' @param column A single string giving the name of a column in `data`.
 ```
 
-Check that links resolve and that any referenced package is appropriate for the package's documentation dependencies. Do not label a character argument as tidy selection just because it identifies columns.
+Check that links resolve and that any referenced package is appropriate for the package's documentation dependencies. Do
+not label a character argument as tidy selection just because it identifies columns.
 
-For `...`, name the receiving function and relevant restrictions when arguments are forwarded. If dots are reserved and must be empty, say so. “Additional arguments” alone is rarely enough.
+For `...`, name the receiving function and relevant restrictions when arguments are forwarded. If dots are reserved and
+must be empty, say so. “Additional arguments” alone is rarely enough.
 
 ### `@return`
 
-Describe the object the caller receives, not just the calculation. State its class or type and its length or dimensions where meaningful. Include names, ordering, grouping, attributes, and missing-value behavior when they affect subsequent work.
+Describe the object the caller receives, not just the calculation. State its class or type and its length or dimensions
+where meaningful. Include names, ordering, grouping, attributes, and missing-value behavior when they affect subsequent
+work.
 
-For data frames, explain the unit represented by a row and identify newly created columns. State whether inputs are retained or replaced. For lists, describe named components and their types. For functions called for side effects, explain the side effect and any invisible return value.
+For data frames, explain the unit represented by a row and identify newly created columns. State whether inputs are
+retained or replaced. For lists, describe named components and their types. For functions called for side effects,
+explain the side effect and any invisible return value.
 
 ```r
 #' @return A double vector with the same length and names as `x`. Each
@@ -157,13 +191,16 @@ For data frames, explain the unit represented by a row and identify newly create
 #'   contains a missing value, every element of the result is `NA`.
 ```
 
-Avoid vague text such as “The processed data” or “An object containing results.” Do not claim a tibble, preserved attributes, or an invisible return without checking.
+Avoid vague text such as “The processed data” or “An object containing results.” Do not claim a tibble, preserved
+attributes, or an invisible return without checking.
 
 ### `@details` and `@section`
 
-Use details for behavior readers need beyond the basic call. Good topics include boundary rules, group handling, zero denominators, matching policies, interpretation, and practical limitations.
+Use details for behavior readers need beyond the basic call. Good topics include boundary rules, group handling, zero
+denominators, matching policies, interpretation, and practical limitations.
 
-Prefer an explanation followed by a small example to a dense list of implementation steps. Use named sections when several topics would otherwise form a long paragraph.
+Prefer an explanation followed by a small example to a dense list of implementation steps. Use named sections when
+several topics would otherwise form a long paragraph.
 
 ```r
 #' @details
@@ -171,7 +208,9 @@ Prefer an explanation followed by a small example to a dense list of implementat
 #' an error because proportions are undefined when the total is zero.
 ```
 
-Do not create a details section simply to repeat arguments. Include mathematical notation or algorithms when they help interpret the output, establish a necessary assumption, or explain a consequential tradeoff. Keep helper names and control flow in source comments.
+Do not create a details section simply to repeat arguments. Include mathematical notation or algorithms when they help
+interpret the output, establish a necessary assumption, or explain a consequential tradeoff. Keep helper names and
+control flow in source comments.
 
 ### `@examples`
 
