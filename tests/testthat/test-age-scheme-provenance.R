@@ -1,7 +1,7 @@
 provenance_scheme <- function(verified = TRUE) {
   g <- age_interval(c(0, 10), c(10, Inf), unit = "year")
   names(g) <- c("Younger", "Older")
-  age_scheme(g, "original", "Original title", domain = c(0, Inf), complete = TRUE,
+  age_scheme(g, "original", "Original title", domain = c(0, Inf),
              source = "Source", version = "v1", reference = "Citation",
              organization = "Organization", verified = verified)
 }
@@ -50,7 +50,7 @@ test_that("nested labels, interval replacements and units are substantive", {
   x <- original
   g <- age_interval(0, 9, unit = "year")
   names(g) <- "Younger"
-  x[c("intervals", "complete")] <- list(c(g, original$intervals[2]), FALSE)
+  x$intervals <- c(g, original$intervals[2])
   expect_derivative(x, original)
   replacement <- age_interval(0, 8, unit = "year")
   names(replacement) <- "Younger"
@@ -70,8 +70,8 @@ test_that("nested labels, interval replacements and units are substantive", {
   x <- original
   x$domain <- c(0, Inf) # identical domain
   expect_identical(x, original)
-  x$complete <- NA
-  expect_derivative(x, original)
+  expect_error(x$complete <- NA, "calculated")
+  expect_identical(x, original)
 })
 
 test_that("cosmetic and identical edits preserve verification and ancestry", {
@@ -141,10 +141,10 @@ test_that("batch replacements validate final state and failed edits are atomic",
   original <- provenance_scheme()
   saved <- serialize(original, NULL)
   partial <- original$intervals[1]
-  expect_error(original$intervals <- partial, "coverage")
+  expect_error(original$intervals <- unname(partial), "names")
   expect_identical(serialize(original, NULL), saved)
   x <- original
-  x[c("intervals", "complete")] <- list(partial, FALSE)
+  x$intervals <- partial
   expect_derivative(x, original)
   expect_false(summary(x)$covered)
   saved_candidate <- serialize(x, NULL)
@@ -161,7 +161,7 @@ test_that("batch replacements validate final state and failed edits are atomic",
   expect_error(x[["derived_from"]] <- list(), "protected")
   expect_error(x["derived_from"] <- list(NULL), "protected")
   expect_error(x$id <- original$id, "distinct")
-  expect_error(x[c("domain", "complete")] <- list(c(0, 5), NA), "within domain")
+  expect_error(x$domain <- c(0, 5), "within domain")
   expect_error(attr(x$intervals, "symbols") <- NULL, "symbols")
   expect_identical(serialize(original, NULL), saved)
   expect_identical(serialize(x, NULL), saved_candidate)
@@ -199,7 +199,7 @@ test_that("serialization, legacy schema and classification remain supported", {
 test_that("user-defined and older schemes retain only known ancestry", {
   g <- age_interval(0, 20, unit = "year")
   names(g) <- "All recorded ages"
-  original <- age_scheme(g, "local", "Local definition", domain = c(0L, 20L), complete = TRUE)
+  original <- age_scheme(g, "local", "Local definition", domain = c(0L, 20L))
   x <- original
   x$domain <- c(0, 20) # storage type differs, but both bounds are exactly identical
   expect_identical(x$derived_from, NULL)

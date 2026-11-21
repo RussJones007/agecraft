@@ -33,7 +33,7 @@ test_that("same-unit classification retains exact half-open boundaries without t
   # A genuine one-step gap must not be filled by a tolerance.
   gap <- age_interval(c(0, 11 + step), c(11, Inf), unit = "second")
   names(gap) <- names(g)
-  partial <- age_scheme(gap, "gap", "One-step gap", domain = c(0, Inf), complete = FALSE)
+  partial <- age_scheme(gap, "gap", "One-step gap", domain = c(0, Inf))
   probes <- age(c(11 - step, 11, 11 + step), "second")
   expect_identical(classify_age_scheme(probes, partial, convert_units = "none")$status,
                    c("matched", "unmatched", "matched"))

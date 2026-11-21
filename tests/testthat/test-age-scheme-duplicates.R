@@ -2,7 +2,7 @@ test_that("duplicate-only classifications retain labels, boundaries and statuses
   g <- age_interval(c(0, 0), c(5, 5), unit = "year")
   names(g) <- c("Early childhood", "Preschool age")
   s <- age_scheme(g, "duplicates", "Shared range", type = "classification",
-                  domain = c(0, 5), complete = TRUE)
+                  domain = c(0, 5))
   expect_true(summary(s)$covered)
   values <- c(2, 5, 8, NA_real_)
   a <- age(values, unit = "year")
@@ -46,12 +46,10 @@ test_that("duplicate intervals cannot fill uncovered portions of a domain", {
   g <- age_interval(c(0, 0, 3), c(1, 1, 5), unit = "year")
   names(g) <- c("First", "Second", "Later")
   s <- age_scheme(g, "gap", "Gap", type = "classification",
-                  domain = c(0, 5), complete = FALSE)
+                  domain = c(0, 5))
   info <- summary(s)
   expect_false(info$covered)
   expect_identical(ivs::iv_start(info$gaps), 1)
   expect_identical(ivs::iv_end(info$gaps), 3)
-  expect_error(age_scheme(g, "gap", "Gap", type = "classification",
-                          domain = c(0, 5), complete = TRUE),
-               "complete does not agree with domain coverage")
+  expect_false(s$complete)
 })

@@ -22,8 +22,8 @@ test_that("Boolean overlap respects exact half-open endpoints", {
     before <- g
     assessment <- agecraft:::age_scheme_coverage(g, NULL)
     expect_identical(assessment$overlaps, case[[3]])
-    expect_null(assessment$gaps)
-    expect_identical(assessment$covered, NA)
+    expect_identical(assessment$domain, c(min(case[[1]]), max(case[[2]])))
+    expect_identical(assessment$covered, length(assessment$gaps) == 0L)
     expect_identical(g, before)
     if (case[[3]]) {
       expect_error(age_scheme(g, "p", "Partition"), "partition intervals must not overlap")
@@ -57,35 +57,32 @@ test_that("sorted overlap agrees with an independent pairwise oracle", {
 
 test_that("coverage and completeness retain exact gaps and infinite domains", {
   g <- coverage_intervals(c(1, 0, 0.5 + 2^-50), c(Inf, 0.5, 1))
-  s <- age_scheme(g, "gapped", "Gapped", domain = c(0, Inf), complete = FALSE)
+  s <- age_scheme(g, "gapped", "Gapped", domain = c(0, Inf))
   info <- summary(s)
   expect_false(info$covered)
   expect_false(info$overlaps)
   expect_identical(ivs::iv_start(info$gaps), 0.5)
   expect_identical(ivs::iv_end(info$gaps), 0.5 + 2^-50)
-  expect_error(age_scheme(g, "wrong", "Wrong", domain = c(0, Inf), complete = TRUE),
-               "complete does not agree with domain coverage")
+  expect_false(s$complete)
   adjacent <- coverage_intervals(c(1, 0), c(Inf, 1))
-  complete <- age_scheme(adjacent, "complete", "Complete", domain = c(0, Inf),
-                          complete = TRUE)
+  complete <- age_scheme(adjacent, "complete", "Complete", domain = c(0, Inf))
   expect_true(summary(complete)$covered)
   expect_length(summary(complete)$gaps, 0)
   expect_error(age_scheme(adjacent, "wrong", "Wrong", domain = c(0, 2)),
                "intervals must lie within domain")
-  expect_error(age_scheme(adjacent, "wrong", "Wrong", complete = TRUE),
-               "completeness claim requires an explicit domain")
+  expect_true(age_scheme(adjacent, "inferred", "Inferred")$complete)
 })
 
 test_that("assessment preserves category order and classification memberships", {
   g <- coverage_intervals(c(2, 0, 1), c(Inf, 1, 2))
-  s <- age_scheme(g, "ordered", "Ordered", domain = c(0, Inf), complete = TRUE)
+  s <- age_scheme(g, "ordered", "Ordered", domain = c(0, Inf))
   a <- age(c(0, 1, 2, NA), unit = "year")
   expect_identical(scheme_intervals(s), g)
   expect_identical(classify_age_scheme(a, s)$group_index, c(2L, 3L, 1L, NA_integer_))
   expect_identical(categorize_age(a, by = s), categorize_age(a, by = g))
   overlapping <- coverage_intervals(c(1, 0, 0), c(2, 3, 3))
   s <- age_scheme(overlapping, "overlap", "Overlap", type = "classification",
-                  domain = c(0, 3), complete = TRUE)
+                  domain = c(0, 3))
   expect_true(summary(s)$overlaps)
   expect_true(summary(s)$covered)
   expect_identical(classify_age_scheme(age(1, unit = "year"), s)$group_index, 1:3)
@@ -97,7 +94,7 @@ test_that("assessment preserves category order and classification memberships", 
 
 test_that("summary performs one coverage assessment while validating", {
   g <- coverage_intervals(c(0, 1), c(1, 2))
-  s <- age_scheme(g, "summary", "Summary", domain = c(0, 2), complete = TRUE)
+  s <- age_scheme(g, "summary", "Summary", domain = c(0, 2))
   calls <- 0L
   original <- agecraft:::age_scheme_coverage
   local_mocked_bindings(age_scheme_coverage = function(...) {

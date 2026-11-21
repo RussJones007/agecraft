@@ -31,13 +31,15 @@ without repair. This does not independently verify external provenance.}
 \value{
 \code{print()} invisibly returns its input. \code{summary()} returns a list
 of class \code{summary_age_scheme}, with a readable print method,
-containing identity, unit, group count, declared completeness, observed
+containing identity, unit, group count, calculated completeness, observed
 coverage, overlap flag, uncovered domain intervals, and provenance.
 \code{as.data.frame()} returns one row per group, with labels, numeric bounds,
 unit, and scheme identifier. Its \code{scheme_metadata} attribute contains the
 remaining scheme fields. This is an inspection format, not an automatic
 round-trip constructor; data-frame operations may discard the attribute.
-Without a domain, gaps and coverage are unspecified (NULL and NA).
+\code{domain} contains the effective bounds and \code{domain_inferred} indicates
+whether they were inferred from the interval span. \code{complete} and \code{covered}
+both report calculated coverage; \code{covered} is retained for compatibility.
 Derivatives print their ancestor ID/version; summaries and data-frame metadata
 include \code{derived_from}. See \code{\link[=age_scheme]{age_scheme()}} for editing and ancestry rules.
 }
@@ -47,8 +49,7 @@ Inspect an age scheme
 \examples{
 g <- age_interval(c(0, 10), c(5, 20), unit = "year")
 names(g) <- c("Young", "Older")
-s <- age_scheme(g, "partial", "Partial coverage", domain = c(0, 20),
-                complete = FALSE)
+s <- age_scheme(g, "partial", "Partial coverage")
 summary(s)
 as.data.frame(s)
 }

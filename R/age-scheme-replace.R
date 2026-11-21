@@ -5,15 +5,17 @@ age_scheme_definition <- function(x) {
   validate_age_interval(g)
   list(start = unname(ivs::iv_start(g)), end = unname(ivs::iv_end(g)),
        unit = get_unit(g), labels = unname(names(g)), type = unname(x$type),
-       domain = if (is.null(x$domain)) NULL else as.double(x$domain),
-       complete = unname(x$complete))
+       domain = if (is.null(x$domain)) NULL else as.double(x$domain))
 }
 
 # All public replacement forms commit one fully validated candidate. Raw list
 # writes avoid recursive dispatch and preserve NULL-valued schema fields.
 age_scheme_update <- function(x, fields, values) {
   validate_age_scheme(x)
-  editable <- setdiff(names(x), "derived_from")
+  if ("complete" %in% fields) {
+    stop("complete is calculated from intervals and domain and cannot be assigned", call. = FALSE)
+  }
+  editable <- setdiff(names(x), c("derived_from", "complete"))
   if (anyNA(fields) || any(!fields %in% editable) || anyDuplicated(fields)) {
     stop("Replace known scheme fields exactly once; derived_from is protected", call. = FALSE)
   }
@@ -37,8 +39,12 @@ age_scheme_update <- function(x, fields, values) {
     # replacement version is a caller-supplied local/source claim, not inferred.
     if (!"version" %in% fields) candidate["version"] <- list(NULL)
   }
+  candidate$complete <- NA
   class(candidate) <- class(x)
-  validate_age_scheme(candidate)
+  coverage <- age_scheme_assess(candidate)
+  candidate <- unclass(candidate)
+  candidate$complete <- coverage$covered
+  class(candidate) <- class(x)
   candidate
 }
 

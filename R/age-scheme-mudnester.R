@@ -182,7 +182,6 @@ mudnester_convert_row <- function(row, package_version, warn = TRUE) {
   scheme <- age_scheme(
     groups, id = paste0("mudnester_", row$scheme), name = row$scheme,
     type = "partition", domain = c(0, Inf),
-    complete = breaks[1L] == 0 && utils::tail(breaks, 1L) == Inf,
     source = optional(row$source), reference = optional(row$source_url),
     verified = FALSE,
     notes = paste0("Imported from mudnester package snapshot ", package_version,

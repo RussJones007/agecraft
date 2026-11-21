@@ -336,7 +336,6 @@ visit_scheme <- age_scheme(
   name = "Illustrative visit reporting bands",
   type = "partition",
   domain = c(0, Inf),
-  complete = TRUE,
   purpose = "Demonstrate age classes using fictional visits"
 )
 visit_scheme
@@ -344,8 +343,8 @@ scheme_intervals(visit_scheme)
 ```
 
 This object contains the named `age_interval` vector. It also contains
-its ID, name, purpose, partition/classification type, optional domain,
-completeness claim, and provenance fields such as source, reference,
+its ID, name, purpose, partition/classification type, optional explicit domain,
+calculated completeness, and provenance fields such as source, reference,
 organization, version, and verification status. Information that is
 unknown can remain unspecified. The scheme does not contain the visit
 records or their assignments.
@@ -370,7 +369,7 @@ names(childhood_intervals) <- c("Under 1", "1-4", "5-9", "10-14", "15-19", "20+"
 childhood_scheme <- age_scheme(
   childhood_intervals,
   id = "cdc_childhood_teaching", name = "CDC childhood teaching pattern",
-  domain = c(0, Inf), complete = TRUE,
+  domain = c(0, Inf),
   purpose = "Retain infant and childhood detail for a teaching analysis",
   organization = "Centers for Disease Control and Prevention",
   source = "Principles of Epidemiology, Lesson 5, Section 5 (archived)",
@@ -393,7 +392,7 @@ interval operations such as categorizing ages, use the `scheme_intervals()` func
 | Bounds, endpoint rule, labels, units | `scheme_intervals(x)` gives named, left-closed, right-open intervals; `as.data.frame(x)` displays bounds and units. |
 | Source and edition | `x$organization`, `x$source`, `x$reference`, and `x$version`; unknown information can remain `NULL`. |
 | Intended use and rationale | `x$purpose` and `x$notes`; there is no separate rationale or adaptation field. |
-| Domain and completeness | `x$domain`, `x$complete`, and `summary(x)` describe coverage claims and their checks. |
+| Domain and completeness | `x$domain` stores NULL for inference or explicit bounds; `summary(x)` reports effective bounds, `domain_inferred`, gaps and calculated completeness. |
 | Verification and ancestry | `x$verified` records the caller's claim; `x$derived_from` records ancestry after a tracked substantive edit. |
 | Assigned observations | `categorize_age(ages, by = x)` returns an `age_group`; retain `x` separately for its provenance. |
 
@@ -406,9 +405,12 @@ the analysis. Use `notes` to explain a deliberate adaptation, and consult the
 
 ### Validation expresses the intended classification
 
-A `partition` prohibits overlapping categories. With `domain = c(0, Inf)` and `complete = TRUE`, construction also
-checks that these bands cover the declared all-age domain. Completeness is a separate property from nonoverlap. A
-`classification` may permit overlapping memberships, and `complete = NA` makes no completeness claim.
+A `partition` prohibits overlapping categories. Completeness is calculated
+against the inferred interval span or an explicit `domain`, independently of
+overlap. With `domain = c(0, Inf)`, `summary(scheme)$complete` reports whether all
+ages are covered. Without an explicit domain, `domain_inferred` in the summary
+is TRUE; coverage outside the interval span cannot be assessed. A
+`classification` may permit overlapping memberships and still be complete.
 
 These checks establish properties of the definition. They do not
 establish that its categories are appropriate for a reporting system or

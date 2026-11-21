@@ -20,8 +20,11 @@ test_that("renamed classes reproduce captured classification and interval defini
   expect_identical(attr(x, "units"), attr(old$assignments, "units"))
   expect_null(attr(x, "groups", exact = TRUE))
   expect_false("groups" %in% names(s))
-  expect_identical(unclass(s)[setdiff(names(s), "intervals")],
-                   unclass(old$scheme)[setdiff(names(old$scheme), "groups")])
+  # Constructor completeness is now calculated, while historical metadata stays
+  # comparable independently of the class naming migration.
+  expect_identical(unclass(s)[setdiff(names(s), c("intervals", "complete"))],
+                   unclass(old$scheme)[setdiff(names(old$scheme), c("groups", "complete"))])
+  expect_identical(s$complete, summary(s)$covered)
   expect_null(s$derived_from)
   expect_identical(age_interval_presets, old$presets)
   expect_identical(age_group_presets, old$presets)

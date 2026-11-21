@@ -1,7 +1,8 @@
 #' Construct a reusable age classification scheme
 #'
-#' A scheme contains an existing [age_interval()] vector and scheme-level metadata.
-#' It does not inherit from `age_interval`. All intervals are right-open `[start,end)`.
+#' A scheme contains an existing [age_interval()] vector and scheme-level metadata like
+#' its purpose, organization that created it, reference URL or citation, version and notes.
+#' All intervals are right-open `[start,end)`.
 #'
 #' @param intervals A nonempty `age_interval` vector with an explicit time unit and
 #'   unique, nonblank names for every category. Missing intervals are not allowed.
@@ -10,14 +11,22 @@
 #' @param name Nonblank human-readable title. For `$<-`, the exact field name
 #'   to replace; changing the title field `name` is descriptive, not substantive.
 #' @param type `"partition"` rejects overlap; `"classification"` permits it.
-#' @param domain NULL or two numeric bounds specifying the intended right-open
-#'   age domain, in the intervals' unit. All intervals must lie within this domain.
-#' @param complete Logical coverage claim: NA (unknown), TRUE (complete), or FALSE
-#'   (incomplete). TRUE/FALSE require a domain and must agree with actual coverage.
-#' @param purpose,organization,source,reference,version,notes Optional nonblank
-#'   character scalars describing intended use and provenance. `reference` can be
-#'   a URL or citation. A version is an edition or source version, not a claim of
-#'   current authority.
+#' @param domain NULL (the default) to infer the right-open domain from the
+#'   smallest interval start and largest interval end, or two numeric bounds
+#'   declaring an intended domain in the intervals' unit. All intervals must lie
+#'   within an explicit domain. NULL retains automatic inference after edits.
+#' @param purpose Optional nonblank character scalar describing the intended use.
+#' @param organization Optional nonblank character scalar naming the organization
+#'   responsible for issuing the original classification, such as an agency,
+#'   research institution or local health department. Use NULL when unknown.
+#' @param source Optional nonblank character scalar identifying the document,
+#'   dataset or specification from which the interval definitions were obtained.
+#'   This identifies the resource, whereas `organization` identifies its issuer.
+#' @param reference Optional nonblank character scalar giving the source URL or
+#'   citation.
+#' @param version Optional nonblank character scalar identifying the source
+#'   edition or version, not a claim of current authority.
+#' @param notes Optional nonblank character scalar with additional context.
 #' @param verified Logical scalar; TRUE requires source, reference and version.
 #'   This records the caller's verification claim; the constructor cannot verify
 #'   an external source. Legacy built-ins are unverified.
@@ -26,6 +35,18 @@
 #'   or errors. `scheme_intervals()` returns its `age_interval` vector. Replacement
 #'   methods return the validated updated scheme.
 #' @details Scheme units must be second, minute, hour, day, week, month or year.
+#'   Completeness is calculated by subtracting the intervals' coverage from the
+#'   effective domain using [ivs::iv_set_difference()]. With `domain = NULL`,
+#'   [ivs::iv_span()] supplies that domain. Internal gaps make coverage incomplete;
+#'   overlap does not itself make coverage incomplete. An inferred domain cannot
+#'   detect missing coverage outside the intervals' outer bounds. Supply an
+#'   explicit domain, such as `c(0, Inf)`, when those outside ages are intended
+#'   to be covered. `summary(x)$domain` reports the effective bounds and
+#'   `summary(x)$domain_inferred` distinguishes inferred from explicit domains.
+#'   The stored `domain` remains NULL for automatic inference. `x$complete` is
+#'   calculated at construction and after edits and cannot be assigned directly.
+#'   To require complete coverage, check `isTRUE(summary(x)$complete)`.
+#'
 #'   Validation checks the complete stored `age_interval` representation, including
 #'   interval fields, bounds, units, category names and the actual `below`, `sep`
 #'   and `above` display symbols. Malformed metadata is rejected without repair
@@ -38,14 +59,13 @@
 #'   Classifications permit identical intervals with distinct category names:
 #'   each name represents a separate category, and [classify_age_scheme()] returns
 #'   every membership with its original label and category index. Duplicate names
-#'   are invalid in either scheme type. These scheme requirements do not tighten
-#'   the naming rules for bare `age_interval` vectors. No registry lookup is performed
-#'   by this constructor.
+#'   are invalid in either scheme type.
 #' @section Editing local copies:
 #' Schemes are independent R value objects. Copy with `modified <- original`,
 #' then edit using `$<-`, `[[<-` or batch `[<-` replacement. Substantive changes
-#' to bounds, units, ordered category labels, category order, type, domain or
-#' completeness create a derivative. Display symbols, title, purpose and notes
+#' to bounds, units, ordered category labels, category order, type or domain
+#' create a derivative. Completeness is recalculated automatically. Display
+#' symbols, title, purpose and notes
 #' are descriptive/cosmetic; valid changes to these preserve status. Identical
 #' definition assignments do not create derivatives or reset verification.
 #'
@@ -64,12 +84,14 @@
 #'
 #' `derived_from` is protected from ordinary replacement. Use one exact field name
 #' or position for `[[<-`; recursive indices are rejected. Use a list of values
-#' for atomic batch edits, for example `x[c("intervals", "complete")] <- list(g, FALSE)`.
+#' for atomic batch edits, for example `x[c("intervals", "domain")] <- list(g, c(0, Inf))`.
 #' Each completed assignment must be valid; batch related policy/interval changes
 #' rather than relying on an invalid intermediate object. Optional fields can be
 #' cleared with NULL without deleting schema fields.
 #'
 #' Older serialized schemes without `derived_from` remain readable and valid.
+#' Legacy unknown completeness is calculated in summaries and normalized on
+#' subsequent edits; inspection does not modify the original object.
 #' Their first tracked edit records their then-current metadata, not an invented
 #' historical lineage. Deliberate class removal, `unclass()` or reconstruction
 #' bypasses tracking. No definition snapshots or change histories are stored;
@@ -78,23 +100,25 @@
 #' @examples
 #' g <- age_interval(c(0, 18, 65), c(18, 65, Inf), unit = "year")
 #' names(g) <- c("Children", "Adults", "Older adults")
-#' s <- age_scheme(g, "example", "Example bands", domain = c(0, Inf),
-#'                 complete = TRUE)
+#' s <- age_scheme(g, "example", "Example bands")
 #' s
 #' scheme_intervals(s)
 #' summary(s)
 #' @export
 age_scheme <- function(intervals, id, name, type = c("partition", "classification"),
-                       domain = NULL, complete = NA, purpose = NULL,
+                       domain = NULL, purpose = NULL,
                        organization = NULL, source = NULL, reference = NULL,
                        version = NULL, verified = FALSE, notes = NULL) {
   type <- match.arg(type)
   x <- structure(list(intervals = intervals, id = id, name = name, type = type,
-                      domain = domain, complete = complete, purpose = purpose,
+                      domain = domain, complete = NA, purpose = purpose,
                       organization = organization, source = source,
                       reference = reference, version = version,
                       verified = verified, notes = notes, derived_from = NULL), class = "age_scheme")
-  validate_age_scheme(x)
+  coverage <- age_scheme_assess(x)
+  x <- unclass(x)
+  x$complete <- coverage$covered
+  class(x) <- "age_scheme"
   x
 }
 
@@ -200,8 +224,6 @@ age_scheme_assess <- function(x) {
     if (any(ivs::iv_start(g) < d[1] | ivs::iv_end(g) > d[2])) {
       stop("intervals must lie within domain", call. = FALSE)
     }
-  } else if (!is.na(x$complete)) {
-    stop("a completeness claim requires an explicit domain", call. = FALSE)
   }
   coverage <- age_scheme_coverage(g, x$domain)
   if (x$type == "partition" && coverage$overlaps) {

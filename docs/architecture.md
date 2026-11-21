@@ -95,8 +95,10 @@ data-frame inspection expose its identity, bounds, unit, provenance, coverage,
 gaps, and overlaps. Metadata is stored once per definition, not per observation.
 
 A validated `type` distinguishes nonoverlapping partitions from classifications
-that may overlap. A domain is optional; any `complete = TRUE` or FALSE claim
-requires an explicit domain and must agree with actual coverage. Category names
+that may overlap. A NULL domain infers the enclosing interval span with `ivs`;
+an explicit domain declares intended coverage. Completeness is calculated from
+domain gaps and is read-only. Summaries expose effective bounds and whether they
+were inferred; inference cannot detect omitted ages outside the span. Category names
 must be nonblank and unique. Unit and coordinate metadata live in `intervals`.
 Ordinary replacement uses a shared validated update transaction with exact,
 label-aware definition comparison. The first substantive or asserted-source edit

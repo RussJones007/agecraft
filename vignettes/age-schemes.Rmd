@@ -21,7 +21,7 @@ an interval vector, rather than another vector class attached to every age.
 
 Intervals include their lower bound and exclude their upper bound: `[0,5)`
 contains ages below 5, including fractions such as 4.9. A partition disallows
-overlapping groups. Completeness is a separate claim against a declared domain.
+overlapping groups. Completeness is calculated separately against its domain.
 
 ```{r partition}
 cuts <- c(seq(0, 85, by = 5), Inf)
@@ -29,7 +29,6 @@ g <- age_interval(breaks = cuts, unit = "year")
 names(g) <- as.character(g)
 five_year <- age_scheme(
   g, id = "example_five_year", name = "Illustrative five-year bands",
-  domain = c(0, Inf), complete = TRUE,
   purpose = "Example population tabulation"
 )
 five_year
@@ -37,11 +36,38 @@ summary(five_year)
 head(as.data.frame(five_year))
 ```
 
-A domain uses the same unit as the intervals. Use `complete = NA` when making
-no completeness claim. An incomplete partition can be useful: disjoint groups
-covering ages 0–17 need not cover the rest of a declared all-age domain. With
-`complete = FALSE`, construction verifies that coverage really is incomplete.
-Without a domain, coverage and domain gaps are unspecified.
+By default, the domain is inferred from the smallest interval start and largest
+interval end. Here that span is `[0, Inf)`. `summary(five_year)$domain` reports
+those bounds and `domain_inferred` is TRUE. `complete` is calculated: TRUE means
+there are no gaps within the effective domain, even if classifications overlap.
+
+Inference cannot identify omitted coverage outside the span. For example, bands
+covering `[18,65)` are complete within their own span but incomplete for all ages.
+Declare the intended domain to make that distinction:
+
+```{r intended-domain}
+adult_bands <- age_interval(breaks = c(18, 40, 65), unit = "year")
+names(adult_bands) <- c("18-39", "40-64")
+adult_only <- age_scheme(adult_bands, "adults", "Adult bands")
+all_ages <- age_scheme(adult_bands, "all_ages", "Intended all-age coverage",
+                       domain = c(0, Inf))
+summary(adult_only)$complete # TRUE
+summary(all_ages)$complete  # FALSE
+summary(all_ages)$gaps
+```
+
+The stored `domain = NULL` retains automatic inference after interval edits.
+An explicit domain remains fixed until you change it. Completeness is read-only
+and recalculated after edits. To require full coverage in an analysis, use
+`stopifnot(isTRUE(summary(all_ages)$complete))` after choosing the intended domain.
+The last example would fail that check because outside ages are uncovered.
+
+`organization` names the issuer of a classification; `source` identifies the
+document, dataset or specification that supplies its definitions. For example,
+an illustrative local definition might record `organization = "Example County
+Health Department"` and `source = "Annual surveillance reporting specification"`.
+Use `reference` for the URL or citation and `version` for its edition. Neither
+field implies external verification.
 
 ```{r classification}
 a <- age(c(0, 4.9, 5, 84.9, 85, NA), unit = "year")
@@ -191,7 +217,7 @@ g <- age_interval(c(10, 15, 10), c(20, 25, 25), unit = "year")
 names(g) <- c("Example A", "Example B", "Example C")
 overlapping <- age_scheme(
   g, id = "example_overlap", name = "Illustrative overlapping bands",
-  type = "classification", domain = c(10, 25), complete = TRUE,
+  type = "classification", domain = c(10, 25),
   notes = "Invented example; not an authoritative life-stage definition"
 )
 classify_age_scheme(age(c(12, 17, 24, 30, NA), unit = "year"), overlapping)
@@ -228,7 +254,7 @@ g <- age_interval(c(0, 0), c(5, 5), unit = "year")
 names(g) <- c("Early childhood", "Preschool age")
 s <- age_scheme(
   intervals = g, id = "example", name = "Illustrative shared age range",
-  type = "classification", domain = c(0, 5), complete = TRUE
+  type = "classification", domain = c(0, 5)
 )
 classify_age_scheme(age(c(2, 5), unit = "year"), s)
 ```
@@ -299,7 +325,7 @@ modified$name <- "My reporting title" # descriptive: no new derivative
 ```
 
 Bounds, units, category labels and their order, partition/classification policy,
-domain and completeness are substantive. Labels convey meaning even when
+and domain are substantive. Completeness is calculated from these definitions. Labels convey meaning even when
 bounds are identical. The first edit captures `derived_from`; later edits keep
 that ancestry unchanged. Reverting a definition does not restore verification.
 Valid title, purpose, notes and cosmetic display-symbol changes preserve status.
@@ -316,17 +342,17 @@ a derivative are attribution, not a claim that the changed definition was
 published or verified. A separate later `verified = TRUE` is an explicit caller
 claim, requiring source, reference and version; the package does not verify it.
 
-Use `$<-`, `[[<-` or `[<-` normally. For changes requiring several fields, use an
-atomic list replacement so the final candidate can be validated together:
+Use `$<-`, `[[<-` or `[<-` normally. An interval edit recalculates coverage
+without a separate completeness assignment:
 
 ```{r derivative-batch}
 partial <- original
-partial[c("intervals", "complete")] <- list(original$intervals[1:2], FALSE)
+partial$intervals <- original$intervals[1:2]
 summary(partial)$covered # FALSE
 ```
 
 Each completed assignment must be valid. A single edit contradicting the current
-coverage or partition policy errors; use a batch rather than an invalid editing
+domain bounds or partition policy errors; use a batch rather than an invalid editing
 state. `[[<-` accepts one exact field name or position and rejects recursive
 indices. `derived_from` cannot be replaced through the ordinary setters.
 Optional metadata can be cleared with NULL without deleting its schema field.

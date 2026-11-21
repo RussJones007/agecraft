@@ -1,3 +1,45 @@
+# Inferred scheme domains and calculated completeness — 2026-11-21
+
+Removed `complete` from `age_scheme()` arguments. NULL domains now infer the
+enclosing interval span with `ivs::iv_span()`; explicit domains still declare
+intended coverage and must contain every interval. The stored NULL preserves
+automatic inference after edits. Completeness is calculated using domain set
+difference and is read-only through ordinary replacement. Summaries report
+effective bounds and `domain_inferred`, with matching calculated `complete` and
+`covered` fields. Overlap remains independent of coverage.
+
+Legacy list schemas remain readable, including unknown completeness. Summaries
+calculate coverage without changing saved objects; subsequent substantive or
+descriptive edits normalize completeness without manufacturing ancestry.
+Existing nonmissing completeness values must agree with actual coverage.
+Derivative tracking still records changes to intervals, type and domain.
+
+This is an intentional constructor compatibility change: remove named `complete`
+arguments, name metadata arguments after `domain`, and check
+`isTRUE(summary(scheme)$complete)` where complete coverage is required. Updated
+registry/import callers, examples, four vignettes, README, API/design documents,
+and roxygen help. Organization identifies the issuer; source identifies the
+document, dataset or specification.
+
+Validation used a clean snapshot of the proposed commit to exclude separate
+uncommitted user edits to the age header, DESCRIPTION and documentation guidance.
+`devtools::document()` completed; scheme/conversion/import tests passed 1,899
+assertions with one optional mudnester skip. Full snapshot `devtools::test()`
+passed 3,742 assertions, zero failures/warnings and one optional skip.
+`devtools::check(document = FALSE)` completed with zero errors/warnings and the
+same two environment/dependency notes: `purrr_eval` registration and the compiler
+flag `-mno-omit-leaf-frame-pointer`. Installed tests, examples and all vignette
+rebuilds passed. Rendered constructor/summary help and scheme/class guides were
+reviewed; the final class-guide prose was rendered separately after review.
+The staged diff passed `git diff --cached --check`.
+
+Temporary logs: `/tmp/agecraft-scheme-simplify-focused.log`,
+`/tmp/agecraft-scheme-snapshot-tests.log`,
+`/tmp/agecraft-scheme-simplify-check.log`, and
+`/tmp/agecraft-scheme-simplify-help.log`.
+
+---
+
 # Session options and reversed-date warnings — 2026-11-21
 
 Implemented four validated, call-time session defaults through private

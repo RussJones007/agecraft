@@ -140,9 +140,23 @@ intervals with an explicit supported time unit. Validation checks the complete
 stored `age_interval` representation, including actual display symbols, interval
 fields and category metadata, without repair or default substitution. Custom
 scalar-string display symbols remain valid. Partitions prohibit overlaps;
-coverage is independently checked against an optional right-open domain.
-`complete = TRUE` or FALSE asserts actual completeness/incompleteness and requires
-a domain; NA makes no claim.
+coverage is independently calculated against the right-open domain. NULL (the
+default) infers the interval span using `ivs::iv_span()`; an explicit numeric
+domain declares intended coverage and must contain every interval. The stored
+NULL retains inference after edits. Summaries expose effective `domain` bounds
+and `domain_inferred`. `complete` is no longer a constructor argument or editable
+field: new objects and replacements calculate it from uncovered domain intervals.
+`summary(x)$complete` and `$covered` report the same calculated result.
+Inference detects internal gaps but cannot detect omitted outside ages.
+
+This intentionally removes the constructor's completeness assertion. Remove
+named `complete` arguments and check `isTRUE(summary(x)$complete)` when complete
+coverage is required. Positional arguments after `domain` shift left; use named
+metadata arguments. Older schemes retain their list schema and remain readable;
+legacy NA completeness is calculated for summaries and normalized on edits,
+without inferring historical ancestry. Existing explicit completeness claims
+must still agree with coverage. Organization identifies the original issuer;
+source identifies its document, dataset or specification.
 
 Identical intervals overlap and are invalid in partitions. Classifications permit
 identical intervals with distinct labels as separate semantic categories. Every
@@ -167,8 +181,8 @@ The initial registry contains eight legacy schemes with year units and stable
 legacy numeric lists and aliases retain their existing behavior. Verification
 metadata records a caller's claim, not external validation by the constructor.
 Ordinary `$<-`, `[[<-` and `[<-` edits now validate the completed candidate and
-track derivatives. Bounds, units, ordered labels, category order, type, domain
-and completeness changes capture first ancestry in protected `derived_from`,
+track derivatives. Bounds, units, ordered labels, category order, type and domain
+changes capture first ancestry in protected `derived_from`,
 assign a local `_derived` ID and clear current verification/version. Title,
 purpose, notes and cosmetic symbols preserve status. Identical definition
 assignments preserve status. Source/organization/reference/ID/version edits also

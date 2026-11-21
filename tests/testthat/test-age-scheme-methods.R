@@ -1,7 +1,7 @@
 test_that("scheme inspection preserves provenance and interval coordinates", {
   g <- age_interval(c(0, 5.25), c(5, Inf), unit = "year")
   names(g) <- c("Young", "Older")
-  s <- age_scheme(g, "test", "Example", domain = c(0, Inf), complete = FALSE,
+  s <- age_scheme(g, "test", "Example", domain = c(0, Inf),
                   source = "Example source", reference = "Example citation",
                   version = "2026", verified = TRUE)
   expect_output(print(s), "age_scheme: test")
@@ -18,8 +18,9 @@ test_that("scheme inspection preserves provenance and interval coordinates", {
   expect_identical(out$end, ivs::iv_end(g))
   expect_true(attr(out, "scheme_metadata")$verified)
   unknown <- summary(age_scheme(g, "unknown", "Unknown"))
-  expect_null(unknown$gaps)
-  expect_true(is.na(unknown$covered))
+  expect_length(unknown$gaps, 1)
+  expect_false(unknown$covered)
+  expect_true(unknown$domain_inferred)
   altered <- unclass(s)
   altered$intervals <- age_interval(0, 10, unit = "year")
   class(altered) <- "age_scheme"

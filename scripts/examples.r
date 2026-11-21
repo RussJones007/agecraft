@@ -88,8 +88,7 @@ scheme <- age_scheme(
   groups,
   id = "example",
   name = "Example age bands",
-  domain = c(0, Inf),
-  complete = TRUE
+  domain = c(0, Inf)
 )
 
 categorize_age(x, by = scheme)  # Ordered category factor

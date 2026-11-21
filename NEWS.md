@@ -1,5 +1,11 @@
 # agecraft 0.1.0.9023
 
+- Simplify `age_scheme()`: infer the domain from the interval span by default,
+  retain explicit domains for intended coverage, and calculate read-only
+  completeness. Remove `complete` arguments from calls; use
+  `isTRUE(summary(scheme)$complete)` to require coverage. Summaries distinguish
+  inferred domains with `domain_inferred`. Metadata arguments after `domain`
+  move one position left; name them explicitly. Clarify organization versus source.
 - Reversed date pairs in `calculate_age()` return `NA` and warn once with the
   affected count instead of stopping by default. Set
   `options(agecraft.end_before_start = "error")` to retain strict validation.

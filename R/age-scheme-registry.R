@@ -50,7 +50,7 @@ get_age_scheme <- function(id) {
   g <- age_interval(utils::head(cuts, -1L), utils::tail(cuts, -1L), unit = "year")
   names(g) <- as.character(g)
   age_scheme(g, id = id, name = row$name, type = "partition",
-             domain = c(cuts[1], cuts[length(cuts)]), complete = TRUE,
+             domain = c(cuts[1], cuts[length(cuts)]),
              purpose = row$intended_use, source = row$source,
              reference = "agecraft: extdata/age-group-provenance.csv",
              version = row$package_snapshot, verified = FALSE,

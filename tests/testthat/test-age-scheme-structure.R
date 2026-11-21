@@ -119,7 +119,7 @@ test_that("validated schemes support ordinary operations and custom display symb
     # Named list ordering has no semantic significance.
     attr(g, "symbols") <- symbols
     attr(g, "user_note") <- "Unrelated attributes are permitted"
-    s <- age_scheme(g, "custom", "Custom", domain = c(0, Inf), complete = TRUE)
+    s <- age_scheme(g, "custom", "Custom", domain = c(0, Inf))
     before <- serialize(s, NULL)
     expect_identical(validate_age_scheme(s), s)
     out <- scheme_intervals(s)

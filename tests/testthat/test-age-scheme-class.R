@@ -6,7 +6,7 @@ scheme_test_groups <- function(start = c(0, 5), end = c(5, Inf)) {
 
 test_that("schemes preserve groups and validate coverage independently of overlap", {
   g <- scheme_test_groups()
-  s <- age_scheme(g, "test", "Test", domain = c(0, Inf), complete = TRUE)
+  s <- age_scheme(g, "test", "Test", domain = c(0, Inf))
   expect_true(is_age_scheme(s))
   expect_false(is_age_interval(s))
   expect_identical(scheme_intervals(s), g)
@@ -15,18 +15,15 @@ test_that("schemes preserve groups and validate coverage independently of overla
   overlap <- scheme_test_groups(c(0, 2), c(5, Inf))
   expect_error(age_scheme(overlap, "test", "Test"), "overlap")
   s2 <- age_scheme(overlap, "test", "Test", type = "classification",
-                   domain = c(0, Inf), complete = TRUE)
+                   domain = c(0, Inf))
   expect_true(summary(s2)$overlaps)
   expect_true(summary(s2)$covered)
   gapped <- scheme_test_groups(c(0, 5.25), c(5, Inf))
-  expect_error(age_scheme(gapped, "test", "Test", domain = c(0, Inf),
-                         complete = TRUE), "coverage")
-  partial <- age_scheme(gapped, "test", "Test", domain = c(0, Inf), complete = FALSE)
+  partial <- age_scheme(gapped, "test", "Test", domain = c(0, Inf))
   expect_equal(ivs::iv_start(summary(partial)$gaps), 5)
   expect_equal(ivs::iv_end(summary(partial)$gaps), 5.25)
-  expect_error(age_scheme(g, "test", "Test", domain = c(0, Inf), complete = FALSE),
-               "coverage")
-  expect_error(age_scheme(g, "test", "Test", complete = TRUE), "domain")
+  expect_true(age_scheme(g, "test", "Test")$complete)
+  expect_false(partial$complete)
   expect_error(age_scheme(g, "test", "Test", domain = c(0, 5)), "within domain")
 })
 

@@ -7,13 +7,15 @@
 #' @param ... Additional arguments, currently unused.
 #' @return `print()` invisibly returns its input. `summary()` returns a list
 #'   of class `summary_age_scheme`, with a readable print method,
-#'   containing identity, unit, group count, declared completeness, observed
+#'   containing identity, unit, group count, calculated completeness, observed
 #'   coverage, overlap flag, uncovered domain intervals, and provenance.
 #'   `as.data.frame()` returns one row per group, with labels, numeric bounds,
 #'   unit, and scheme identifier. Its `scheme_metadata` attribute contains the
 #'   remaining scheme fields. This is an inspection format, not an automatic
 #'   round-trip constructor; data-frame operations may discard the attribute.
-#'   Without a domain, gaps and coverage are unspecified (NULL and NA).
+#'   `domain` contains the effective bounds and `domain_inferred` indicates
+#'   whether they were inferred from the interval span. `complete` and `covered`
+#'   both report calculated coverage; `covered` is retained for compatibility.
 #'   Derivatives print their ancestor ID/version; summaries and data-frame metadata
 #'   include `derived_from`. See [age_scheme()] for editing and ancestry rules.
 #' @param row.names Optional row names for the data frame.
@@ -22,8 +24,7 @@
 #' @examples
 #' g <- age_interval(c(0, 10), c(5, 20), unit = "year")
 #' names(g) <- c("Young", "Older")
-#' s <- age_scheme(g, "partial", "Partial coverage", domain = c(0, 20),
-#'                 complete = FALSE)
+#' s <- age_scheme(g, "partial", "Partial coverage")
 #' summary(s)
 #' as.data.frame(s)
 NULL
@@ -51,6 +52,9 @@ summary.age_scheme <- function(object, ...) {
     list(unit = get_unit(object$intervals), n_groups = length(object$intervals),
          overlaps = coverage$overlaps, gaps = coverage$gaps,
          covered = coverage$covered))
+  out$domain <- coverage$domain
+  out$complete <- coverage$covered
+  out$domain_inferred <- coverage$domain_inferred
   class(out) <- "summary_age_scheme"
   out
 }
@@ -59,7 +63,7 @@ summary.age_scheme <- function(object, ...) {
 #' @export
 print.summary_age_scheme <- function(x, ...) {
   cat("<age_scheme summary:", x$id, ">", x$name, "\n")
-  fields <- c("type", "unit", "n_groups", "domain", "complete", "covered",
+  fields <- c("type", "unit", "n_groups", "domain", "domain_inferred", "complete", "covered",
               "overlaps", "purpose", "organization", "source", "reference",
               "version", "verified", "notes")
   for (field in fields) {

@@ -16,7 +16,6 @@ age_scheme(
   name,
   type = c("partition", "classification"),
   domain = NULL,
-  complete = NA,
   purpose = NULL,
   organization = NULL,
   source = NULL,
@@ -50,20 +49,32 @@ to replace; changing the title field \code{name} is descriptive, not substantive
 
 \item{type}{\code{"partition"} rejects overlap; \code{"classification"} permits it.}
 
-\item{domain}{NULL or two numeric bounds specifying the intended right-open
-age domain, in the intervals' unit. All intervals must lie within this domain.}
+\item{domain}{NULL (the default) to infer the right-open domain from the
+smallest interval start and largest interval end, or two numeric bounds
+declaring an intended domain in the intervals' unit. All intervals must lie
+within an explicit domain. NULL retains automatic inference after edits.}
 
-\item{complete}{Logical coverage claim: NA (unknown), TRUE (complete), or FALSE
-(incomplete). TRUE/FALSE require a domain and must agree with actual coverage.}
+\item{purpose}{Optional nonblank character scalar describing the intended use.}
 
-\item{purpose, organization, source, reference, version, notes}{Optional nonblank
-character scalars describing intended use and provenance. \code{reference} can be
-a URL or citation. A version is an edition or source version, not a claim of
-current authority.}
+\item{organization}{Optional nonblank character scalar naming the organization
+responsible for issuing the original classification, such as an agency,
+research institution or local health department. Use NULL when unknown.}
+
+\item{source}{Optional nonblank character scalar identifying the document,
+dataset or specification from which the interval definitions were obtained.
+This identifies the resource, whereas \code{organization} identifies its issuer.}
+
+\item{reference}{Optional nonblank character scalar giving the source URL or
+citation.}
+
+\item{version}{Optional nonblank character scalar identifying the source
+edition or version, not a claim of current authority.}
 
 \item{verified}{Logical scalar; TRUE requires source, reference and version.
 This records the caller's verification claim; the constructor cannot verify
 an external source. Legacy built-ins are unverified.}
+
+\item{notes}{Optional nonblank character scalar with additional context.}
 
 \item{x}{An object to identify, validate, or inspect.}
 
@@ -81,11 +92,24 @@ or errors. \code{scheme_intervals()} returns its \code{age_interval} vector. Rep
 methods return the validated updated scheme.
 }
 \description{
-A scheme contains an existing \code{\link[=age_interval]{age_interval()}} vector and scheme-level metadata.
-It does not inherit from \code{age_interval}. All intervals are right-open \verb{[start,end)}.
+A scheme contains an existing \code{\link[=age_interval]{age_interval()}} vector and scheme-level metadata like
+its purpose, organization that created it, reference URL or citation, version and notes.
+All intervals are right-open \verb{[start,end)}.
 }
 \details{
 Scheme units must be second, minute, hour, day, week, month or year.
+Completeness is calculated by subtracting the intervals' coverage from the
+effective domain using \code{\link[ivs:iv_set_difference]{ivs::iv_set_difference()}}. With \code{domain = NULL},
+\code{\link[ivs:iv_span]{ivs::iv_span()}} supplies that domain. Internal gaps make coverage incomplete;
+overlap does not itself make coverage incomplete. An inferred domain cannot
+detect missing coverage outside the intervals' outer bounds. Supply an
+explicit domain, such as \code{c(0, Inf)}, when those outside ages are intended
+to be covered. \code{summary(x)$domain} reports the effective bounds and
+\code{summary(x)$domain_inferred} distinguishes inferred from explicit domains.
+The stored \code{domain} remains NULL for automatic inference. \code{x$complete} is
+calculated at construction and after edits and cannot be assigned directly.
+To require complete coverage, check \code{isTRUE(summary(x)$complete)}.
+
 Validation checks the complete stored \code{age_interval} representation, including
 interval fields, bounds, units, category names and the actual \code{below}, \code{sep}
 and \code{above} display symbols. Malformed metadata is rejected without repair
@@ -98,16 +122,15 @@ separate properties. Identical intervals overlap, so partitions reject them.
 Classifications permit identical intervals with distinct category names:
 each name represents a separate category, and \code{\link[=classify_age_scheme]{classify_age_scheme()}} returns
 every membership with its original label and category index. Duplicate names
-are invalid in either scheme type. These scheme requirements do not tighten
-the naming rules for bare \code{age_interval} vectors. No registry lookup is performed
-by this constructor.
+are invalid in either scheme type.
 }
 \section{Editing local copies}{
 
 Schemes are independent R value objects. Copy with \code{modified <- original},
 then edit using \verb{$<-}, \verb{[[<-} or batch \verb{[<-} replacement. Substantive changes
-to bounds, units, ordered category labels, category order, type, domain or
-completeness create a derivative. Display symbols, title, purpose and notes
+to bounds, units, ordered category labels, category order, type or domain
+create a derivative. Completeness is recalculated automatically. Display
+symbols, title, purpose and notes
 are descriptive/cosmetic; valid changes to these preserve status. Identical
 definition assignments do not create derivatives or reset verification.
 
@@ -126,12 +149,14 @@ also assigns TRUE.
 
 \code{derived_from} is protected from ordinary replacement. Use one exact field name
 or position for \verb{[[<-}; recursive indices are rejected. Use a list of values
-for atomic batch edits, for example \code{x[c("intervals", "complete")] <- list(g, FALSE)}.
+for atomic batch edits, for example \code{x[c("intervals", "domain")] <- list(g, c(0, Inf))}.
 Each completed assignment must be valid; batch related policy/interval changes
 rather than relying on an invalid intermediate object. Optional fields can be
 cleared with NULL without deleting schema fields.
 
 Older serialized schemes without \code{derived_from} remain readable and valid.
+Legacy unknown completeness is calculated in summaries and normalized on
+subsequent edits; inspection does not modify the original object.
 Their first tracked edit records their then-current metadata, not an invented
 historical lineage. Deliberate class removal, \code{unclass()} or reconstruction
 bypasses tracking. No definition snapshots or change histories are stored;
@@ -141,8 +166,7 @@ validation checks structure and ancestry shape, not historical authenticity.
 \examples{
 g <- age_interval(c(0, 18, 65), c(18, 65, Inf), unit = "year")
 names(g) <- c("Children", "Adults", "Older adults")
-s <- age_scheme(g, "example", "Example bands", domain = c(0, Inf),
-                complete = TRUE)
+s <- age_scheme(g, "example", "Example bands")
 s
 scheme_intervals(s)
 summary(s)

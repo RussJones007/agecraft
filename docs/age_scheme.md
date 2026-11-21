@@ -51,8 +51,8 @@ Each scheme should include the following information. Some fields are required f
 | `intervals` | Named `age_interval` vector | Required; retains `ivs` interval semantics |
 | `type` | `partition` or `classification` | Required |
 | `unit` | Unit for all interval endpoints | Taken from/consistent with `intervals` |
-| `domain` | Intended age range or population | Optional but strongly recommended |
-| `complete` | Whether groups cover the stated domain | Validated or explicitly unknown |
+| `domain` | Intended age range or population | NULL infers the interval span; explicit bounds override |
+| `complete` | Whether groups cover the effective domain | Calculated, read-only |
 | `purpose` | Intended analytical/reporting use | Recommended |
 | `organization` | WHO, CDC, NCHS, local health department, etc. | Recommended for published schemes |
 | `source` | Document title or dataset specification | Recommended for published schemes |
@@ -125,7 +125,7 @@ categorize_age(ages, by = s)
 
 The cut points above are **illustrative**, not a claim about the current official NNDSS specification.
 
-**Constructor behavior:** Validate bounds and labels, verify that group units agree, determine overlaps/gaps, check declared completeness against the domain, and reject contradictory metadata. Prefer validated construction/update helpers over unsupported direct mutation.
+**Constructor behavior:** Validate bounds and labels, verify that group units agree, determine overlaps/gaps, calculate completeness against the effective domain, and reject contradictory metadata. Prefer validated construction/update helpers over unsupported direct mutation.
 
 **Classification output:** For a partition, retain the existing ordered-factor behavior of `categorize_age()` where practical. For an overlapping classification, define a separate explicit multiple-membership representation (for example, a list-column or long table) rather than silently forcing a factor.
 
@@ -248,9 +248,16 @@ an explicit supported time unit. Category names must be nonblank and unique.
 `scheme_intervals()` accesses intervals; `is_age_scheme()` identifies the class;
 `validate_age_scheme()` checks the full object, including after direct mutation.
 
-`domain` is NULL or a numeric pair describing a right-open interval in the group
-unit. Groups must lie inside a declared domain. `complete = NA` makes no coverage
-claim; TRUE/FALSE assert complete/incomplete coverage and require a domain.
+`domain` is NULL (infer the interval span using `ivs::iv_span()`) or a numeric
+pair declaring a right-open target domain in the group unit. Groups must lie
+inside a declared domain. NULL retains automatic inference after interval edits;
+summaries show effective bounds and `domain_inferred`. `complete` is calculated
+using `ivs::iv_set_difference()` and is no longer a constructor argument or
+editable field. Internal gaps imply incomplete coverage; an inferred span cannot
+detect omitted outside ages. Explicit completeness checks belong in the calling
+workflow. Legacy objects remain readable; unknown coverage is calculated in
+summaries and normalized after edits. Organization names the issuer, while source
+identifies the document, dataset or specification containing the definition.
 Overlap is independent of completeness; partitions reject overlap. Ordinary scheme replacement now uses `$<-`, `[[<-` and `[<-` methods to validate
 completed candidates and track minimal `derived_from` ancestry. Ordered labels
 are substantive, while descriptive title/notes and cosmetic symbols are not.

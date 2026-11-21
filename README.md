@@ -252,7 +252,7 @@ MIT. See [LICENSE](LICENSE).
 
 ## Reusable age schemes
 
-Wrap named, unit-bearing groups in `age_scheme()` to declare a partition or overlapping classification with purpose and provenance. Use the same scheme across datasets; completeness is validated against an explicit age domain.
+Wrap named, unit-bearing groups in `age_scheme()` to declare a partition or overlapping classification with purpose and provenance. By default, the domain is inferred from the interval span and completeness is calculated. Supply an explicit domain to assess intended coverage beyond that span. `summary(scheme)` reports effective bounds, `domain_inferred`, gaps, and calculated `complete`. Use `stopifnot(isTRUE(summary(scheme)$complete))` when your workflow requires full coverage.
 
 ``` r
 legacy_ili <- get_age_scheme("legacy_ili")

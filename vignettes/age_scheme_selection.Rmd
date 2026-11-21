@@ -85,7 +85,7 @@ childhood <- age_scheme(
   make_bands(c(0, 1, 5, 10, 15, 20, Inf),
              c("Under 1", "1-4", "5-9", "10-14", "15-19", "20+")),
   id = "cdc_childhood_teaching", name = "CDC childhood teaching pattern",
-  domain = c(0, Inf), complete = TRUE,
+  domain = c(0, Inf),
   purpose = "Preserve infant and childhood distinctions in a teaching analysis",
   organization = "Centers for Disease Control and Prevention",
   source = "Principles of Epidemiology, Lesson 5, Section 5 (archived)",
@@ -97,13 +97,13 @@ childhood <- age_scheme(
 five_year <- age_scheme(
   make_bands(c(seq(0, 85, 5), Inf)),
   id = "five_year_teaching", name = "Five-year teaching bands",
-  domain = c(0, Inf), complete = TRUE,
+  domain = c(0, Inf),
   purpose = "Compare pooling infants with ages 1-4"
 )
 ten_year <- age_scheme(
   make_bands(c(seq(0, 90, 10), Inf)),
   id = "ten_year_teaching", name = "Ten-year teaching bands",
-  domain = c(0, Inf), complete = TRUE,
+  domain = c(0, Inf),
   purpose = "Compare further pooling of childhood ages"
 )
 schemes <- list("Childhood pattern" = childhood,

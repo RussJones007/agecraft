@@ -10,11 +10,13 @@ test_that("summary keeps metadata accessible and prints provenance", {
                          organization = "Example Agency", verified = TRUE)
   info <- summary(s)
   expect_s3_class(info, "summary_age_scheme")
-  for (field in setdiff(names(s), "intervals")) {
+  for (field in setdiff(names(s), c("intervals", "domain"))) {
     expect_identical(info[[field]], s[[field]])
   }
   expect_identical(info$n_groups, 2L)
-  expect_null(info$gaps)
+  expect_length(info$gaps, 0)
+  expect_identical(info$domain, c(0, Inf))
+  expect_true(info$domain_inferred)
   expect_output(print(info), "source: Reporting handbook")
   expect_output(print(info), "version: Edition A")
   expect_output(print(info), "verified: TRUE")
