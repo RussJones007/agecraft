@@ -1,5 +1,8 @@
 # agecraft 0.1.0.9023
 
+- Add `age_group-class` and `agecraft-classes` help topics. Clarify that
+  `age_group()` constructs category assignments together with their interval
+  definitions, and link constructor and package help to the class references.
 - Simplify `age_scheme()`: infer the domain from the interval span by default,
   retain explicit domains for intended coverage, and calculate read-only
   completeness. Remove `complete` arguments from calls; use

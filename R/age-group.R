@@ -1,8 +1,13 @@
 #' Create age groups with interval definitions
 #'
-#' Create an ordered factor when you already have age-category labels and
-#' their interval definitions. Each level corresponds to one defining interval.
-#' To classify numerical ages instead, use [categorize_age()].
+#' Construct an `age_group` object from category labels and their defining age
+#' intervals. The object records each observation's category and retains the
+#' `age_interval` vector defining all available categories.
+#'
+#' Use `age_group()` when the category labels are already known. To assign
+#' numerical ages to categories, use [categorize_age()], which returns an
+#' `age_group` object by default. See [age_group class][age_group-class] for the class structure
+#' and supported operations, and [agecraft-classes] for the package's four classes.
 #'
 #' Subsetting retains unused levels and their definitions. Use `droplevels()`
 #' to remove them together, or [group_intervals()] to retrieve the definitions.
@@ -15,24 +20,34 @@
 #' Original numerical ages and scheme provenance are not stored. The `units`
 #' attribute, when present, describes the original observations; definition
 #' units are available from `group_intervals()`.
-#' @param x Character category labels or a factor; missing values are allowed.
+#' @param x Character category labels or a factor, one value per observation.
+#'   Every non-missing label must match a category defined by `intervals`.
+#'   Missing values are allowed. For `is_age_group()` and `group_intervals()`,
+#'   an object to identify or an `age_group` object to inspect, respectively.
 #' @param intervals An `age_interval` vector in chronological order. Each
 #'   interval must be present and have a unique nonblank label, supplied by
 #'   its name or formatted bounds. Unused intervals are retained as levels.
-#' @return `age_group()` returns an ordered-factor subclass with the same
-#'   length and observation names as `x`;
+#' @return `age_group()` returns an `age_group` object with classes
+#'   `c("age_group", "ordered", "factor")`, having the same length and observation
+#'   names as `x`. Factor codes and levels represent the supplied assignments;
+#'   an associated `age_interval` vector defines one interval per level,
+#'   including unused categories. Retrieve it with `group_intervals()`.
 #'   `is_age_group()` returns a logical scalar; `group_intervals()` returns
 #'   the defining `age_interval` vector, including unused categories.
+#' @seealso [age_group class][age_group-class] for the class contract; [agecraft-classes] for
+#'   relationships among ages, intervals, assignments and schemes.
 #' @section Saved objects:
 #' Earlier development versions used the class name `age_group` for interval
 #' records. Reconstruct those ranges with [age_interval()] before using them.
 #' They are not categorical assignments: `is_age_group()` returns `FALSE`,
 #' and group methods reject them with migration guidance.
 #' @examples
-#' intervals <- age_interval(c(0, 5), c(5, Inf))
-#' x <- age_group(c("0-4", "5+", NA), intervals)
-#' group_intervals(x)
-#' droplevels(x[1])
+#' bands <- age_interval(breaks = c(0, 5, 18, Inf), unit = "year")
+#' names(bands) <- c("Preschool", "School age", "Adult")
+#' groups <- age_group(c("Adult", "Preschool", NA), intervals = bands)
+#' as.character(groups)     # One assignment per observation
+#' group_intervals(groups)  # One interval per available category
+#' droplevels(groups)       # Remove unused School age and its interval
 #' @export
 age_group <- function(x = character(), intervals) {
   reject_legacy_age_group(x)

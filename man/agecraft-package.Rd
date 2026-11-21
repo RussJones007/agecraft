@@ -13,7 +13,9 @@ construct classifications suited to your analysis.
 \if{html}{\figure{logo.png}{options: align="right" width="120" alt="agecraft logo"}}
 }
 \details{
-The package provides four complementary S3 classes:
+The package provides four complementary S3 classes.
+See \link{agecraft-classes} for a class overview and an example connecting them,
+and \link[=age_group-class]{age_group class} for the structure of categorical assignments.
 \itemize{
 \item \strong{\code{age}} represents age values with fractional precision and an explicit
 time unit. Printed values show completed units while the stored values
@@ -69,7 +71,7 @@ group_intervals(groups)
 }
 \seealso{
 \code{\link[=calculate_age]{calculate_age()}}, \code{\link[=age]{age()}}, \code{\link[=age_interval]{age_interval()}}, \code{\link[=as_age_interval]{as_age_interval()}},
-\code{\link[=categorize_age]{categorize_age()}}, \code{\link[=age_scheme]{age_scheme()}}
+\code{\link[=categorize_age]{categorize_age()}}, \code{\link[=age_scheme]{age_scheme()}}, \link{agecraft-classes}, \link[=age_group-class]{age_group class}
 }
 \author{
 \strong{Maintainer}: Russ Jones \email{RussJones007@gmail.com}

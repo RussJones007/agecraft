@@ -8,7 +8,9 @@
 #' \if{html}{\figure{logo.png}{options: align="right" width="120" alt="agecraft logo"}}
 #'
 #' @details
-#' The package provides four complementary S3 classes:
+#' The package provides four complementary S3 classes.
+#' See [agecraft-classes] for a class overview and an example connecting them,
+#' and [age_group class][age_group-class] for the structure of categorical assignments.
 #'
 #' * **`age`** represents age values with fractional precision and an explicit
 #'   time unit. Printed values show completed units while the stored values
@@ -46,7 +48,7 @@
 #'
 #' @seealso
 #' [calculate_age()], [age()], [age_interval()], [as_age_interval()],
-#' [categorize_age()], [age_scheme()]
+#' [categorize_age()], [age_scheme()], [agecraft-classes], [age_group class][age_group-class]
 #'
 #' @examples
 #' ages <- age(c(0.5, 1, 4.9, 5, 17, 65), unit = "year")

@@ -15,6 +15,10 @@ The package provides:
 
 The `age` and `age_interval` vector classes use the [vctrs](https://vctrs.r-lib.org/) framework. Group intervals build on [ivs](https://davisvaughan.github.io/ivs/), and explicit unit conversions use [units](https://r-quantities.github.io/units/). Requires R 4.1.0 or later. The package is under active development; see [NEWS](NEWS.md) for API changes.
 
+Use `help("agecraft-classes", package = "agecraft")` for an overview of the four
+classes, or `help("age_group-class", package = "agecraft")` for category
+assignments and their associated interval definitions.
+
 ## Start with dates, finish with named categories
 
 ``` r

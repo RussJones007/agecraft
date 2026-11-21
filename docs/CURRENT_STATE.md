@@ -1,3 +1,26 @@
+# Class help and age-group constructor documentation — 2026-11-21
+
+Clarified that `age_group()` constructs an `age_group` object with classes
+`c("age_group", "ordered", "factor")`, representing supplied labels through
+factor codes/levels and retaining one interval definition per category. Added
+`age_group-class` help for representation, creation, accessors, missing/unused
+categories, supported operations and information not retained. Added
+`agecraft-classes` help introducing age values, interval definitions, category
+assignments and schemes with a connected classification example. Constructor,
+package and README links make both new topics discoverable.
+
+Documentation only: existing executable expressions were compared with HEAD
+and are unchanged; the new roxygen source contains only NULL topic sentinels.
+`devtools::document()` completed without warnings on the final run. Parsed and
+checked all four affected Rd topics with `tools::checkRd()`, rendered HTML/text
+help and reviewed headings, content and class-reference links. Extracted and
+ran the examples from all four topics successfully and verified the two new
+help aliases. The full test suite and package check were skipped as requested.
+Temporary logs: `/tmp/agecraft-class-help-document.log` and
+`/tmp/agecraft-class-help-validation.log`.
+
+---
+
 # Inferred scheme domains and calculated completeness — 2026-11-21
 
 Removed `complete` from `age_scheme()` arguments. NULL domains now infer the

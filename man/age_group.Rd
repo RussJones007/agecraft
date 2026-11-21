@@ -13,24 +13,35 @@ is_age_group(x)
 group_intervals(x)
 }
 \arguments{
-\item{x}{Character category labels or a factor; missing values are allowed.}
+\item{x}{Character category labels or a factor, one value per observation.
+Every non-missing label must match a category defined by \code{intervals}.
+Missing values are allowed. For \code{is_age_group()} and \code{group_intervals()},
+an object to identify or an \code{age_group} object to inspect, respectively.}
 
 \item{intervals}{An \code{age_interval} vector in chronological order. Each
 interval must be present and have a unique nonblank label, supplied by
 its name or formatted bounds. Unused intervals are retained as levels.}
 }
 \value{
-\code{age_group()} returns an ordered-factor subclass with the same
-length and observation names as \code{x};
+\code{age_group()} returns an \code{age_group} object with classes
+\code{c("age_group", "ordered", "factor")}, having the same length and observation
+names as \code{x}. Factor codes and levels represent the supplied assignments;
+an associated \code{age_interval} vector defines one interval per level,
+including unused categories. Retrieve it with \code{group_intervals()}.
 \code{is_age_group()} returns a logical scalar; \code{group_intervals()} returns
 the defining \code{age_interval} vector, including unused categories.
 }
 \description{
-Create an ordered factor when you already have age-category labels and
-their interval definitions. Each level corresponds to one defining interval.
-To classify numerical ages instead, use \code{\link[=categorize_age]{categorize_age()}}.
+Construct an \code{age_group} object from category labels and their defining age
+intervals. The object records each observation's category and retains the
+\code{age_interval} vector defining all available categories.
 }
 \details{
+Use \code{age_group()} when the category labels are already known. To assign
+numerical ages to categories, use \code{\link[=categorize_age]{categorize_age()}}, which returns an
+\code{age_group} object by default. See \link[=age_group-class]{age_group class} for the class structure
+and supported operations, and \link{agecraft-classes} for the package's four classes.
+
 Subsetting retains unused levels and their definitions. Use \code{droplevels()}
 to remove them together, or \code{\link[=group_intervals]{group_intervals()}} to retrieve the definitions.
 When combining vectors, the bounds, labels and definition units must match.
@@ -52,8 +63,14 @@ and group methods reject them with migration guidance.
 }
 
 \examples{
-intervals <- age_interval(c(0, 5), c(5, Inf))
-x <- age_group(c("0-4", "5+", NA), intervals)
-group_intervals(x)
-droplevels(x[1])
+bands <- age_interval(breaks = c(0, 5, 18, Inf), unit = "year")
+names(bands) <- c("Preschool", "School age", "Adult")
+groups <- age_group(c("Adult", "Preschool", NA), intervals = bands)
+as.character(groups)     # One assignment per observation
+group_intervals(groups)  # One interval per available category
+droplevels(groups)       # Remove unused School age and its interval
+}
+\seealso{
+\link[=age_group-class]{age_group class} for the class contract; \link{agecraft-classes} for
+relationships among ages, intervals, assignments and schemes.
 }
