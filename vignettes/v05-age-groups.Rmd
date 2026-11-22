@@ -225,7 +225,7 @@ retain a scheme separately when its identity and provenance matter. Assigned
 groups provide counts for the observed records; rates also require compatible
 population denominators.
 
-For a broader view of the representations, see [Understanding ages, intervals, groups, and schemes](classes.html).
+For a broader view of the representations, see [Understanding ages, intervals, groups, and schemes](v03-classes.html).
 To attach purpose and provenance to reusable definitions, continue with
-[Creating and using reusable age schemes](age-schemes.html). The full assignment
+[Creating and using reusable age schemes](v07-age-schemes.html). The full assignment
 interface is documented in `help("age_group")` and `help("categorize_age")`.

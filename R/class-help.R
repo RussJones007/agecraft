@@ -81,6 +81,8 @@ NULL
 #' carry category names and one common unit. Use [age_interval()] to define
 #' ranges and [as_age_interval()] to convert supported inputs. These ranges can
 #' define categories or represent observations whose exact ages are unknown.
+#' Gaps and overlaps are valid; an interval vector need not be a mutually
+#' exclusive classification.
 #' @section Category assignments (age_group):
 #' An `age_group` vector records one category assignment per observation as an
 #' ordered factor and retains the interval definition for each available
@@ -91,7 +93,9 @@ NULL
 #' @section Reusable classification definitions (age_scheme):
 #' An `age_scheme` contains named `age_interval` definitions with identity,
 #' purpose, provenance and coverage information. It represents a reusable
-#' classification, rather than observations or their assignments. Its domain
+#' collection of age definitions, metadata and provenance. It may contain
+#' overlaps and may be complete or incomplete, independently. A partition
+#' requires complete coverage and no overlaps within its effective domain. Its domain
 #' can be inferred from the interval span or specified explicitly; completeness
 #' is calculated. Use [age_scheme()] to construct one and [scheme_intervals()]
 #' to retrieve its interval definitions. Schemes and groups contain intervals;

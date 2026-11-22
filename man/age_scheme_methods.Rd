@@ -46,6 +46,14 @@ include \code{derived_from}. See \code{\link[=age_scheme]{age_scheme()}} for edi
 \description{
 Inspect an age scheme
 }
+\details{
+\code{overlaps} is TRUE when at least one age belongs to multiple
+intervals. Touching right-open intervals do not overlap. \code{gaps} contains
+uncovered intervals within the effective domain. Completeness and overlap
+are independent: a partition requires \code{complete} to be TRUE and \code{overlaps}
+to be FALSE, regardless of the stored \code{type} validation policy. See
+\code{\link[=age_scheme]{age_scheme()}} for explicit and inferred domain rules.
+}
 \examples{
 g <- age_interval(c(0, 10), c(5, 20), unit = "year")
 names(g) <- c("Young", "Older")

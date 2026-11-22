@@ -1,7 +1,7 @@
 Package: agecraft
 Type: Package
 Title: Age Calculation and Grouping
-Version: 0.1.0.9024
+Version: 0.1.0.9025
 Authors@R: person(
     "Russ", "Jones",
     role = c("aut", "cre"),
@@ -20,6 +20,7 @@ Encoding: UTF-8
 LazyData: true
 Language: en
 Suggests:
+    dplyr,
     mudnester,
     testthat (>= 3.0.0),
     knitr,

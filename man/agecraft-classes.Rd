@@ -24,6 +24,8 @@ representation. Each range includes its start and excludes its end: \verb{[start
 carry category names and one common unit. Use \code{\link[=age_interval]{age_interval()}} to define
 ranges and \code{\link[=as_age_interval]{as_age_interval()}} to convert supported inputs. These ranges can
 define categories or represent observations whose exact ages are unknown.
+Gaps and overlaps are valid; an interval vector need not be a mutually
+exclusive classification.
 }
 
 \section{Category assignments (age_group)}{
@@ -40,7 +42,9 @@ for the representation and supported operations.
 
 An \code{age_scheme} contains named \code{age_interval} definitions with identity,
 purpose, provenance and coverage information. It represents a reusable
-classification, rather than observations or their assignments. Its domain
+collection of age definitions, metadata and provenance. It may contain
+overlaps and may be complete or incomplete, independently. A partition
+requires complete coverage and no overlaps within its effective domain. Its domain
 can be inferred from the interval span or specified explicitly; completeness
 is calculated. Use \code{\link[=age_scheme]{age_scheme()}} to construct one and \code{\link[=scheme_intervals]{scheme_intervals()}}
 to retrieve its interval definitions. Schemes and groups contain intervals;

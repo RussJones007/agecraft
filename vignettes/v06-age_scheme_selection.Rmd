@@ -21,7 +21,7 @@ This vignette follows one decision: how much childhood detail to retain when
 reporting pertussis incidence. You will compare three schemes, examine what
 pooling conceals, and document a choice. It assumes familiarity with R data
 frames and with age values and intervals; see [Understanding agecraft
-classes](classes.html) for those concepts.
+classes](v03-classes.html) for those concepts.
 
 ## Start with the question
 
@@ -237,8 +237,8 @@ denominator compatibility, uncertainty, intended comparisons, and boundary
 rules. These are analytical decisions; they need not all become class fields.
 Save the scheme with the analysis because classified `age_group` results retain
 interval definitions but do not retain scheme provenance. See the
-[classes vignette](classes.html#the-age_scheme-class-a-reusable-definition-with-context)
-for the storage model and [Reusable age schemes](age-schemes.html) for validation
+[classes vignette](v03-classes.html#the-age_scheme-class-a-reusable-definition-with-context)
+for the storage model and [Reusable age schemes](v07-age-schemes.html) for validation
 and derivative tracking.
 
 [cdc-surveillance]: https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson5/section5.html

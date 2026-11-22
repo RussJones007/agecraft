@@ -1,0 +1,324 @@
+---
+title: "02. Age reporting workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{02. Age reporting workflow}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(agecraft)
+library(dplyr)
+```
+A table of counts by age group can look straightforward while hiding decisions
+that change its counts. Which date defines someone's age? What happens when a
+birth date is missing or comes after the event? Do the reporting age groups
+cover everyone, and can a person appear in more than one age group? Answering
+these questions makes a table easier to interpret and reproduce.
+
+This vignette follows a small, invented set of surveillance records from dates
+to a finished age report. We will choose an event date, identify records that
+need review, document reporting age groups, check their coverage, and count
+records without losing sight of missing assignments or empty categories. We will
+also consider what those counts can tell us and what we would need before
+calculating population rates.
+
+If you are new to calculating and grouping ages using this package, start with
+[Getting started](v01-getting-started.html). Here the emphasis is on the choices
+and checks that connect those operations in an analysis workflow.
+
+## Decide what each record and its age represent
+
+Suppose we are preparing an age distribution for illness episodes with onset in
+January 2025. Each row below is one reported episode, with a unique record ID.
+Assume that case eligibility and duplicate checks have already been completed.
+
+```{r records}
+# Create the example data frame.
+records <- data.frame(
+  record_id = sprintf("E%02d", 1:10),
+  birth_date = as.Date(c(
+    "2020-01-16", "2020-01-15", "2010-06-01", "2000-08-20",
+    "1960-01-15", "1939-09-01", NA, "2025-02-01",
+    "1985-04-10", "2021-01-10"
+  )),
+  onset_date = as.Date(c(
+    rep("2025-01-15", 8), NA, "2025-01-20"
+  )),
+  report_date = as.Date(c(
+    rep("2025-01-22", 8), "2025-01-23", "2025-02-03"
+  ))
+)
+records
+```
+For this report, age will be defined as **age at symptom onset**, and inclusion
+in the month is based on onset date. A report date answers a different question:
+when the record reached the reporting system. An example of onset and reporting
+months is E10 where the onset was in January whereas the report month is
+February. E09 has no onset date, so we cannot establish its onset month or age
+at onset from these fields.
+
+The difference between using age at onset or age at report can also change the
+age group assigned. E01 turns five between onset and reporting; E02 is already
+five on the onset date. For example:
+
+```{r event-choice}
+records |>
+  slice(1:2) |>
+  transmute(
+    record_id,
+    age_at_onset = calculate_age(birth_date, onset_date, unit = "year"),
+    age_at_report = calculate_age(birth_date, report_date, unit = "year")
+  )
+```
+Using report date as a substitute for missing onset would mix two definitions of
+age. We will retain the missing onset for review instead. A real reporting
+protocol may specify a fallback date or a derived event date; document that rule
+before applying it.
+
+An example of using a derived date and the rule involved is the "event date." used in epidemiological surveillance.
+An event date is a surveillance date selected from the dates available for a case. In the legacy approach,
+selection follows a priority order: onset, diagnosis, laboratory-related date, first report to public health, then
+report date. This selects the first available date type in the hierarchy, rather than necessarily the earliest calendar
+date. The original dates and the selected date type should remain available for interpretation. CSTE describes this
+approach and its variation across surveillance systems in its [2024 case-counting-date
+proposal](https://cdn.ymaws.com/www.cste.org/resource/resmgr/2015weston/DSWG_BestPracticeGuidelines_.pdf).
+
+That proposal distinguishes event date from a calculated case counting date,
+which uses the earliest available value among specified component dates. These
+approaches can produce different results. Follow the applicable program and
+jurisdiction rules, and specify whether the selected counting date also serves
+as the reference for age. This example continues to use onset alone: it does not
+implement either derived-date algorithm.
+
+## Separate date problems before calculating ages
+
+A missing date and a birth date after onset both prevent a usable age, but they
+call for different follow-up. Keep that distinction in a record-level status
+variable. The checks below give missing birth dates priority when several
+problems occur in the same record.
+
+```{r date-review}
+records <- records |>
+  mutate(date_status = case_when(
+    is.na(birth_date) ~ "Missing birth date",
+    is.na(onset_date) ~ "Missing onset date",
+    birth_date > onset_date ~ "Birth after onset",
+    TRUE ~ "Ready"
+  ))
+records |> count(date_status, name = "records")
+
+# Display the records where there is a date problem.
+records |>
+  filter(date_status != "Ready") |>
+  select(record_id, birth_date, onset_date, date_status)
+```
+E07 needs a birth date, E08 needs its birth or onset date sequence corrected,
+and E09 needs an onset date. We will keep all three records in the audit trail
+without assigning them an age group. We cannot infer a correction from these
+values alone.
+
+```{r calculate-ages}
+reviewed_ages <- records |>
+  filter(date_status == "Ready") |>
+  transmute(
+    record_id,
+    age_at_onset = calculate_age(birth_date, onset_date, unit = "year")
+  )
+records <- records |>
+  left_join(reviewed_ages, by = "record_id")
+```
+Only the reviewed date pairs enter `calculate_age()`. If reversed pairs were passed directly, its default policy would
+return missing ages and issue a warning. Explicit review gives those missing results a reason we can carry into the
+report. The calculated ages retain fractions, even though printing shows completed years as is the norm for talking
+about a person's age. Calendar-year calculations use March 1 for leap birthdays in non-leap years by default; a
+different reporting rule may be supplied with the `leap_day` argument in calculate_age().  This should recorded with the
+analysis.
+
+## Try interval definitions before creating a scheme
+
+`categorize_age()` can assign age groups directly from interval definitions. For
+example, the supplied five-year cut points can be made into a unit-bearing
+`age_interval` vector and used immediately:
+
+```{r preset-intervals}
+five_year_intervals <- age_interval(
+  breaks = age_interval_presets$Yr.5, unit = "year"
+)
+
+records |>
+  transmute(
+    record_id,
+    five_year_group = categorize_age(age_at_onset, by = five_year_intervals)
+  )
+```
+The presets are inherited reporting conventions; confirm their suitability
+against the applicable reporting specification. For a quick alternative,
+construct intervals directly inside the call:
+
+```{r inline-intervals}
+
+records |>
+  transmute(
+    record_id,
+    broad_age_group = categorize_age(
+      age_at_onset,
+      by = age_interval(breaks = c(0, 18, 65, Inf), unit = "year")
+    )
+  )
+```
+
+Both approaches produce assignments without requiring a scheme. The different
+boundaries shown above answer different reporting questions for demonstration purposes. We will use a different
+set of boundaries in the followin section.
+
+## Document reusable age groups with an age scheme
+
+An `age_scheme` contains named age intervals together with descriptive metadata
+and provenance. Construct an `age_scheme` with the conveniently named function `age_scheme()` when a definition needs to
+be reused or explained beyond the current calculation. For the `age_scheme` class model, see [The age_scheme
+class](v03-classes.html#the-age_scheme-class-a-reusable-definition-with-context).
+
+A saved scheme lets later reports reuse the same intervals, labels and unit,
+while carrying their source, version and purpose. Supplying that scheme to
+`categorize_age()` applies its intervals; it does not attach all of the scheme's
+metadata to each assignment. Keep the scheme with the analysis.
+
+Our illustrative report uses six age groups covering all ages in
+years. A single scheme keeps the named intervals together with the purpose and
+source of the definition. You can replace these groups with the applicable specification
+in a real reporting system.
+
+```{r reporting-scheme}
+reporting_intervals <- age_interval(breaks = c(0, 5, 18, 45, 65, 85, Inf), unit = "year")
+names(reporting_intervals) <- c("Under 5", "5–17", "18–44", "45–64", "65–84", "85+")
+reporting_scheme <- age_scheme(
+  reporting_intervals,
+  id = "example_onset_report",
+  name = "Illustrative five year age groups",
+  type = "partition",
+  domain = c(0, Inf),
+  purpose = "Count illness episodes by age at symptom onset",
+  source = "Synthetic example in the age reporting workflow vignette",
+  version = "Teaching example 1",
+  notes = "Not an official surveillance classification; ages measured in years."
+)
+scheme_intervals(reporting_scheme)
+```
+Intervals include the lower bound and exclude the upper bound. Under 5 in
+interval notation means `[0, 5)` years, and 5–17 means `[5, 18)`. E02 belongs to
+5–17 on its fifth birthday. E01 remains Under 5 at onset, even though its age at
+report would put it in the next age group.
+
+## Check coverage before counting
+
+To produce additive counts, we need both complete coverage of our intended age
+domain and non-overlapping age groups. Check these independently.
+
+```{r coverage-check}
+coverage <- summary(reporting_scheme)
+coverage[c("domain", "domain_inferred", "complete", "overlaps")]
+coverage$gaps
+stopifnot(isTRUE(coverage$complete), !coverage$overlaps)
+```
+The domain (ages covered) is explicitly `[0, Inf)` years, completeness is TRUE,
+and overlaps are FALSE: these age groups form a partition of that domain. An
+explicit domain makes our intended coverage part of the check. The `age_scheme`
+constructor with `type = "partition"` rejects interval overlap but permits gaps,
+so the completeness check still matters.
+
+Overlapping age interval definitions can be valid schemes for other purposes. Selecting the first match would
+resolve a software ambiguity, but would not establish a justified reporting rule. For intentionally overlapping
+memberships, see [Creating and using reusable age schemes](v07-age-schemes.html).
+
+## Assign age groups and account for every record
+
+We can now classify the ages using the documented scheme. Explicitly requiring
+matching units avoids a conversion during this step.
+
+```{r assign-groups}
+records <- records |>
+  mutate(
+    age_group = categorize_age(
+      age_at_onset, by = reporting_scheme,
+      multiple = "error", convert_units = "none"
+    ),
+    report_status = case_when(
+      date_status != "Ready" ~ date_status,
+      is.na(age_group) ~ "Age outside reporting groups",
+      TRUE ~ "Included"
+    )
+  )
+records |> select(record_id, age_at_onset, age_group, report_status)
+```
+A missing assignment alone cannot tell us whether dates were missing, dates were
+invalid, or a usable age fell outside the definition. `report_status` preserves
+those explanations. With these complete age groups, none of the seven usable
+ages should be outside the definition.
+
+```{r record-accounting}
+accounting <- records |>
+  count(status = report_status, name = "records")
+accounting
+stopifnot(sum(accounting$records) == nrow(records))
+```
+Seven records are included and three need date review. The missing-onset record
+also has unresolved reporting-period eligibility. Keep these review counts
+alongside the age table; omitting missing assignments silently would hide why
+only seven of the ten input records contribute.
+
+## Produce a table that retains empty categories
+
+The `age_group` result retains all defined levels, including age groups with no
+observations. `count(..., .drop = FALSE)` therefore includes the empty 45–64 age
+group. A zero means no included episodes in that age group; it does not mean the
+definition was absent.
+
+```{r reporting-table}
+age_report <- records |>
+  filter(report_status == "Included") |>
+  count(age_group, name = "episodes", .drop = FALSE)
+age_report
+stopifnot(sum(age_report$episodes) == sum(records$report_status == "Included"))
+```
+The table has two episodes Under 5, two aged 5–17, one aged 18–44, none aged
+45–64, one aged 65–84, and one aged 85 or older. These counts sum to the seven
+included records. Retain `records` for record-level review and
+`reporting_scheme` for the boundaries and provenance: the assignment vector
+alone does not retain the original ages or the scheme's provenance.
+
+## Interpret counts before calculating rates
+
+The table describes the age distribution of included episodes in this example. A
+larger count in one age group does not by itself imply greater disease risk: the
+population in that age group may also be larger. Population rates need
+appropriate denominators for the same geography, period, age-attribution rules
+and age groups, with a numerator that matches the rate's definition. The records
+needing date review can also affect the apparent age distribution.
+
+Before using external population counts, check their units, boundaries and
+coverage against the reporting scheme. A denominator for ages 0–9 cannot be
+split into Under 5 and 5–9 from interval overlap alone. Likewise, overlapping
+categories cannot be summed as if each person appeared exactly once. See
+[Comparing age intervals](v08-age-range-comparisons.html) for what crosswalks
+can establish and where additional data or assumptions are needed.
+
+## What this workflow established
+
+We started with ten synthetic episode records and made the reporting choices
+visible: onset defined both the reporting month and the age reference date,
+calendar years supplied the age unit, and a named scheme documented the age
+groups and their purpose. We compared direct interval definitions with a
+reusable scheme and distinguished age at onset from derived surveillance
+counting dates. We separated missing and invalid dates, checked complete
+coverage and non-overlap, and assigned the usable ages without changing units.
+
+The final table accounts for seven included episodes and retains an empty age
+age group. Three records remain available for date review, with explicit reasons for
+their missing assignments. Together, the age table, record accounting and saved
+scheme make the result easier to reproduce and explain. Population rates remain
+a separate step requiring compatible denominators and reporting definitions.
+For more detail on retaining and working with assignments, continue with
+[Working with assigned age groups](v05-age-groups.html).

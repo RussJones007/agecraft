@@ -202,6 +202,19 @@ valid_age_interval_symbol <- function(x){
 #' @details
 #' `age_interval` is an S3 subclass of `ivs_iv`. Classification accepts
 #' supported `units` objects and performs explicit unit conversion.
+#' @section Interval relationships:
+#' Each element represents one age range with a lower and upper bound. A vector
+#' may contain overlapping intervals: some ages can belong to more than one
+#' range. Overlap is valid interval data; the vector does not necessarily define
+#' a mutually exclusive classification. Adjacent intervals `[0, 5)` and
+#' `[5, 10)` do not overlap because their upper bounds are excluded.
+#'
+#' Operations impose their own requirements. For example, [categorize_age()]
+#' errors by default when an observation matches multiple intervals; an explicit
+#' `multiple` policy selects one match. [classify_age_scheme()] returns all
+#' memberships in a scheme. See [age_scheme()] for completeness and partitions
+#' relative to an age domain.
+#' @details
 #'
 #' With `breaks`, `n` cut points create `n - 1` adjacent intervals. A finite
 #' final cut is the exclusive upper boundary of the final interval; append Inf
@@ -225,8 +238,12 @@ valid_age_interval_symbol <- function(x){
 #' @examples
 #' age_interval(breaks = c(0, 5, 18, 65, Inf), unit = "year")
 #' age_interval(breaks = c(0, 5, 18), unit = "year")
-#' # Paired bounds can describe gaps or overlaps.
-#' age_interval(start = c(1, 10), end = c(5, Inf), unit = "year")
+#' # Adjacent intervals: age 5 belongs only to the second interval.
+#' age_interval(start = c(0, 5), end = c(5, 10), unit = "year")
+#' # Overlapping intervals share ages from 5 up to, but excluding, 10.
+#' age_interval(start = c(0, 5), end = c(10, 15), unit = "year")
+#' # Gapped intervals leave ages from 5 up to 10 uncovered.
+#' age_interval(start = c(0, 10), end = c(5, 15), unit = "year")
 #' groups <- age_interval(breaks = c(0, 0.077, 1, 3), unit = "year")
 #' names(groups) <- c("Neonate", "Infant", "Toddler")
 #' categorize_age(units::set_units(c(0.02, 0.5, 2), "year"), by = groups)

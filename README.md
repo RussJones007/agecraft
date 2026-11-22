@@ -58,12 +58,12 @@ For development in the repository, use `devtools::load_all()`.
 
 | Guide | What it covers |
 |:---|:---|
-| [Getting started](vignettes/getting-started.Rmd) | A beginner workflow: dates, output choices, supplied groups, names, and tables |
-| [Understanding ages, intervals, groups, and schemes](vignettes/classes.Rmd) | The four main classes and how they work together |
-| [An age reporting workflow for public health](vignettes/public-health-workflow.Rmd) | Reporting groups, units, and overlapping definitions |
-| [Comparing age intervals](vignettes/age-range-comparisons.Rmd) | Crosswalks, membership, ordering, age gaps, and interval coverage |
+| [Getting started](vignettes/v01-getting-started.Rmd) | A beginner workflow: dates, output choices, supplied groups, names, and tables |
+| [Age reporting workflow](vignettes/v02-age-reporting-workflow.Rmd) | A worked report: event dates, date review, scheme coverage, counts, and interpretation |
+| [Understanding ages, intervals, groups, and schemes](vignettes/v03-classes.Rmd) | The four main classes and how they work together |
+| [Comparing age intervals](vignettes/v08-age-range-comparisons.Rmd) | Crosswalks, membership, ordering, age gaps, and interval coverage |
 
-After installing with vignettes, use `vignette("getting-started", package = "agecraft")` or `vignette("classes", package = "agecraft")`.
+After installing with vignettes, use `vignette("v01-getting-started", package = "agecraft")` or `vignette("v03-classes", package = "agecraft")`.
 
 ## Calculate ages and choose the return format
 
@@ -265,7 +265,7 @@ categorize_age(ages, by = legacy_ili)
 classify_age_scheme(ages, legacy_ili)
 ```
 
-`list_age_schemes()` lists eight legacy definitions with unchanged cut points and unverified external editions. Unit-bearing schemes require unit-bearing ages. Existing numeric presets and classification defaults remain available. For user-defined partitions and overlapping classifications, see the [age-schemes guide](vignettes/age-schemes.Rmd).
+`list_age_schemes()` lists eight legacy definitions with unchanged cut points and unverified external editions. Unit-bearing schemes require unit-bearing ages. Existing numeric presets and classification defaults remain available. For user-defined partitions and overlapping classifications, see the [age-schemes guide](vignettes/v07-age-schemes.Rmd).
 
 Unit-bearing observations must use a supported simple time unit (second, minute, hour, day, week, month or year, including supported aliases). `as_age()` and classification functions reject compound, squared, inverse, dimensionless and non-time quantities before conversion or matching. For plain numeric ages with a known unit, use `age(x, unit = "year")` (or the appropriate supported unit).
 
@@ -288,7 +288,7 @@ group_intervals(categories)
 group_intervals(droplevels(categories[1]))
 ```
 
-Subsetting retains unused categories. Combining requires matching definitions, labels and units. Use `vctrs::vec_rbind()` for binding with metadata validation, and `generics::as.factor()` for an ordinary factor. Base coercers retain factor subclasses, while base data-frame binding may discard their metadata. See the [age-groups guide](vignettes/age-groups.Rmd) for the full contracts.
+Subsetting retains unused categories. Combining requires matching definitions, labels and units. Use `vctrs::vec_rbind()` for binding with metadata validation, and `generics::as.factor()` for an ordinary factor. Base coercers retain factor subclasses, while base data-frame binding may discard their metadata. See the [age-groups guide](vignettes/v05-age-groups.Rmd) for the full contracts.
 
 ### Interval naming transition
 

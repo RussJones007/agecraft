@@ -18,6 +18,12 @@
 #'   both report calculated coverage; `covered` is retained for compatibility.
 #'   Derivatives print their ancestor ID/version; summaries and data-frame metadata
 #'   include `derived_from`. See [age_scheme()] for editing and ancestry rules.
+#' @details `overlaps` is TRUE when at least one age belongs to multiple
+#'   intervals. Touching right-open intervals do not overlap. `gaps` contains
+#'   uncovered intervals within the effective domain. Completeness and overlap
+#'   are independent: a partition requires `complete` to be TRUE and `overlaps`
+#'   to be FALSE, regardless of the stored `type` validation policy. See
+#'   [age_scheme()] for explicit and inferred domain rules.
 #' @param row.names Optional row names for the data frame.
 #' @param optional Logical, passed to [data.frame()].
 #' @name age_scheme_methods

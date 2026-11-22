@@ -1,3 +1,43 @@
+# Reporting workflow and terminology — 2026-11-22
+
+Development version: **0.1.0.9025**. Reference help distinguishes interval
+representation from analytical assignment, defines completeness relative to the
+effective domain, and explains mathematical partitions separately from the
+existing non-overlap validation policy. APIs and executable behavior are unchanged.
+
+The eight vignettes use `v01`–`v08` filename prefixes. The second is now
+`v02-age-reporting-workflow`, with a connected synthetic surveillance example,
+dplyr pipelines, record accounting, interval and scheme examples, and sourced
+CSTE event-date context. dplyr is a suggested vignette dependency. README and
+help links follow the renamed files. Age-display tests accept parenthesized
+units and optional spacing before vector length.
+
+`devtools::document()` succeeded. `devtools::test()` passed 3,742 assertions with
+no failures or warnings; one optional mudnester test was skipped because that
+package is not installed. Log: `/tmp/agecraft-9025-validation.log`.
+Source/binary builds and user-library installation follow this commit.
+
+---
+
+# Installed HTML vignette order correction — 2026-11-21
+
+Title prefixes alone did not reorder the installed HTML vignette index: that
+index preserves file-based metadata order, whereas `getVignetteInfo()` sorts
+titles. Added matching 01–08 filename prefixes and updated README links,
+cross-vignette HTML links and the direct vignette call in age help. Direct
+vignette names now include the numeric prefix; the titles retain their numbering.
+
+Regenerated roxygen help, built all vignettes and installed the source archive
+into `/tmp/agecraft-vignette-order-lib`. Verified the actual installed
+`doc/index.html` lists the eight vignettes in the requested order, every linked
+vignette exists, and relative links between installed vignette HTML files resolve.
+Also verified installed `Meta/vignette.rds` order and matching titles. No full
+test suite was run for this documentation/link change. Build/install log:
+`/tmp/agecraft-vignette-order-build.log`. The normal installed user library was
+not changed.
+
+---
+
 # Class help and age-group constructor documentation — 2026-11-21
 
 Clarified that `age_group()` constructs an `age_group` object with classes

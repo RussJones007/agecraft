@@ -60,11 +60,30 @@ Names follow observations through slicing, sorting, concatenation and casts;
 interval set operations discard names because they can create new intervals.
 Names do not change interval equality or ordering.
 }
+\section{Interval relationships}{
+
+Each element represents one age range with a lower and upper bound. A vector
+may contain overlapping intervals: some ages can belong to more than one
+range. Overlap is valid interval data; the vector does not necessarily define
+a mutually exclusive classification. Adjacent intervals \verb{[0, 5)} and
+\verb{[5, 10)} do not overlap because their upper bounds are excluded.
+
+Operations impose their own requirements. For example, \code{\link[=categorize_age]{categorize_age()}}
+errors by default when an observation matches multiple intervals; an explicit
+\code{multiple} policy selects one match. \code{\link[=classify_age_scheme]{classify_age_scheme()}} returns all
+memberships in a scheme. See \code{\link[=age_scheme]{age_scheme()}} for completeness and partitions
+relative to an age domain.
+}
+
 \examples{
 age_interval(breaks = c(0, 5, 18, 65, Inf), unit = "year")
 age_interval(breaks = c(0, 5, 18), unit = "year")
-# Paired bounds can describe gaps or overlaps.
-age_interval(start = c(1, 10), end = c(5, Inf), unit = "year")
+# Adjacent intervals: age 5 belongs only to the second interval.
+age_interval(start = c(0, 5), end = c(5, 10), unit = "year")
+# Overlapping intervals share ages from 5 up to, but excluding, 10.
+age_interval(start = c(0, 5), end = c(10, 15), unit = "year")
+# Gapped intervals leave ages from 5 up to 10 uncovered.
+age_interval(start = c(0, 10), end = c(5, 15), unit = "year")
 groups <- age_interval(breaks = c(0, 0.077, 1, 3), unit = "year")
 names(groups) <- c("Neonate", "Infant", "Toddler")
 categorize_age(units::set_units(c(0.02, 0.5, 2), "year"), by = groups)

@@ -1,3 +1,24 @@
+# agecraft 0.1.0.9025
+
+- Clarify that age intervals and schemes may overlap, that completeness is
+  relative to an explicit or inferred domain, and that a mathematical partition
+  requires both complete coverage and non-overlap. Preserve existing validation
+  policies, metadata and classification behavior; document the distinction from
+  the existing `type = "partition"` policy, which permits gaps.
+- Rename the eight vignettes with letter-prefixed sequence numbers (`v01` through
+  `v08`) to preserve reading order and satisfy installed-document filename rules.
+  Update README links, cross-vignette links and direct vignette references.
+- Replace the public-health introduction with `v02-age-reporting-workflow`, a
+  connected surveillance reporting example covering event-date choice, date
+  review, interval definitions, reusable schemes, coverage checks, record
+  accounting, empty groups and interpretation of counts. Use age-group and
+  age-interval terminology consistently and dplyr pipelines, including
+  `case_when()` and `count(.drop = FALSE)`. Add dplyr to Suggests for the vignette.
+- Explain legacy event-date selection and the proposed calculated case counting
+  date using CSTE guidance; retain onset as the worked example's age reference.
+- Align age-display tests with parenthesized units, accepting optional spacing
+  before the vector length. Refresh generated reference documentation.
+
 # agecraft 0.1.0.9024
 
 - Add `age_group-class` and `agecraft-classes` help topics. Clarify that
@@ -23,8 +44,9 @@
 - Show the age unit in parentheses in console type headers, for example
   `<age (year)[3]>`, while retaining square brackets for the vector length.
 - Number all eight vignette titles and index entries in the intended reading
-  order, from getting started through interval comparisons; filenames remain
-  unchanged.
+  order, from getting started through interval comparisons. Number filenames
+  as well so the installed HTML vignette index uses the same order. Direct
+  vignette names and HTML links now include the numeric prefix.
 - Expand the example script with calendar/elapsed-age timing comparisons and
   optimized development loading. Ignore locally compiled native libraries and
   object files under `src/`.

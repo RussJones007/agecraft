@@ -326,7 +326,7 @@ intended use. Provenance records the source and history, including versions
 and adaptations. Purpose and rationale explain what the scheme is intended
 to describe and why the boundaries were chosen. For a worked comparison
 showing how pooling can conceal infant incidence, see
-[Choosing age groups for an analysis](age_scheme_selection.html).
+[Choosing age groups for an analysis](v06-age_scheme_selection.html).
 Here we follow how the class represents and retains those decisions.
 
 ```{r define-scheme}
@@ -401,7 +401,7 @@ Attribution alone does not certify that the pattern suits a new question.
 A scheme does not store population denominators, assess statistical precision,
 or establish comparability with another report. Record those decisions with
 the analysis. Use `notes` to explain a deliberate adaptation, and consult the
-[schemes guide](age-schemes.html) before editing a sourced definition.
+[schemes guide](v07-age-schemes.html) before editing a sourced definition.
 
 ### Validation expresses the intended classification
 
@@ -454,7 +454,7 @@ tables. A scheme summary uses the supporting `summary_age_scheme` class
 for readable printing. These support the four roles above without
 replacing them.
 
-For detailed assignment operations, see [Working with assigned age groups](age-groups.html). For overlapping classifications,
-provenance, and editing definitions, see [Creating and using reusable age schemes](age-schemes.html). For individual arithmetic tasks, see [Calculating, comparing, and grouping ages](age_math_examples.html). The
+For detailed assignment operations, see [Working with assigned age groups](v05-age-groups.html). For overlapping classifications,
+provenance, and editing definitions, see [Creating and using reusable age schemes](v07-age-schemes.html). For individual arithmetic tasks, see [Calculating, comparing, and grouping ages](v04-age_math_examples.html). The
 help topics `?age`, `?age_interval`, `?age_group`, and `?age_scheme`
 provide their full construction and behavior contracts.

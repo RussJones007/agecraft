@@ -1,8 +1,10 @@
-#' Construct a reusable age classification scheme
+#' Organize age interval definitions and provenance
 #'
 #' A scheme contains an existing [age_interval()] vector and scheme-level metadata like
 #' its purpose, organization that created it, reference URL or citation, version and notes.
-#' All intervals are right-open `[start,end)`.
+#' It documents age definitions and their provenance; constructing a scheme does
+#' not assign observations to statistical groups. Intervals are left-closed and
+#' right-open `[start, end)`. Schemes can contain overlaps, gaps, or both.
 #'
 #' @param intervals A nonempty `age_interval` vector with an explicit time unit and
 #'   unique, nonblank names for every category. Missing intervals are not allowed.
@@ -10,7 +12,10 @@
 #'   hyphens and starting with a letter.
 #' @param name Nonblank human-readable title. For `$<-`, the exact field name
 #'   to replace; changing the title field `name` is descriptive, not substantive.
-#' @param type `"partition"` rejects overlap; `"classification"` permits it.
+#' @param type Validation policy: `"partition"` (the default) rejects overlap;
+#'   `"classification"` permits it. Neither policy requires complete coverage.
+#'   The policy name `"partition"` alone does not establish a mathematical
+#'   partition; see the Overlap, completeness and partitions section.
 #' @param domain NULL (the default) to infer the right-open domain from the
 #'   smallest interval start and largest interval end, or two numeric bounds
 #'   declaring an intended domain in the intervals' unit. All intervals must lie
@@ -53,13 +58,30 @@
 #'   or substitution of defaults. Custom scalar-string display symbols remain
 #'   valid. Structural validation does not independently verify external sources.
 #'   Ordinary replacement validates the completed candidate; invalid edits error
-#'   without changing the original. A
-#'   partition need not cover the entire domain; disjointness and coverage are
-#'   separate properties. Identical intervals overlap, so partitions reject them.
+#'   without changing the original. Identical intervals overlap, so the
+#'   `type = "partition"` policy rejects them.
 #'   Classifications permit identical intervals with distinct category names:
 #'   each name represents a separate category, and [classify_age_scheme()] returns
 #'   every membership with its original label and category index. Duplicate names
 #'   are invalid in either scheme type.
+#' @section Overlap, completeness and partitions:
+#' Non-overlapping intervals share no age values; overlapping intervals share at
+#' least one. Complete intervals cover every age in the effective domain;
+#' incomplete intervals leave one or more ages in that domain uncovered.
+#' Overlap and completeness are independent. All four combinations are valid
+#' representations, using `type = "classification"` when overlaps are present.
+#'
+#' A partition is both complete and non-overlapping relative to a defined age
+#' domain. This is a derived property, regardless of the scheme's `type` policy.
+#' The existing `type = "partition"` policy enforces only non-overlap and can
+#' accept gaps. Use `summary(x)` to inspect `complete`, `overlaps`, `gaps` and
+#' the effective `domain`; `isTRUE(summary(x)$complete) &&
+#' !summary(x)$overlaps` checks both properties without storing extra metadata.
+#'
+#' Analytical operations have their own requirements. [categorize_age()] errors
+#' by default on multiple matches and offers explicit single-match policies.
+#' [classify_age_scheme()] returns every membership. A valid overlapping scheme
+#' does not make its categories suitable for additive population totals.
 #' @section Editing local copies:
 #' Schemes are independent R value objects. Copy with `modified <- original`,
 #' then edit using `$<-`, `[[<-` or batch `[<-` replacement. Substantive changes
@@ -104,6 +126,16 @@
 #' s
 #' scheme_intervals(s)
 #' summary(s)
+#' # Illustrative overlapping definitions, without an external authority claim.
+#' g <- age_interval(c(10, 15, 10), c(20, 25, 25), unit = "year")
+#' names(g) <- c("Adolescents", "Youth", "Young people")
+#' overlapping <- age_scheme(g, "overlap_example", "Overlapping age definitions",
+#'                           type = "classification", domain = c(10, 25))
+#' summary(overlapping) # Complete over [10, 25), with overlaps.
+#' # The same intervals are incomplete over the wider domain [0, 25).
+#' wider <- overlapping
+#' wider$domain <- c(0, 25)
+#' summary(wider)
 #' @export
 age_scheme <- function(intervals, id, name, type = c("partition", "classification"),
                        domain = NULL, purpose = NULL,

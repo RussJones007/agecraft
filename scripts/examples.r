@@ -14,10 +14,6 @@ event_dates |> head()
 library(microbenchmark)
 library(lubridate)
 
-is.Date(bdays)
-yrs   = calculate_age(start = bdays, end = event_dates)
-mnths = calculate_age(start = bdays, end = event_dates, unit = "month")
-
 microbenchmark(times = 20,
 yrs   = calculate_age(start = bdays, end = event_dates),
 mnths = calculate_age(start = bdays, end = event_dates, unit = "month"),

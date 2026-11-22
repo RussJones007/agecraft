@@ -120,7 +120,7 @@ Use consistent units for ages and definitions when precise boundary
 classification matters. \code{convert_units = "none"} rejects differing units and
 avoids additional classification-time conversion; it cannot recover precision
 lost in earlier conversions. See the age-schemes vignette for an 11-second
-boundary example (\code{vignette("age-schemes", package = "agecraft")}).
+boundary example (\code{vignette("v07-age-schemes", package = "agecraft")}).
 }
 
 \examples{
