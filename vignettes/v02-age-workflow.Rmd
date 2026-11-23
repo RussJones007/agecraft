@@ -1,0 +1,481 @@
+---
+title: "02. Age workflow"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+    css: !expr c(system.file("rmarkdown/templates/html_vignette/resources/vignette.css", package = "rmarkdown"), "vignette.css")
+vignette: >
+  %\VignetteIndexEntry{02. Age workflow}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(agecraft)
+library(dplyr)
+library(tibble)
+```
+
+An age workflow connects three tasks: calculate ages from dates, define the age intervals you need fir grouping, and
+categorize each age into an age group. A scheme adds purpose and provenance to an interval definition when those choices
+need to travel with an analysis.
+
+In the first 'quick" we'll work through a short example using age in completed years and quick group definitions. The
+second section provides a more detailed description an steps by developing a report workflow that keeps fractional ages,
+reviews date problems, documents a scheme, and produces a frequency table of age groups with the information needed to
+interpret and reproduce it.
+
+## A quick age workflow
+
+### Calculate ages in completed years
+
+Suppose each row is one person's visit. Choose the visit date as the reference
+for age and calculate completed years:
+
+```{r quick-ages}
+
+# Create the visits tibble and calculate ages.
+visits <- tibble(
+  birth_date = as.Date(c("2020-01-16", "2020-01-15", "2000-08-20", "1960-01-15")),
+  visit_date = as.Date("2025-01-15")
+) |>
+  mutate(
+    age_at_visit = calculate_age(birth_date, visit_date, unit = "year"),
+    age_years = as.integer(age_at_visit)
+  )
+
+visits
+```
+
+The ages are 4, 5, 24, and 65 completed years. The tibble shows the `age`
+class and year unit beneath the `age_at_visit` column name; `age_years` is an
+ordinary integer column. `as.integer()` explicitly keeps
+the age in completed years only. That is sufficient for the whole-year cut points below;
+keep the default `age` result when fractions or unit metadata will matter later.
+
+### Categorize with a preset or your own cut points
+
+Use the supplied five-year cut points for a quick classification:
+
+```{r quick-preset}
+visits <- visits |>
+  mutate(five_year_group = categorize_age(age_years, by = age_interval_presets$Yr.5))
+visits |> select(age_years, five_year_group)
+```
+
+The numeric ages and cut points are both interpreted here as years. Presets
+are historical reporting conventions; choose one because its boundaries suit
+your task, rather than assuming its name establishes an official standard.
+
+For your own cut points, supply the boundaries directly:
+
+```{r quick-cut-points}
+visits <- visits |>
+  mutate(broad_group = categorize_age(age_years, by = c(0, 18, 65, Inf)))
+visits |> select(age_years, broad_group)
+```
+
+These intervals are `[0, 18)`, `[18, 65)`, and `[65, Inf)`: the lower boundary
+is included, and the upper boundary is excluded. Someone exactly 65 belongs
+to the final group. `Inf` gives the last group no finite upper limit.
+
+If you want to name and reuse those intervals, make an `age_interval` vector:
+
+```{r quick-named-intervals}
+broad_intervals <- age_interval(breaks = c(0, 18, 65, Inf), unit = "year")
+names(broad_intervals) <- c("Under 18", "18–64", "65+")
+visits <- visits |>
+  mutate(broad_group = categorize_age(age_at_visit, by = broad_intervals))
+visits |> select(age_at_visit, broad_group)
+```
+
+Here we use the original `age_at_visit` column, which already carries its year
+unit and stored fractions. Its unit matches the interval definition. `categorize_age()` returns an `age_group`
+with ordered categories and their interval definitions. This completes a quick
+calculate–define–categorize workflow. The following section carries those same
+steps into an analysis where precision, missing data, and documentation matter.
+
+## An age workflow for an analysis
+
+We will prepare a frequency table of age groups for illness episodes with onset
+in January 2025. Each row is one episode, so the frequencies count episodes,
+not necessarily distinct people. Alongside the table, we will retain the
+record-level assignments, date-review counts, and scheme definition.
+
+### Decide what each record and its age represent
+
+Each record has a unique ID. Assume that case eligibility and duplicate checks
+have already been completed, apart from the unresolved dates we review below.
+
+```{r records}
+# Create the example tibble.
+records <- tibble(
+  record_id = sprintf("E%02d", 1:10),
+  birth_date = as.Date(c(
+    "2020-01-16", "2020-01-15", "2010-06-01", "2000-08-20",
+    "1960-01-15", "1939-09-01", NA, "2025-02-01",
+    "1985-04-10", "2021-01-10"
+  )),
+  onset_date = as.Date(c(
+    rep("2025-01-15", 8), NA, "2025-01-20"
+  )),
+  report_date = as.Date(c(
+    rep("2025-01-22", 8), "2025-01-23", "2025-02-03"
+  ))
+)
+records
+```
+For this report, age will be defined as **age at symptom onset**, and inclusion
+in the month is based on onset date. A report date answers a different question:
+when the record reached the reporting system. An example of onset and reporting
+months is E10 where the onset was in January whereas the report month is
+February. E09 has no onset date, so we cannot establish its onset month or age
+at onset from these fields.
+
+The difference between using age at onset or age at report can also change the
+age group assigned. E01 turns five between onset and reporting; E02 is already
+five on the onset date. For example:
+
+```{r event-choice}
+records |>
+  slice(1:2) |>
+  transmute(
+    record_id,
+    age_at_onset = calculate_age(birth_date, onset_date, unit = "year"),
+    age_at_report = calculate_age(birth_date, report_date, unit = "year")
+  )
+```
+Using report date as a substitute for missing onset would mix two definitions of
+age. We will retain the missing onset for review instead. A real reporting
+protocol may specify a fallback date or a derived event date; document that rule
+before applying it.
+
+Retain the original dates if your analysis uses a derived date. This example
+uses onset alone throughout.
+
+### Separate date problems before calculating ages
+
+A missing date and a birth date after onset both prevent a usable age, but they
+call for different follow-up. Keep that distinction in a record-level status
+variable. The checks below give missing birth dates priority when several
+problems occur in the same record.
+
+```{r date-review}
+records <- records |>
+  mutate(date_status = case_when(
+    is.na(birth_date) ~ "Missing birth date",
+    is.na(onset_date) ~ "Missing onset date",
+    birth_date > onset_date ~ "Birth after onset",
+    TRUE ~ "Ready"
+  ))
+records |> count(date_status, name = "records")
+
+# Display the records where there is a date problem.
+records |>
+  filter(date_status != "Ready") |>
+  select(record_id, birth_date, onset_date, date_status)
+```
+E07 needs a birth date, E08 needs its birth or onset date sequence corrected,
+and E09 needs an onset date. We will keep all three records in the audit trail
+without assigning them an age group. We cannot infer a correction from these
+values alone.
+
+```{r calculate-ages}
+reviewed_ages <- records |>
+  filter(date_status == "Ready") |>
+  transmute(
+    record_id,
+    age_at_onset = calculate_age(birth_date, onset_date, unit = "year")
+  )
+records <- records |>
+  left_join(reviewed_ages, by = "record_id")
+```
+Only the reviewed date pairs enter `calculate_age()`. Reversed pairs would
+otherwise return missing ages and issue a warning under its default policy.
+The review gives those missing results a reason we can carry into the report.
+
+We calculate calendar years. For February 29 births, the default anniversary in
+non-leap years is March 1; use `leap_day = "feb28"` if that is your reporting
+rule. Record this choice with the analysis. Printing shows completed years,
+but the calculated ages retain fractions.
+
+### Keep fractional ages until the groups are assigned
+
+The quick workflow used completed years. For whole-year boundaries, discarding
+the fraction does not change membership: both 4 and 4.9 belong below 5. But an
+integer no longer tells us how far someone has progressed through that year.
+That matters when a boundary falls within a year.
+
+```{r fractional-ages}
+records |>
+  filter(date_status == "Ready") |>
+  transmute(
+    record_id,
+    completed_years = as.integer(age_at_onset),
+    fractional_years = round(as.numeric(age_at_onset), 4)
+  )
+```
+
+E01 is just short of five at onset; E02 is exactly five. The `age` display uses
+completed years, while the stored values keep that distinction. Rounding here
+is only for inspection; pass the original ages to classification.
+
+For a short illustration of a fractional boundary, compare two ages around
+4.5 years:
+
+```{r fractional-boundary}
+example_ages <- age(c(4.4, 4.6), unit = "year")
+half_year_intervals <- age_interval(breaks = c(0, 4.5, Inf), unit = "year")
+tibble(
+  stored_years = as.numeric(example_ages),
+  using_fractions = categorize_age(example_ages, by = half_year_intervals),
+  after_truncating = categorize_age(
+    age(as.integer(example_ages), unit = "year"), by = half_year_intervals
+  )
+)
+```
+
+The stored ages belong to different groups. Truncating both to 4 puts them in
+the lower group and loses the information needed to recover the assignment.
+Keep fractions when you may need finer boundaries later. If the analysis needs
+calendar months, calculate age in months from the dates rather than assuming
+a fixed number of days per month or an exact conversion from fractional years.
+
+### Move from preset cut points to documented definitions
+
+The quick example used `age_interval_presets$Yr.5`, a numeric vector of cut
+points. Numeric presets use the ages' unit; they do not carry their own unit or
+source metadata. An `age_interval` adds explicit bounds, a unit, and optional
+category names. An `age_scheme` contains those intervals together with their
+purpose and provenance.
+
+The registry offers scheme versions of the historical presets:
+
+```{r preset-scheme}
+five_year_scheme <- get_age_scheme("legacy_yr_5")
+scheme_intervals(five_year_scheme)
+five_year_scheme[c("id", "source", "version", "verified")]
+
+records |>
+  transmute(
+    record_id,
+    five_year_group = categorize_age(age_at_onset, by = five_year_scheme)
+  )
+```
+
+These schemes declare years and record the known source history. They are
+unverified legacy definitions, not claims of current institutional authority.
+Check the applicable specification before adopting one. For this report we
+will instead document our own illustrative boundaries and the reason for them.
+
+### Document reusable age groups with an age scheme
+
+An `age_scheme` contains named age intervals together with descriptive metadata
+and provenance. Use `age_scheme()` when a definition needs to be reused or
+explained beyond the current calculation. For the `age_scheme` class model, see [The age_scheme
+class](v03-classes.html#the-age_scheme-class-a-reusable-definition-with-context).
+
+A saved scheme lets later reports reuse the same intervals, labels and unit,
+while carrying their source, version and purpose. Supplying that scheme to
+`categorize_age()` applies its intervals; it does not attach all of the scheme's
+metadata to each assignment. Keep the scheme with the analysis.
+
+Our illustrative report uses six age groups covering all ages in
+years. A single scheme keeps the named intervals together with the purpose and
+source of the definition. You can replace these groups with the applicable specification
+in a real reporting system.
+
+```{r reporting-scheme}
+reporting_intervals <- age_interval(breaks = c(0, 5, 18, 45, 65, 85, Inf), unit = "year")
+names(reporting_intervals) <- c("Under 5", "5–17", "18–44", "45–64", "65–84", "85+")
+reporting_scheme <- age_scheme(
+  reporting_intervals,
+  id = "example_onset_report",
+  name = "Illustrative onset reporting age groups",
+  type = "partition",
+  domain = c(0, Inf),
+  purpose = "Count illness episodes by age at symptom onset",
+  source = "Synthetic example in the age workflow vignette",
+  version = "Teaching example 1",
+  notes = "Not an official surveillance classification; ages measured in years."
+)
+scheme_intervals(reporting_scheme)
+```
+The age intervals include the lower bound and exclude the upper bound. Under 5 in
+interval notation means `[0, 5)` years, and 5–17 means `[5, 18)`. E02 belongs to
+5–17 on its fifth birthday. E01 remains Under 5 at onset, even though its age at
+report would put it in the next age group.
+
+### Check coverage before counting
+
+To produce additive counts, we need both complete coverage of our intended age
+domain and non-overlapping age groups. Check these independently.
+
+```{r coverage-check}
+coverage <- summary(reporting_scheme)
+coverage[c("domain", "domain_inferred", "complete", "overlaps")]
+coverage$gaps
+stopifnot(isTRUE(coverage$complete), !coverage$overlaps)
+```
+The domain (ages covered) is explicitly `[0, Inf)` years, completeness is TRUE,
+and overlaps are FALSE: these age groups form a partition of that domain. An
+explicit domain makes our intended coverage part of the check. The `age_scheme`
+constructor with `type = "partition"` rejects interval overlap but permits gaps,
+so the completeness check still matters.
+
+Overlapping age interval definitions can be valid schemes for other purposes. Selecting the first match would
+resolve a software ambiguity, but would not establish a justified reporting rule. For intentionally overlapping
+memberships, see [Creating and using reusable age schemes](v07-age-schemes.html).
+
+### Assign age groups and account for every record
+
+We can now classify the ages using the documented scheme. Explicitly requiring
+matching units avoids a conversion during this step.
+
+```{r assign-groups}
+records <- records |>
+  mutate(
+    age_group = categorize_age(
+      age_at_onset, by = reporting_scheme,
+      multiple = "error", convert_units = "none"
+    ),
+    report_status = case_when(
+      date_status != "Ready" ~ date_status,
+      is.na(age_group) ~ "Age outside reporting groups",
+      TRUE ~ "Included"
+    )
+  )
+records |> select(record_id, age_at_onset, age_group, report_status)
+```
+A missing assignment alone cannot tell us whether dates were missing, dates were
+invalid, or a usable age fell outside the definition. `report_status` preserves
+those explanations. With these complete age groups, none of the seven usable
+ages should be outside the definition.
+
+```{r record-accounting}
+accounting <- records |>
+  count(status = report_status, name = "records")
+accounting
+stopifnot(sum(accounting$records) == nrow(records))
+```
+Seven records are included and three need date review. The missing-onset record
+also has unresolved reporting-period eligibility. Keep these review counts
+alongside the frequency table; omitting missing assignments silently would hide why
+only seven of the ten input records contribute.
+
+### Build a frequency table of age groups
+
+The `age_group` result retains all defined levels, including age groups with no
+observations. `count(..., .drop = FALSE)` therefore includes the empty 45–64 age
+group. A zero means no included episodes in that age group; it does not mean the
+definition was absent.
+
+```{r reporting-table}
+age_report <- records |>
+  filter(report_status == "Included") |>
+  count(age_group, name = "episodes", .drop = FALSE)
+age_report
+stopifnot(sum(age_report$episodes) == sum(records$report_status == "Included"))
+```
+The frequency table has two episodes Under 5, two aged 5–17, one aged 18–44, none aged
+45–64, one aged 65–84, and one aged 85 or older. These counts sum to the seven
+included records. Retain `records` for record-level review and
+`reporting_scheme` for the boundaries and provenance: the assignment vector
+alone does not retain the original ages or the scheme's provenance.
+
+### Choose intervals that answer the analysis question
+
+A frequency table of age groups depends on the boundaries chosen. Our Under 5
+group pools infants with children aged 1–4; that may be too broad if infancy is
+central to the question. Five-year bands and broad child/adult groups preserve
+different distinctions even when applied to the same records. Labels alone do
+not establish that two reports used the same bounds or units.
+
+See [Choosing age groups for an analysis](v06-age_scheme_selection.html) for a
+worked comparison of schemes, what pooling can conceal, and how denominator
+availability and precision affect the choice. A scheme records that decision;
+its validation does not establish that the decision suits the analysis.
+
+### Interpret counts before calculating rates
+
+The table describes the age distribution of included episodes in this example. A
+larger count in one age group does not by itself imply greater disease risk: the
+population in that age group may also be larger. Population rates need
+appropriate denominators for the same geography, period, age-attribution rules
+and age groups, with a numerator that matches the rate's definition. The records
+needing date review can also affect the apparent age distribution.
+
+Before using external population counts, check their units, boundaries and
+coverage against the reporting scheme. A denominator for ages 0–9 cannot be
+split into Under 5 and 5–9 from interval overlap alone. Likewise, overlapping
+categories cannot be summed as if each person appeared exactly once. See
+[Comparing age intervals](v08-age-range-comparisons.html) for what crosswalks
+can establish and where additional data or assumptions are needed.
+
+### Cite the scheme used in the analysis
+
+The frequency table uses `reporting_scheme`, so that is the definition to cite.
+Export its recorded metadata with the standard `utils::toBibtex()` generic:
+
+```{r scheme-citation}
+scheme_citation <- reporting_scheme |> utils::toBibtex()
+scheme_citation
+```
+
+The result is a BibTeX `@Misc` entry whose key is the scheme ID,
+`example_onset_report`. Its title, source, version, purpose, and notes identify
+the definition used. Unknown reference information remains explicit; export
+does not invent an author or publication year or verify the source. Here the
+entry identifies our synthetic teaching definition, not an official standard.
+
+For a published scheme, record its actual source, reference, and edition before
+exporting the citation. Cite the scheme used, including any documented
+adaptation, rather than only the name of a preset. The citation supplies
+bibliographic context; keep the scheme object as well to preserve its exact
+intervals. Package attribution is separate and is available through
+`citation("agecraft")`.
+
+### Keep the frequency table and its documentation together
+
+The seven included episodes are accounted for in the frequency table; three
+records remain available for date review. The assignments retain interval
+definitions, but they do not retain the scheme's provenance or the original
+ages. Keep those objects together rather than relying on a printed table alone.
+
+```{r analysis-bundle}
+analysis_result <- list(
+  frequency_table = age_report,
+  record_accounting = accounting,
+  records = records,
+  scheme = reporting_scheme,
+  scheme_citation = scheme_citation,
+  age_calculation = list(
+    reference = "Symptom onset date; no fallback for missing onset",
+    unit = "year",
+    leap_day = "mar1",
+    period = "January 2025"
+  ),
+  package_version = as.character(utils::packageVersion("agecraft"))
+)
+analysis_result$scheme[c("id", "name", "purpose", "source", "version", "notes")]
+```
+
+The bundle keeps the frequency table beside the data, the exact intervals,
+their purpose and source, and the age calculation choices. To retain the R
+objects between sessions, save the bundle with `saveRDS()`; a CSV export of the
+frequency table alone will not preserve that context.
+
+```{r save-analysis, eval=FALSE}
+saveRDS(analysis_result, "age-workflow-result.rds")
+writeLines(as.character(scheme_citation), "age-workflow-scheme.bib")
+```
+
+These save calls are not run during vignette rendering because they write files
+for your analysis. The `.bib` file can be used in a report bibliography. Choose
+an appropriate project location when saving either file.
+
+For more on assignments, see [Working with assigned age groups](v05-age-groups.html).
+For source metadata and later adaptations of a definition, continue with
+[Creating and using reusable age schemes](v07-age-schemes.html).

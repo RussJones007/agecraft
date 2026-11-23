@@ -1,6 +1,10 @@
 ---
 title: "08. Comparing age intervals"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+    css: !expr c(system.file("rmarkdown/templates/html_vignette/resources/vignette.css", package = "rmarkdown"), "vignette.css")
 vignette: >
   %\VignetteIndexEntry{08. Comparing age intervals}
   %\VignetteEngine{knitr::rmarkdown}

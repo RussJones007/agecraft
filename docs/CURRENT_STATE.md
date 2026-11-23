@@ -1,3 +1,28 @@
+# Vignette navigation and age workflow — 2026-11-22
+
+All eight HTML vignettes include a shared right-margin table of contents on
+screens at least 1100px wide. Narrow screens and print use an in-flow TOC.
+The shared stylesheet retains the standard rmarkdown vignette appearance and
+keeps figures and wide tables within the reading column.
+
+Vignette 02 is `v02-age-workflow` (formerly `v02-age-reporting-workflow`). Its two
+main sections cover a quick completed-year calculation and grouping workflow,
+then a deeper analysis using fractional ages, date review, presets, a documented
+scheme, coverage checks, and a frequency table of age groups. A saved analysis
+bundle retains record assignments, review counts, the scheme and calculation
+choices. The vignette links to `v06-age_scheme_selection` for choosing boundaries.
+README navigation follows the new filename; direct vignette calls must use it.
+No package APIs or calculation behavior changed.
+
+Validation: all eight vignettes rendered with executable examples, and the source
+package built with vignettes. Browser checks covered 1440, 1100, 1099, 768 and
+390px widths, TOC anchors/navigation, and print positioning. Wide and narrow
+screenshots were inspected. Logs: `/tmp/agecraft-vignette-render.log` and
+`/tmp/agecraft-vignette-build.log`. No package test suite was run for this
+vignette-only change.
+
+---
+
 # Reporting workflow and terminology — 2026-11-22
 
 Development version: **0.1.0.9025**. Reference help distinguishes interval

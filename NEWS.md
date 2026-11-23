@@ -1,5 +1,10 @@
 # agecraft 0.1.0.9025
 
+- Add a right-margin table of contents to each HTML vignette, with an in-flow
+  layout on narrow screens and in print. Rename vignette 02 to
+  `v02-age-workflow` and organize it into a quick workflow and a deeper analysis
+  covering fractional ages, schemes, provenance, and a frequency table of age groups.
+
 - Clarify that age intervals and schemes may overlap, that completeness is
   relative to an explicit or inferred domain, and that a mathematical partition
   requires both complete coverage and non-overlap. Preserve existing validation

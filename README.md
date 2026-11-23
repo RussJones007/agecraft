@@ -59,7 +59,7 @@ For development in the repository, use `devtools::load_all()`.
 | Guide | What it covers |
 |:---|:---|
 | [Getting started](vignettes/v01-getting-started.Rmd) | A beginner workflow: dates, output choices, supplied groups, names, and tables |
-| [Age reporting workflow](vignettes/v02-age-reporting-workflow.Rmd) | A worked report: event dates, date review, scheme coverage, counts, and interpretation |
+| [Age workflow](vignettes/v02-age-workflow.Rmd) | Quick age calculation and grouping, followed by a documented analysis and frequency table of age groups |
 | [Understanding ages, intervals, groups, and schemes](vignettes/v03-classes.Rmd) | The four main classes and how they work together |
 | [Comparing age intervals](vignettes/v08-age-range-comparisons.Rmd) | Crosswalks, membership, ordering, age gaps, and interval coverage |
 

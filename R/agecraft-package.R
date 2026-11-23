@@ -71,6 +71,7 @@
 #' @importFrom vctrs field
 #' @importFrom rlang %||%
 #' @importFrom purrr compose attr_getter pluck
+#' @importFrom dplyr select filter mutate group_by summarise between case_when replace_when
 #' @importFrom Rcpp evalCpp
 #' @importFrom stringr str_extract str_detect str_replace str_to_lower str_trim regex
 #' @useDynLib agecraft, .registration = TRUE

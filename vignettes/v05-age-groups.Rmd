@@ -1,6 +1,10 @@
 ---
 title: "05. Working with assigned age groups"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+    css: !expr c(system.file("rmarkdown/templates/html_vignette/resources/vignette.css", package = "rmarkdown"), "vignette.css")
 vignette: >
   %\VignetteIndexEntry{05. Working with assigned age groups}
   %\VignetteEncoding{UTF-8}
