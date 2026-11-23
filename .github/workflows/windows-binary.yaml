@@ -28,14 +28,14 @@ jobs:
       - name: Build source archive
         shell: pwsh
         run: |
-          R CMD build .
+          R.exe CMD build .
 
       - name: Build Windows binary from source archive
         shell: pwsh
         run: |
           $source = Get-ChildItem -File -Filter 'agecraft_*.tar.gz' | Select-Object -First 1
           if (-not $source) { throw "Source archive not found" }
-          R CMD INSTALL --build $source.FullName
+          R.exe CMD INSTALL --build $source.FullName
           if ($LASTEXITCODE -ne 0) { throw "Windows binary build failed" }
 
       - name: Upload Windows binary
