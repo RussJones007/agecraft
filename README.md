@@ -1,4 +1,4 @@
-# agecraft <img src="man/figures/agecraft_archtect_lifestage.png" alt="agecraft logo" align="right" height="140"/>
+# agecraft <img src="man/figures/logo.png" alt="agecraft logo" align="right" height="140"/>
 
 ![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)
 
