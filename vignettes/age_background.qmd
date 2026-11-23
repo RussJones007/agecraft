@@ -1,0 +1,184 @@
+---
+title: "Understanding Age: Cultural Conventions, Measurement, and Data Quality"
+subtitle: "Cultural reckoning, demographic evidence, and epidemiological interpretation"
+format:
+  html:
+    toc: true
+    footnotes-hover: true
+bibliography: understanding-age-revised.bib
+link-citations: true
+---
+
+## Introduction
+
+Age is among the most familiar variables in human data and among the easiest to misunderstand. A reported age of 40 may mean 40 completed years since birth, a count that began at one and advanced at a shared New Year, an approximate age inferred from social position, or a number supplied by someone other than the individual concerned. These distinctions matter when interpreting historical records, comparing populations, and constructing epidemiologic denominators. This vignette examines age as a cultural convention, a measurement, and a potentially imperfect observation. It is not a claim that **agecraft** implements every convention described here.
+
+## What exactly is being counted?
+
+*Chronological age* describes elapsed time since birth. In contemporary demographic practice, age in completed years ordinarily begins at zero at birth and advances on birthdays. For a person who has not yet reached their next birthday, the number of completed years is lower than the difference between the observation year and birth year. The convention is therefore not simply a rounding operation on a decimal number of years: it is a calendar-based rule.
+
+Age can also mean biological condition, developmental stage, legal eligibility, or socially recognized seniority. These constructs are related but not interchangeable. A legal threshold may depend on an exact birthday, whereas a social transition may depend on an initiation ceremony or an institution's classification. The first question in any analysis should therefore be: *Age according to which definition, and as of what date?*
+
+## Different traditions of age reckoning
+
+### Completed years and the birthday convention
+
+In the internationally widespread completed-years convention, a newborn is age zero; age increases by one on each anniversary of birth. A child born on 31 December remains age zero on 1 January. In epidemiologic datasets, a person's age at diagnosis may differ from age at symptom onset, specimen collection, or interview. A reference event is part of the definition of the variable, not a technical afterthought.
+
+### Traditional East Asian reckoning
+
+Historical population records from China, Japan, and Korea include a traditional reckoning described as *sui*, *sai*, and *se*, respectively. Under the convention described for these records, a child begins at one and advances at Lunar New Year rather than on their birthday. Researchers comparing these registers with Western-style age data have warned that exact conversion is impossible without sufficiently reliable dates of birth.[^1]
+
+[^1]: @eastasia2015, especially note 17 on *sui/sai/se* and the limits of conversion.
+
+Consider a child born shortly before Lunar New Year. The child may be counted as two shortly afterward despite having lived only a few days. This is not the same as rounding an exact elapsed age upward to the nearest integer. The starting value and the date of increment both differ.
+
+Traditional reckoning should not be confused with contemporary national administrative practice. South Korea's 2023 legal reforms standardized birthday-based age in major areas of civil and administrative law, although particular age rules remain for specified purposes.[^2] Likewise, historical Japanese or Chinese conventions should not be presumed to describe every modern official dataset.
+
+[^2]: @yonhap2023, reporting the June 2023 legal transition and exceptions.
+
+### Social age, age sets, and age grades
+
+In some societies, age organizes social roles as well as elapsed time. Anthropological accounts of Maasai age organization distinguish an *age set*, a cohort with an enduring shared identity, from an *age grade*, a social status through which members progress. Initiation and collective transitions may determine the social meaning of age more directly than a precisely known birthday.[^3] Research on Turkana age-set institutions likewise shows how age organization can structure relationships beyond kinship.[^4]
+
+[^3]: @spencer1993, discussion of the distinction between age sets and age grades.
+
+[^4]: @lienard2016, analysis of Turkana age-set organization.
+
+Such systems are not alternative formulas for computing completed years. They represent different variables. An age-set designation may be informative about approximate birth cohorts or life-course position, but translating it into a single exact age without additional evidence would create false precision.
+
+## Age groups are analytic choices, not natural units
+
+Age is often published in single years, five-year bands, ten-year bands, or special categories such as under one year, ages 1–4, and ages 85 and over. A United Nations review documented substantial international variation in the boundaries and terminal ages used for reporting, with consequences for comparability.[^5]
+
+[^5]: @un2003, paragraphs 84–88 on recommended and observed age groupings.
+
+An age interval such as 5–9 completed years includes everyone from their fifth birthday until just before their tenth. Its mathematical representation can be a left-closed, right-open interval, $[5,10)$, provided the underlying variable is age in completed years. In contrast, a label such as “school age” is context-dependent and may not map to the same interval across jurisdictions or time.
+
+The distinction between an *age-reckoning system* and an *age-grouping scheme* is essential. Changing the age calculation changes which value a person receives; changing a grouping scheme changes how already defined values are classified. Neither operation repairs an uncertain date of birth.
+
+## Why reported ages can be unreliable
+
+### Approximation and age heaping
+
+When a respondent does not know an exact birth date or age, they may report an attractive round number, particularly one ending in zero or five. The resulting excess frequencies are called *age heaping*. The Whipple index summarizes preference for ages ending in zero and five over a conventional adult-age range. A value near 100 indicates little such preference; larger values indicate stronger heaping. It does not, by itself, establish why particular ages were reported.[^6]
+
+[^6]: @jensen2023, including the Whipple-index comparison and age-only responses.
+
+The United States Census Bureau reported a Whipple index of 105.9 for the 2020 Census, compared with 102.2 in 2010. Crucially, its analysis found much stronger heaping among responses supplying age without date of birth, particularly in proxy-response contexts. This demonstrates that even in settings with extensive civil registration, collection method and respondent knowledge affect age quality.[^7]
+
+[^7]: @jensen2023, including the Whipple-index comparison and age-only responses.
+
+### Missing documentation and administrative persistence
+
+Some errors arise before analysis begins: incomplete birth registration, inaccurate transcription, estimated birth years, or failure to record deaths. Other errors emerge when separate registers are not reconciled. A person remaining in an administrative population after death is not a living person of extraordinary age; the record is a failure of population-status ascertainment.
+
+A Thai investigation illustrates the scale such problems can reach. Of 358 registered presumed centenarians examined, only 53 were found alive. Among 45 surviving people contacted in person, 20 were confirmed to be at least 100. The investigators identified failure to notify authorities of deaths as a leading contributor to the inflated registry count.[^8] This finding should not be generalized automatically to Thailand as a whole or to other countries: it concerns the investigated sample and the underlying registration system.
+
+[^8]: @chuanwan2020, abstract and results of the verification study.
+
+Financial incentives may sometimes motivate intentional misreporting or concealment of deaths, but discrepancies alone do not establish fraud. The distinction between administrative delay, error, uncertainty, and deliberate deception is both analytically and ethically important.
+
+### The special challenge of extreme longevity
+
+Age errors have disproportionate consequences in the oldest age groups because the true number of survivors becomes small. An incorrect birth year or an unremoved death record can therefore materially distort the apparent prevalence of centenarians and the shape of late-life mortality rates. Independent verification typically seeks early-life records and corroborating documentation, not merely a recent identity document.[^9]
+
+[^9]: @perls1999, methods and findings on centenarian validation.
+
+Importantly, verification does not always overturn longevity claims. A study of a subset of Okinawan centenarians found substantial agreement between reported and documented ages and concluded that the registration system examined was reliable.[^10] The appropriate lesson is neither universal skepticism nor uncritical acceptance, but evidence-based validation.
+
+[^10]: @okinawa2008, age-validation study and demographic consistency checks.
+
+## Age in epidemiology: measurement, classification, and interpretation
+
+Age is often one of the first variables examined in epidemiology, but its analytic role changes with the question. It may approximate biological maturation or senescence, mark time available for cumulative exposures, index historical circumstances experienced by a birth cohort, or determine eligibility for services. These meanings should not be collapsed into a single causal interpretation. An association between disease and chronological age does not, by itself, establish that the passage of time is the causal exposure.
+
+### Age at which event?
+
+A surveillance record may contain age at symptom onset, diagnosis, laboratory collection, notification, hospitalization, or death. These can differ, especially around birthdays or during prolonged illnesses. For a disease with a narrow age-specific case definition, the choice may alter case classification. A rate calculation must also reconcile the event-time definition of the numerator with the population-time represented by its denominator. A case occurring before a birthday and one occurring after it need not belong to the same completed-year age category, even within the same reporting year.
+
+In cohort studies, baseline age and *attained age* are different. Attained age changes throughout follow-up; baseline age does not. An individual who enters observation at 49 and experiences an event at 52 contributes time across different ages. Treating everyone as permanently belonging to their baseline age group can misallocate person-time. Korn, Graubard, and Midthune discuss the choice of attained age versus time since study entry as the underlying time scale for proportional-hazards models, emphasizing that the choice has substantive consequences.[^11]
+
+[^11]: @korn1997, especially the discussion of attained age and time-on-study as analysis time scales.
+
+### Why age groups are useful—and what they conceal
+
+Categories are useful for surveillance dashboards, confidentiality protection, communication, and comparisons with published denominators. Their boundaries may reflect developmental biology, eligibility rules, or reporting conventions. Infants may require days, weeks, or months; school-aged populations may follow programmatic thresholds; and mortality at older ages may warrant more detail than an open-ended category such as 65 years and older. There is no universally optimal set of age bands.
+
+Yet grouping also discards information. An age interval treats individuals on opposite sides of a boundary as categorically different, while treating individuals far apart within a broad band as equivalent. Dichotomizing at 65 years, for instance, imposes an abrupt change at a threshold that may have no corresponding biological discontinuity. Altman and Royston describe the statistical costs of dichotomization, and Bennette and Vickers explain why even seemingly objective quantile categories can distort continuous exposure–outcome relationships.[^12]
+
+[^12]: @altman2006; @bennette2012. The first addresses dichotomization; the second discusses quantile grouping and flexible alternatives.
+
+This does not mean that published age-group rates are inherently inappropriate. Rather, the **purpose of categorization should be explicit**. A tabulation designed for communication may legitimately use stable, familiar bands; an etiologic model may be better served by retaining continuous age and modeling a nonlinear association with splines or other flexible methods. Analysts should also avoid selecting cutpoints solely because they maximize statistical significance.
+
+### Age standardization and comparability
+
+Two populations with identical age-specific mortality rates may have different crude mortality rates if one has more older residents. Conversely, similar crude rates can conceal substantial differences within age strata. Direct age standardization applies the populations' age-specific rates to a common standard population, producing a weighted summary that is useful for comparison. The standardized rate is a hypothetical comparative measure, not the observed crude risk in either population.
+
+Age categories and the standard population must be aligned. A numerator tabulated as ages 0–4, 5–14, and 15–24 cannot be combined mechanically with denominators in five-year bands without a defensible reconciliation. Open-ended upper groups can be especially consequential when the age distributions or mortality rates of the oldest populations differ. Clayton and Schifflers connect conventional age standardization to models of temporal variation in disease rates and illustrate why age must be accounted for when comparing periods and cohorts.[^13]
+
+[^13]: @clayton1987a; @clayton1987b, including the identifiability problem in age–period–cohort models.
+
+### Age, period, and cohort
+
+Age, calendar period, and birth cohort provide three perspectives on disease occurrence. An *age effect* describes differences associated with position in the life course; a *period effect* is associated with a historical interval affecting multiple ages; and a *cohort effect* reflects circumstances shared by people born around the same time. For example, a change in diagnostic testing may create a period effect, while early-life exposure patterns may generate cohort differences.
+
+Their interpretation is difficult because birth cohort, period, and age are linked by the identity *cohort = period − age*. The three components cannot be estimated as fully independent linear trends without additional constraints or assumptions. Clayton and Schifflers' paired methodological papers remain instructive discussions of this identifiability problem and the risk of overinterpreting fitted patterns.[^14] Age groups and calendar periods can also create artificial apparent cohort bands when boundaries do not align.
+
+[^14]: @clayton1987a; @clayton1987b, including the identifiability problem in age–period–cohort models.
+
+### Measurement error in age-specific rates
+
+Age misstatement can move cases or population members between adjacent groups. When numerator and denominator age information come from different systems, the errors need not cancel. Heaping at ages ending in zero or five may produce sawtooth patterns in single-year counts. At the oldest ages, an erroneous birth year or an unrecorded death can substantially inflate the denominator, distort mortality estimates, or create implausible longevity claims. At younger ages, inaccurate age or birth dates can alter vaccination eligibility or the classification of age-dependent disease outcomes.
+
+These are reasons to examine the provenance of age data before choosing a finer resolution. Publishing single-year rates from imprecise ages may create the appearance of accuracy without improving inference. Where uncertainty is substantial, sensitivity analyses, broader groupings, explicit missingness, or probabilistic methods may be preferable to silently assigning exact ages.
+
+## Implications for epidemiology and computational work
+
+An epidemiologic age variable should ideally document its source, reference date, reckoning convention, precision, and any imputation. “Age 65” derived from a verified birth date is not equivalent in evidentiary quality to “about 65” reported by a neighbor. This matters for age-specific incidence and mortality, cohort comparisons, age standardization, and analyses of extreme longevity.
+
+For agecraft, these observations suggest a useful separation of concerns. Calendar-aware functions can calculate completed age from dates; intervals and schemes can classify a defined age; and analysts can retain metadata about uncertainty and provenance. A historical *sui* value might sometimes be transformed approximately for a particular analysis, but without reliable dates the transformation should remain explicitly approximate. A socially defined age grade should generally be retained as its own categorical variable rather than presented as an exact chronological age.
+
+**The central principle is simple:** before computing with age, establish what was counted, when it was counted, who supplied the information, and how certain the observation is.
+
+## Further reading
+
+The following works are especially useful starting points for readers who wish to go beyond the examples in this vignette. Their inclusion is for their methodological or historical value, not because agecraft implements all of their subject matter.
+
+- **Age categorization and modeling:** Bennette and Vickers provide an accessible methodological argument against routine quantile categorization; Altman and Royston offer a concise introduction to the costs of dichotomizing continuous predictors.[^15]
+- **Time scales in longitudinal epidemiology:** Korn, Graubard, and Midthune explain why attained age may be a more appropriate analysis clock than time since enrollment for many longitudinal questions.[^16]
+- **Age–period–cohort interpretation:** Clayton and Schifflers' two-part treatment connects age-standardized rates to temporal models and explains their fundamental identification limitations.[^17]
+- **Population data quality:** The U.S. Census Bureau's age-heaping analysis gives a contemporary example of how response mode and age reporting influence apparent age distributions.[^18]
+- **Historical and social meanings of age:** Historical East Asian population research and anthropological accounts of Maasai and Turkana age organization show why the definition of age must precede its computation.[^19][^20][^21]
+- **Validation at extreme ages:** The Thailand, New England, and Okinawa studies offer contrasting case studies in checking claims of exceptional longevity.[^22][^23][^24]
+
+[^15]: @altman2006; @bennette2012. The first addresses dichotomization; the second discusses quantile grouping and flexible alternatives.
+
+[^16]: @korn1997, especially the discussion of attained age and time-on-study as analysis time scales.
+
+[^17]: @clayton1987a; @clayton1987b, including the identifiability problem in age–period–cohort models.
+
+[^18]: @jensen2023, including the Whipple-index comparison and age-only responses.
+
+[^19]: @eastasia2015, especially note 17 on *sui/sai/se* and the limits of conversion.
+
+[^20]: @spencer1993, discussion of the distinction between age sets and age grades.
+
+[^21]: @lienard2016, analysis of Turkana age-set organization.
+
+[^22]: @chuanwan2020, abstract and results of the verification study.
+
+[^23]: @perls1999, methods and findings on centenarian validation.
+
+[^24]: @okinawa2008, age-validation study and demographic consistency checks.
+
+## Source verification and editorial status
+
+This is a research draft, not a completed systematic review. The epidemiological journal references newly added in this revision were checked against journal or PubMed publication records, including their titles, authors, dates, and abstracts or accessible article text. Older citations carried forward from the initial draft have **not all been independently rechecked in this revision**; several bibliographic records remain incomplete. Accordingly, page-specific historical assertions and the older bibliography should be verified against the full original sources before publication. A reference should not be treated as full-text verified solely because its abstract or publisher listing was consulted. The source-audit companion file identifies outstanding work.
+
+## Notes
+
+## References
+
+::: {#refs}
+:::
