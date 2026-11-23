@@ -1,8 +1,6 @@
 # Based on https://github.com/r-lib/actions/tree/v2/examples
 name: R-CMD-check
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 permissions:
   contents: read
