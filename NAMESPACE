@@ -132,6 +132,16 @@ export(valid_age_interval_symbol)
 export(validate_age_scheme)
 importFrom(Rcpp,evalCpp)
 importFrom(assertthat,assert_that)
+importFrom(dplyr,
+  between,
+  case_when,
+  filter,
+  group_by,
+  mutate,
+  replace_when,
+  select,
+  summarise
+)
 importFrom(generics,
   as.factor,
   as.ordered
